@@ -1,0 +1,22 @@
+{
+  "name": "megacorp",
+  "version": "1.0.0",
+  "description": "A monopoly-like game",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sladewasinger/megacorp.git"
+  },
+  "author": "Austin Wasinger",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sladewasinger/megacorp/issues"
+  },
+  "homepage": "https://github.com/sladewasinger/megacorp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
