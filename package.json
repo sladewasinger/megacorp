@@ -2,9 +2,9 @@
   "name": "megacorp",
   "version": "1.0.0",
   "description": "A monopoly-like game",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/sladewasinger/megacorp#readme",
   "dependencies": {
-    "express": "^4.18.2"
-  }
+    "express": "^4.18.2",
+    "socket.io": "^4.5.3"
+  },
+  "type": "module"
 }

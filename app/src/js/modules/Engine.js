@@ -1,5 +1,7 @@
+import { io } from "socket.io-client";
+
 export class Engine {
   constructor() {
-    console.log("The engine is running!");
+    var socket = io();
   }
 }
