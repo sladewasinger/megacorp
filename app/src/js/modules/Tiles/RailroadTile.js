@@ -1,18 +1,20 @@
+const PIXI = window.PIXI;
+
 export class RailroadTile {
   constructor(title, color, price) {
     this.title = title;
     this.title = this.title
-      .split(" ")
+      .split(' ')
       .map((word) => {
-        let newWord = "";
+        let newWord = '';
         const maxLength = 9;
         while (word.length > 11) {
-          newWord += word.substr(0, maxLength) + "-\n";
+          newWord += word.substr(0, maxLength) + '-\n';
           word = word.substr(maxLength);
         }
         return newWord + word;
       })
-      .join(" ");
+      .join(' ');
 
     this.color = color;
     this.price = price;
@@ -32,18 +34,19 @@ export class RailroadTile {
     tileContainer.addChild(this.tile);
 
     const title = new PIXI.Text(this.title, {
-      fontFamily: "Arial",
+      fontFamily: 'Arial',
       fontSize: 18,
       fill: 0x000000,
-      align: "center",
+      align: 'center',
       wordWrap: true,
-      wordWrapWidth: width,
+      wordWrapWidth: width
     });
     title.pivot.x = title.width / 2;
     title.x = width / 2;
     tileContainer.addChild(title);
 
-    const image = new PIXI.Sprite.from("src/assets/railroad.png");
+    // eslint-disable-next-line new-cap
+    const image = new PIXI.Sprite.from('src/assets/railroad.png');
     image.width = 69;
     image.height = 50;
     image.x = width / 2 - image.width / 2;
@@ -51,12 +54,12 @@ export class RailroadTile {
     tileContainer.addChild(image);
 
     const price = new PIXI.Text(`$${this.price}`, {
-      fontFamily: "Arial",
+      fontFamily: 'Arial',
       fontSize: 24,
       fill: 0x000000,
-      align: "center",
+      align: 'center',
       wordWrap: true,
-      wordWrapWidth: width,
+      wordWrapWidth: width
     });
     price.pivot.x = price.width / 2;
     price.x = width / 2;

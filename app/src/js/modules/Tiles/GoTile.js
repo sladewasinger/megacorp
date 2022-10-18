@@ -1,6 +1,6 @@
-export class GoTile {
-  constructor() {}
+const PIXI = window.PIXI;
 
+export class GoTile {
   draw(container, x, y, rotation = 0) {
     const tileContainer = new PIXI.Container();
 
@@ -13,13 +13,13 @@ export class GoTile {
     this.tile.endFill();
     tileContainer.addChild(this.tile);
 
-    const title = new PIXI.Text("Go", {
-      fontFamily: "Arial",
+    const title = new PIXI.Text('Go', {
+      fontFamily: 'Arial',
       fontSize: 24,
       fill: 0x000000,
-      align: "center",
+      align: 'center',
       wordWrap: true,
-      wordWrapWidth: width,
+      wordWrapWidth: width
     });
     title.pivot.x = title.width / 2;
     title.x = width / 2;

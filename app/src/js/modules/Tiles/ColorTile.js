@@ -1,18 +1,20 @@
+const PIXI = window.PIXI;
+
 export class ColorTile {
   constructor(title, color, price) {
     this.title = title;
     this.title = this.title
-      .split(" ")
+      .split(' ')
       .map((word) => {
-        let newWord = "";
+        let newWord = '';
         const maxLength = 9;
         while (word.length > 11) {
-          newWord += word.substr(0, maxLength) + "-\n";
+          newWord += word.substr(0, maxLength) + '-\n';
           word = word.substr(maxLength);
         }
         return newWord + word;
       })
-      .join(" ");
+      .join(' ');
 
     this.color = color;
     this.price = price;
@@ -38,12 +40,12 @@ export class ColorTile {
     tileContainer.addChild(colorBar);
 
     const title = new PIXI.Text(this.title, {
-      fontFamily: "Arial",
+      fontFamily: 'Arial',
       fontSize: 19,
       fill: 0x000000,
-      align: "center",
+      align: 'center',
       wordWrap: true,
-      wordWrapWidth: width,
+      wordWrapWidth: width
     });
     title.pivot.x = title.width / 2;
     title.x = width / 2;
@@ -51,12 +53,12 @@ export class ColorTile {
     tileContainer.addChild(title);
 
     const price = new PIXI.Text(`$${this.price}`, {
-      fontFamily: "Arial",
+      fontFamily: 'Arial',
       fontSize: 24,
       fill: 0x000000,
-      align: "center",
+      align: 'center',
       wordWrap: true,
-      wordWrapWidth: width,
+      wordWrapWidth: width
     });
     price.pivot.x = price.width / 2;
     price.x = width / 2;
