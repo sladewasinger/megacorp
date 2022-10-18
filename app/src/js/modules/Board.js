@@ -4,6 +4,7 @@ import { FreeParkingTile } from "./Tiles/FreeParkingTile.js";
 import { GoTile } from "./Tiles/GoTile.js";
 import { JailTile } from "./Tiles/JailTile.js";
 import { GoToJailTile } from "./Tiles/GoToJailTile.js";
+import { RailroadTile } from "./Tiles/RailroadTile.js";
 
 export class Board {
   constructor() {}
@@ -61,7 +62,11 @@ export class Board {
       this.incomeTax = new ColorTile("Income Tax", 0x000000, 0);
       this.incomeTax.draw(boardContainer, width - 150 - 100 * 4, height - 150);
 
-      this.readingRailroad = new ColorTile("Reading Railroad", 0x000000, 200);
+      this.readingRailroad = new RailroadTile(
+        "Reading Railroad",
+        0x000000,
+        200
+      );
       this.readingRailroad.draw(
         boardContainer,
         width - 150 - 100 * 5,
@@ -131,7 +136,7 @@ export class Board {
         Math.PI / 2
       );
 
-      this.pennsylvaniaRailroad = new ColorTile(
+      this.pennsylvaniaRailroad = new RailroadTile(
         "Pennsylvania Railroad",
         0x000000,
         200
@@ -190,7 +195,7 @@ export class Board {
       this.illinoisAvenue = new ColorTile("Illinois Avenue", 0xed1b24, 240);
       this.illinoisAvenue.draw(boardContainer, 150 + 100 * 3, 0, 0);
 
-      this.bAndORailroad = new ColorTile("B & O Railroad", 0x000000, 200);
+      this.bAndORailroad = new RailroadTile("B & O Railroad", 0x000000, 200);
       this.bAndORailroad.draw(boardContainer, 150 + 100 * 4, 0, 0);
 
       this.atlanticAvenue = new ColorTile("Atlantic Avenue", 0xfef200, 260);
@@ -248,7 +253,7 @@ export class Board {
         -Math.PI / 2
       );
 
-      this.shortLine = new ColorTile("Short Line", 0x000000, 200);
+      this.shortLine = new RailroadTile("Short Line", 0x000000, 200);
       this.shortLine.draw(
         boardContainer,
         width - 150,
