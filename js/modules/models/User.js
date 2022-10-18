@@ -1,8 +1,7 @@
 
 export class User {
-  constructor(socket) {
-    this.socket = socket;
-    this.id = socket.id;
+  constructor(socketId) {
+    this.id = socketId;
     this.name = null;
   }
 }

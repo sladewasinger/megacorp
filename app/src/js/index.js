@@ -1,4 +1,34 @@
 import { Engine } from './modules/Engine.js';
+const { createApp } = Vue;
 
-const engine = new Engine();
-engine.start();
+createApp({
+  data() {
+    return {
+      name: '',
+      engine: null,
+      lobbyId: null,
+    };
+  },
+  computed: {
+    user() {
+      return this.engine?.user;
+    },
+  },
+  mounted() {
+    this.engine = new Engine();
+    this.engine.start();
+  },
+  methods: {
+    registerName(e) {
+      e.preventDefault();
+      this.engine.registerUser(this.name);
+    },
+    createLobby() {
+      this.engine.createLobby(this.lobbyId);
+    },
+    joinLobby(e) {
+      e.preventDefault();
+      this.engine.joinLobby(this.lobbyId);
+    },
+  },
+}).mount('#app');

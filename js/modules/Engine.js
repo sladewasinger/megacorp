@@ -10,14 +10,14 @@ export class Engine {
   start() {
     console.log('Engine started');
     this.io.on('connection', (socket) => {
-      console.log('a user connected');
-      this.users.push(new User(socket));
+      console.log('user connected', socket.id);
+      this.users.push(new User(socket.id));
 
       socket.on('disconnect', () => this.userDisconnected(socket));
-      socket.on('registerName', (name) => this.registerName(socket, name));
-      socket.on('createLobby', () => this.createLobby(socket));
-      socket.on('joinLobby', (lobbyId) => this.joinLobby(socket, lobbyId));
-      socket.on('startGame', (lobbyId) => this.startGame(socket, lobbyId));
+      socket.on('registerName', (name, callbackFn) => this.registerName(socket, name, callbackFn));
+      socket.on('createLobby', (callbackFn) => this.createLobby(socket, callbackFn));
+      socket.on('joinLobby', (lobbyId, callbackFn) => this.joinLobby(socket, lobbyId, callbackFn));
+      socket.on('startGame', (lobbyId, callbackFn) => this.startGame(socket, lobbyId, callbackFn));
       socket.on('Error', (error) => {
         console.log(error);
         socket.emit('Error', error);
@@ -28,17 +28,26 @@ export class Engine {
   userDisconnected(socket) {
     const user = this.users.find((user) => user.id === socket.id);
     if (!user) {
-      throw new Error('User not found');
+      console.log('User not found');
+      return;
     }
+    console.log('user disconnected', socket.id);
     this.users = this.users.filter((u) => u.id !== user.id);
   }
 
-  registerName(socket, name) {
+  registerName(socket, name, callbackFn) {
     const user = this.users.find((user) => user.id === socket.id);
     if (!user) {
-      throw new Error('User not found');
+      callbackFn('User not found');
+      return;
     }
+    if (user.name) {
+      callbackFn('Name already registered');
+      return;
+    }
+    console.log('registerName', name);
     user.name = name;
+    callbackFn(null, user);
   }
 
   createLobby(socket) {
