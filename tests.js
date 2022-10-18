@@ -1,4 +1,4 @@
-import { GameTester } from './js/modules/Game.TEST.js';
+import { GameTests } from './js/modules/Game.TEST.js';
 
 const getAllMethods = (obj) => {
   let props = [];
@@ -24,11 +24,13 @@ const getAllMethods = (obj) => {
 };
 
 try {
-  const gameTester = new GameTester();
+  const gameTester = new GameTests();
   const tests = getAllMethods(gameTester);
-  tests.forEach((testName) => gameTester[testName]());
+  tests.forEach((testName) => {
+    console.log(`Running test ${testName}`);
+    gameTester[testName]();
+  });
   console.log('All tests passed!');
 } catch (error) {
   console.error('Test failed! ', error);
 }
-

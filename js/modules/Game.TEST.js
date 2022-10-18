@@ -10,23 +10,35 @@ export class Assert {
   }
 }
 
-export class GameTester {
+export class GameTests {
   constructor() {
   }
 
   rollDiceTest() {
     const player1 = Game.createPlayer('Player 1');
     const player2 = Game.createPlayer('Player 2');
-    this.game = new Game([player1, player2]);
+    const game = new Game([player1, player2]);
 
+    game.rollDice(player1.id);
+
+    Assert.equal(player1.hasRolledDice, true);
+    Assert.equal(game.currentPlayer(), player1);
+  }
+
+  endTurnTest() {
+    const player1 = Game.createPlayer('Player 1');
+    const player2 = Game.createPlayer('Player 2');
+    this.game = new Game([player1, player2]);
     Assert.equal(this.game.currentPlayer(), player1);
+
     this.game.rollDice(player1.id);
     this.game.endTurn(player1.id);
-
     Assert.equal(this.game.currentPlayer(), player2);
-    this.game.rollDice(player2.id);
-    // this.game.endTurn(player2.id);
+    Assert.equal(player1.hasRolledDice, false);
 
+    this.game.rollDice(player2.id);
+    this.game.endTurn(player2.id);
     Assert.equal(this.game.currentPlayer(), player1);
+    Assert.equal(player2.hasRolledDice, false);
   }
 }
