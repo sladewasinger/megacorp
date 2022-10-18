@@ -28,8 +28,20 @@ export class Board {
       this.board.lineStyle(2, 0xff0000, 1);
       this.board.drawRect(0, 0, width, height);
       this.board.endFill();
-
       boardContainer.addChild(this.board);
+
+      const title = new PIXI.Text("Megacorp", {
+        fontFamily: "Arial",
+        fontSize: 48,
+        fill: 0x000000,
+        align: "center",
+        wordWrap: true,
+        wordWrapWidth: width,
+      });
+      title.pivot.x = title.width / 2;
+      title.x = width / 2;
+      title.y = height / 2 - title.height / 2;
+      boardContainer.addChild(title);
 
       this.goTile = new GoTile();
       this.goTile.draw(boardContainer, width - 150, height - 150);
@@ -294,6 +306,49 @@ export class Board {
       );
 
       container.addChild(boardContainer);
+
+      this.tiles = [
+        this.go,
+        this.mediterraneanAvenue,
+        this.communityChest1,
+        this.balticAvenue,
+        this.incomeTax,
+        this.readingRailroad,
+        this.orientalAvenue,
+        this.chance1,
+        this.vermontAvenue,
+        this.connecticutAvenue,
+        this.jail,
+        this.stCharlesPlace,
+        this.electricCompany,
+        this.statesAvenue,
+        this.virginiaAvenue,
+        this.pennsylvaniaRailroad,
+        this.stJamesPlace,
+        this.communityChest2,
+        this.tennesseeAvenue,
+        this.newYorkAvenue,
+        this.freeParking,
+        this.kentuckyAvenue,
+        this.chance2,
+        this.indianaAvenue,
+        this.illinoisAvenue,
+        this.bAndORailroad,
+        this.atlanticAvenue,
+        this.ventnorAvenue,
+        this.waterWorks,
+        this.marvinGardens,
+        this.goToJail,
+        this.pacificAvenue,
+        this.northCarolinaAvenue,
+        this.communityChest3,
+        this.pennsylvaniaAvenue,
+        this.shortLine,
+        this.chance3,
+        this.parkPlace,
+        this.luxuryTax,
+        this.boardwalk,
+      ];
     } catch (error) {
       console.log(error);
     }
