@@ -1,11 +1,24 @@
 export class ColorTile {
   constructor(title, color, price) {
     this.title = title;
+    this.title = this.title
+      .split(" ")
+      .map((word) => {
+        let newWord = "";
+        const maxLength = 9;
+        while (word.length > 11) {
+          newWord += word.substr(0, maxLength) + "-\n";
+          word = word.substr(maxLength);
+        }
+        return newWord + word;
+      })
+      .join(" ");
+
     this.color = color;
     this.price = price;
   }
 
-  draw(container, x, y) {
+  draw(container, x, y, rotation = 0) {
     const tileContainer = new PIXI.Container();
 
     const width = 100;
@@ -26,7 +39,7 @@ export class ColorTile {
 
     const title = new PIXI.Text(this.title, {
       fontFamily: "Arial",
-      fontSize: 12,
+      fontSize: 19,
       fill: 0x000000,
       align: "center",
       wordWrap: true,
@@ -39,7 +52,7 @@ export class ColorTile {
 
     const price = new PIXI.Text(`$${this.price}`, {
       fontFamily: "Arial",
-      fontSize: 12,
+      fontSize: 24,
       fill: 0x000000,
       align: "center",
       wordWrap: true,
@@ -52,6 +65,7 @@ export class ColorTile {
 
     tileContainer.x = x;
     tileContainer.y = y;
+    tileContainer.rotation = rotation;
     container.addChild(tileContainer);
   }
 }
