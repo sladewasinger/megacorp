@@ -11,7 +11,7 @@ export class Engine {
       height: window.innerHeight,
       backgroundColor: 0x000000,
       resolution: window.devicePixelRatio || 1,
-      view: this.canvas
+      view: this.canvas,
     });
 
     window.addEventListener('resize', this.resize.bind(this));
