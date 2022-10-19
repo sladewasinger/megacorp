@@ -56,7 +56,18 @@ export class Board {
         player.y += clamp((targetPos.y - player.y) * 0.1, -5, 5);
         await sleep(10);
       }
+
+      const playersOnSameTile = this.gameState.players.filter((p) => p.position === gamePlayer.position);
+      if (playersOnSameTile.length > 1) {
+        const playerIndex = playersOnSameTile.findIndex((p) => p.id === gamePlayer.id);
+        const offset = playerIndex * 20;
+        player.x += offset;
+        player.y += offset;
+      }
     });
+
+    // Set controls:
+    this.dice.setNumber(this.gameState.diceRoll1, this.gameState.diceRoll2);
   }
 
   drawPlayersInitial() {
