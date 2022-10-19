@@ -13,6 +13,12 @@ createApp({
     user() {
       return this.engine?.user;
     },
+    gameRunning() {
+      return this.engine?.gameRunning;
+    },
+    lobby() {
+      return this.engine?.lobby;
+    },
   },
   mounted() {
     this.engine = new Engine();
@@ -29,6 +35,9 @@ createApp({
     joinLobby(e) {
       e.preventDefault();
       this.engine.joinLobby(this.lobbyId);
+    },
+    startGame() {
+      this.engine.startGame();
     },
   },
 }).mount('#app');

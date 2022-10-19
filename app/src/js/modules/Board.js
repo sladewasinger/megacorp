@@ -7,7 +7,8 @@ import { RailroadTile } from './Tiles/RailroadTile.js';
 const PIXI = window.PIXI;
 
 export class Board {
-  constructor() {
+  constructor(canvas) {
+    this.canvas = canvas;
     this.boardContainer = new PIXI.Container();
     this.width = 1200;
     this.height = 1200;
@@ -16,7 +17,7 @@ export class Board {
   }
 
   resize(e) {
-    const scale = Math.min(window.innerWidth / this.width, window.innerHeight / this.height);
+    const scale = Math.min(this.canvas.width / this.width, this.canvas.height / this.height);
     this.boardContainer.scale.x = scale;
     this.boardContainer.scale.y = scale;
   }

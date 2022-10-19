@@ -1,4 +1,5 @@
 import { User } from './models/User.js';
+import { Lobby } from './models/Lobby.js';
 
 export class Engine {
   constructor(io) {
@@ -10,18 +11,23 @@ export class Engine {
   start() {
     console.log('Engine started');
     this.io.on('connection', (socket) => {
-      console.log('user connected', socket.id);
-      this.users.push(new User(socket.id));
+      try {
+        console.log('user connected', socket.id);
+        this.users.push(new User(socket.id));
 
-      socket.on('disconnect', () => this.userDisconnected(socket));
-      socket.on('registerName', (name, callbackFn) => this.registerName(socket, name, callbackFn));
-      socket.on('createLobby', (callbackFn) => this.createLobby(socket, callbackFn));
-      socket.on('joinLobby', (lobbyId, callbackFn) => this.joinLobby(socket, lobbyId, callbackFn));
-      socket.on('startGame', (lobbyId, callbackFn) => this.startGame(socket, lobbyId, callbackFn));
-      socket.on('Error', (error) => {
+        socket.on('disconnect', () => this.userDisconnected(socket));
+        socket.on('registerName', (name, callbackFn) => this.registerName(socket, name, callbackFn));
+        socket.on('createLobby', (callbackFn) => this.createLobby(socket, callbackFn));
+        socket.on('joinLobby', (lobbyId, callbackFn) => this.joinLobby(socket, lobbyId, callbackFn));
+        socket.on('startGame', (lobbyId, callbackFn) => this.startGame(socket, lobbyId, callbackFn));
+        socket.on('Error', (error) => {
+          console.log(error);
+          socket.emit('Error', error);
+        });
+      } catch (error) {
         console.log(error);
         socket.emit('Error', error);
-      });
+      }
     });
   }
 
@@ -33,6 +39,14 @@ export class Engine {
     }
     console.log('user disconnected', socket.id);
     this.users = this.users.filter((u) => u.id !== user.id);
+    this.lobbies.forEach((lobby) => {
+      lobby.removeUser(user);
+      lobby.users.forEach((user) => {
+        console.log('lobbyUpdate, sent to ', user.id);
+        this.io.to(user.id).emit('lobbyUpdate', lobby);
+      });
+    });
+    this.lobbies = this.lobbies.filter((lobby) => lobby.users.length > 0);
   }
 
   registerName(socket, name, callbackFn) {
@@ -50,53 +64,75 @@ export class Engine {
     callbackFn(null, user);
   }
 
-  createLobby(socket) {
+  createLobby(socket, callbackFn) {
     const user = this.users.find((user) => user.id === socket.id);
     if (!user) {
-      throw new Error('User not found');
+      callbackFn('User not found');
+      return;
     }
     if (!user.name) {
-      throw new Error('You need to register a name first');
+      callbackFn('You have not registered a name');
+      return;
     }
+    console.log('createLobby');
 
     const lobby = new Lobby();
-    this.lobbies.add(lobby);
-    this.joinLobby(socket, lobby.id, owner = true);
+    this.lobbies.push(lobby);
+    this.joinLobby(socket, lobby.id, callbackFn);
+    lobby.owner = user;
+    callbackFn(null, lobby);
   }
 
-  joinLobby(socket, lobbyId, owner = false) {
+  joinLobby(socket, lobbyId, callbackFn) {
     const user = this.users.find((user) => user.id === socket.id);
     if (!user) {
-      throw new Error('User not found');
+      callbackFn('User not found');
+      return;
     }
     if (!user.name) {
-      throw new Error('You have not registered a name');
+      callbackFn('You have not registered a name');
+      return;
     }
-    const lobby = this.lobbies.find((lobby) => lobby.id === lobbyId);
+    const lobby = this.lobbies.find((lobby) => lobby.id.toUpperCase() === lobbyId.toUpperCase());
     if (!lobby) {
-      throw new Error('Lobby not found');
+      callbackFn('Lobby not found');
+      return;
     }
     if (lobby.users.length >= 15) {
-      throw new Error('Lobby is full');
+      callbackFn('Lobby is full');
+      return;
     }
+
     lobby.addUser(user);
-    if (owner) {
-      lobby.owner = user;
-    }
+
+    lobby.users.forEach((user) => {
+      console.log('lobbyUpdate, sent to ', user.id);
+      this.io.to(user.id).emit('lobbyUpdate', lobby);
+    });
+
+    callbackFn(null, lobby);
   }
 
-  startGame(socket, lobbyId) {
+  startGame(socket, lobbyId, callbackFn) {
     const user = this.users.find((user) => user.id === socket.id);
     if (!user) {
-      throw new Error('User not found');
+      callbackFn('User not found');
+      return;
     }
     const lobby = this.lobbies.find((lobby) => lobby.id === lobbyId);
     if (!lobby) {
-      throw new Error('Lobby not found');
+      callbackFn('Lobby not found');
+      return;
     }
     if (lobby.owner !== user) {
-      throw new Error('You are not the owner of this lobby');
+      callbackFn('You are not the owner of this lobby');
+      return;
     }
     lobby.startGame();
+    lobby.users.forEach((user) => {
+      console.log('gameUpdate, sent to ', user.id);
+      this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
+    });
+    callbackFn(null, lobby);
   }
 }

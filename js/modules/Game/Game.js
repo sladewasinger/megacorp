@@ -11,8 +11,16 @@ export class Game {
     this.board = new Board();
   }
 
-  getGameState() {
-    return this.gameState;
+  getGameState(user) {
+    const gameState = {
+      ...this.gameState,
+      players: this.gameState.players.map((player) => ({
+        name: player.name,
+        money: player.money,
+      })),
+    };
+
+    return gameState;
   }
 
   startGame() {

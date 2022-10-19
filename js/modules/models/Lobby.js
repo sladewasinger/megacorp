@@ -1,8 +1,11 @@
 import { Game } from '../Game/Game.js';
+import { randomUUID } from 'crypto';
 
 
 export class Lobby {
   constructor() {
+    // generate random 4 letter key
+    this.id = randomUUID().substring(0, 4);
     this.users = [];
     this.game = null;
     this.owner = null;
