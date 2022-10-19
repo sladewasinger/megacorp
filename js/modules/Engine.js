@@ -154,8 +154,11 @@ export class Engine {
       return;
     }
 
+    let number1;
+    let number2;
+
     try {
-      lobby.game.rollDice(player.id);
+      [number1, number2] = lobby.game.rollDice(player.id);
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {
@@ -168,6 +171,6 @@ export class Engine {
       console.log('gameUpdate, sent to ', user.id);
       this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
     });
-    callbackFn(null, lobby);
+    callbackFn(null, [number1, number2]);
   }
 }

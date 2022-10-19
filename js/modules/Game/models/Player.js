@@ -8,5 +8,8 @@ export class Player {
     this.money = 1000;
     this.hasRolledDice = false;
     this.position = 0;
+    this.diceRollsInARow = 0;
+    this.isInJail = false;
+    this.requiresPropertyAction = false;
   }
 }

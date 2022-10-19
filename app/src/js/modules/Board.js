@@ -4,6 +4,7 @@ import { GoTile } from './Tiles/GoTile.js';
 import { JailTile } from './Tiles/JailTile.js';
 import { GoToJailTile } from './Tiles/GoToJailTile.js';
 import { RailroadTile } from './Tiles/RailroadTile.js';
+import { Dice } from './Dice.js';
 const PIXI = window.PIXI;
 
 function sleep(ms) {
@@ -12,12 +13,12 @@ function sleep(ms) {
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-
 export class Board {
   constructor(canvas, container, rollDiceCallback) {
     this.canvas = canvas;
     this.container = container;
     this.rollDiceCallback = rollDiceCallback;
+    this.dice = null;
 
     this.container.sortableChildren = true;
     this.boardContainer = new PIXI.Container();
@@ -65,6 +66,8 @@ export class Board {
       const playerContainer = new PIXI.Container();
       playerContainer.id = player.id;
       playerContainer.zIndex = 1000;
+      playerContainer.x = this.width;
+      playerContainer.y = this.height;
 
       const graphics = new PIXI.Graphics();
       graphics.beginFill(0xff0000);
@@ -110,36 +113,9 @@ export class Board {
       this.boardContainer.addChild(title);
 
       // Controls:
-      this.diceContainer = new PIXI.Container();
-      this.diceContainer.x = 0 + 150 + 50;
-      this.diceContainer.y = this.height - 150 - 50 - 100;
-      this.diceContainer.interactive = true;
-      this.diceContainer.buttonMode = true;
-      this.diceContainer.hitArea = new PIXI.Rectangle(0, 0, 100, 100);
-      this.diceContainer.on('pointerdown', () => {
-        this.rollDiceCallback();
-      });
-
-      this.diceOutline = new PIXI.Graphics();
-      this.diceOutline.beginFill(0xffffff);
-      this.diceOutline.lineStyle(2, 0x000000, 1);
-      this.diceOutline.drawRect(0, 0, 100, 100);
-      this.diceOutline.endFill();
-      this.diceContainer.addChild(this.diceOutline);
-
-      this.diceNumber = new PIXI.Text('0', {
-        fontFamily: 'Arial',
-        fontSize: 48,
-        fill: 0x000000,
-        align: 'center',
-      });
-      this.diceNumber.pivot.x = this.diceNumber.width / 2;
-      this.diceNumber.pivot.y = this.diceNumber.height / 2;
-      this.diceNumber.x = this.diceOutline.x + this.diceOutline.width / 2;
-      this.diceNumber.y = this.diceOutline.y + this.diceOutline.height / 2;
-      this.diceContainer.addChild(this.diceNumber);
-
-      this.boardContainer.addChild(this.diceContainer);
+      this.dice = new Dice(this.boardContainer, this.rollDiceCallback);
+      this.dice.draw();
+      this.dice.setPosition(200, this.height - 250);
 
       // Tiles:
       this.goTile = new GoTile();

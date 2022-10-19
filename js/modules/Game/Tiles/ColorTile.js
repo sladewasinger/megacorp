@@ -4,6 +4,6 @@ export class ColorTile {
     this.color = color;
     this.cost = cost;
     this.type = 'color';
-    this.buyable = true;
+    this.isBuyable = true;
   }
 }

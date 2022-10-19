@@ -109,6 +109,8 @@ export class Engine {
         console.error(error);
         return;
       }
+      const [number1, number2] = result;
+      this.board.dice.setNumber(number1, number2);
       console.log('Dice rolled');
     });
   }

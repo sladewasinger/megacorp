@@ -3,6 +3,6 @@ export class UtilityTile {
     this.name = name;
     this.cost = cost;
     this.type = 'utility';
-    this.buyable = true;
+    this.isBuyable = true;
   }
 }
