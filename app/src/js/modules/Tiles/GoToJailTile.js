@@ -1,8 +1,11 @@
 const PIXI = window.PIXI;
 
 export class GoToJailTile {
+  update(gameState) { }
+
   draw(container, x, y, rotation = 0) {
     const tileContainer = new PIXI.Container();
+    this.tileContainer = tileContainer;
 
     const width = 150;
     const height = 150;
@@ -19,7 +22,7 @@ export class GoToJailTile {
       fill: 0x000000,
       align: 'center',
       wordWrap: true,
-      wordWrapWidth: width
+      wordWrapWidth: width,
     });
     title.pivot.x = title.width / 2;
     title.x = width / 2;

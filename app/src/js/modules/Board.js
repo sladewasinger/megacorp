@@ -6,14 +6,76 @@ import { GoToJailTile } from './Tiles/GoToJailTile.js';
 import { RailroadTile } from './Tiles/RailroadTile.js';
 const PIXI = window.PIXI;
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+
 export class Board {
-  constructor(canvas) {
+  constructor(canvas, container, rollDiceCallback) {
     this.canvas = canvas;
+    this.container = container;
+    this.rollDiceCallback = rollDiceCallback;
+
+    this.container.sortableChildren = true;
     this.boardContainer = new PIXI.Container();
+    this.boardContainer.sortableChildren = true;
     this.width = 1200;
     this.height = 1200;
+    this.tiles = [];
+    this.players = null;
 
     window.addEventListener('resize', this.resize.bind(this));
+  }
+
+  async update(gameState) {
+    this.gameState = gameState;
+    this.tiles.forEach((tile) => {
+      tile.update(gameState);
+    });
+
+    if (!this.players) {
+      this.drawPlayersInitial();
+    }
+    this.gameState.players.forEach(async (gamePlayer) => {
+      const tile = this.tiles.find((t, i) => i === gamePlayer.position);
+      if (!tile) {
+        console.error('could not find tile matching player position');
+        return;
+      }
+      const player = this.players.find((p) => p.id === gamePlayer.id);
+      const targetPos = {
+        x: tile.tileContainer.x + 25,
+        y: tile.tileContainer.y + 75,
+      };
+      while (Math.abs(player.x - targetPos.x) > 1 || Math.abs(player.y - targetPos.y) > 1) {
+        player.x += clamp((targetPos.x - player.x) * 0.1, -5, 5);
+        player.y += clamp((targetPos.y - player.y) * 0.1, -5, 5);
+        await sleep(10);
+      }
+    });
+  }
+
+  drawPlayersInitial() {
+    console.log('drawPlayersInitial');
+    this.players = [];
+    this.gameState.players.forEach((player) => {
+      const playerContainer = new PIXI.Container();
+      playerContainer.id = player.id;
+      playerContainer.zIndex = 1000;
+
+      const graphics = new PIXI.Graphics();
+      graphics.beginFill(0xff0000);
+      graphics.drawCircle(0, 0, 15);
+      graphics.endFill();
+      graphics.zIndex = 1001;
+
+      playerContainer.addChild(graphics);
+      this.boardContainer.addChild(playerContainer);
+      this.players.push(playerContainer);
+    });
   }
 
   resize(e) {
@@ -22,7 +84,7 @@ export class Board {
     this.boardContainer.scale.y = scale;
   }
 
-  draw(container) {
+  draw() {
     console.log('drawing board');
     try {
       this.resize();
@@ -47,6 +109,39 @@ export class Board {
       title.y = this.height / 2 - title.height / 2;
       this.boardContainer.addChild(title);
 
+      // Controls:
+      this.diceContainer = new PIXI.Container();
+      this.diceContainer.x = 0 + 150 + 50;
+      this.diceContainer.y = this.height - 150 - 50 - 100;
+      this.diceContainer.interactive = true;
+      this.diceContainer.buttonMode = true;
+      this.diceContainer.hitArea = new PIXI.Rectangle(0, 0, 100, 100);
+      this.diceContainer.on('pointerdown', () => {
+        this.rollDiceCallback();
+      });
+
+      this.diceOutline = new PIXI.Graphics();
+      this.diceOutline.beginFill(0xffffff);
+      this.diceOutline.lineStyle(2, 0x000000, 1);
+      this.diceOutline.drawRect(0, 0, 100, 100);
+      this.diceOutline.endFill();
+      this.diceContainer.addChild(this.diceOutline);
+
+      this.diceNumber = new PIXI.Text('0', {
+        fontFamily: 'Arial',
+        fontSize: 48,
+        fill: 0x000000,
+        align: 'center',
+      });
+      this.diceNumber.pivot.x = this.diceNumber.width / 2;
+      this.diceNumber.pivot.y = this.diceNumber.height / 2;
+      this.diceNumber.x = this.diceOutline.x + this.diceOutline.width / 2;
+      this.diceNumber.y = this.diceOutline.y + this.diceOutline.height / 2;
+      this.diceContainer.addChild(this.diceNumber);
+
+      this.boardContainer.addChild(this.diceContainer);
+
+      // Tiles:
       this.goTile = new GoTile();
       this.goTile.draw(this.boardContainer, this.width - 150, this.height - 150);
 
@@ -309,10 +404,10 @@ export class Board {
         -Math.PI / 2,
       );
 
-      container.addChild(this.boardContainer);
+      this.container.addChild(this.boardContainer);
 
       this.tiles = [
-        this.go,
+        this.goTile,
         this.mediterraneanAvenue,
         this.communityChest1,
         this.balticAvenue,

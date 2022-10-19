@@ -45,8 +45,9 @@
         </div>
       </div>
     </div>
-    <canvas id="canvas" width="500" height="500"></canvas>
-    <script type="module" src="src/js/index.js"></script>
+    <canvas id="canvas" width="500" height="500" :class="{ hidden: !gameRunning }"></canvas>
+  </div>
+  <script type="module" src="src/js/index.js"></script>
 </body>
 
 </html>

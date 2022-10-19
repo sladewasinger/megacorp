@@ -5,7 +5,6 @@ const io = window.io;
 export class Engine {
   constructor() {
     this.canvas = document.getElementById('canvas');
-    this.canvas.className = 'hidden';
     this.reset();
 
     this.app = new PIXI.Application({
@@ -17,6 +16,7 @@ export class Engine {
     });
 
     window.addEventListener('resize', this.resize.bind(this));
+    this.createBoard();
   }
 
   reset() {
@@ -42,14 +42,17 @@ export class Engine {
       console.log('lobbyUpdated', lobby);
       this.lobby = lobby;
     });
-    this.socket.on('gameUpdate', (gameState) => {
-      console.log('gameUpdated', gameState);
-      if (!this.gameRunning) {
-        this.gameRunning = true;
-        this.createBoard();
-      }
-      this.gameState = gameState;
-    });
+    this.socket.on('gameUpdate', (gameState) => this.onGameStateUpdate(gameState));
+  }
+
+  onGameStateUpdate(gameState) {
+    console.log('gameUpdated', gameState);
+    this.gameState = gameState;
+    if (!this.gameRunning) {
+      this.gameRunning = true;
+    }
+
+    this.board.update(gameState);
   }
 
   registerUser(name) {
@@ -90,16 +93,24 @@ export class Engine {
       }
       console.log('Game started');
       this.gameRunning = true;
-      this.createBoard();
     });
   }
 
   createBoard() {
     const container = new PIXI.Container();
     this.app.stage.addChild(container);
-    this.board = new Board(this.canvas);
+    this.board = new Board(this.canvas, container, this.rollDice.bind(this));
     this.board.draw(container);
-    this.canvas.className = '';
+  }
+
+  rollDice() {
+    this.socket.emit('rollDice', this.lobby.id, (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Dice rolled');
+    });
   }
 
   resize() {

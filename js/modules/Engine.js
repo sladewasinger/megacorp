@@ -20,6 +20,7 @@ export class Engine {
         socket.on('createLobby', (callbackFn) => this.createLobby(socket, callbackFn));
         socket.on('joinLobby', (lobbyId, callbackFn) => this.joinLobby(socket, lobbyId, callbackFn));
         socket.on('startGame', (lobbyId, callbackFn) => this.startGame(socket, lobbyId, callbackFn));
+        socket.on('rollDice', (lobbyId, callbackFn) => this.rollDice(socket, lobbyId, callbackFn));
         socket.on('Error', (error) => {
           console.log(error);
           socket.emit('Error', error);
@@ -129,6 +130,40 @@ export class Engine {
       return;
     }
     lobby.startGame();
+    lobby.users.forEach((user) => {
+      console.log('gameUpdate, sent to ', user.id);
+      this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
+    });
+    callbackFn(null, lobby);
+  }
+
+  rollDice(socket, lobbyId, callbackFn) {
+    const user = this.users.find((user) => user.id === socket.id);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.id === lobbyId);
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+
+    try {
+      lobby.game.rollDice(player.id);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      return;
+    }
     lobby.users.forEach((user) => {
       console.log('gameUpdate, sent to ', user.id);
       this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));

@@ -17,6 +17,8 @@ export class Game {
       players: this.gameState.players.map((player) => ({
         name: player.name,
         money: player.money,
+        position: player.position,
+        id: player.id,
       })),
     };
 

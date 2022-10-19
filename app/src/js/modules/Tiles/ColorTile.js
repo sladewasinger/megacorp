@@ -20,8 +20,13 @@ export class ColorTile {
     this.price = price;
   }
 
+  update(gameState) {
+
+  }
+
   draw(container, x, y, rotation = 0) {
     const tileContainer = new PIXI.Container();
+    this.tileContainer = tileContainer;
 
     const width = 100;
     const height = 150;
@@ -45,7 +50,7 @@ export class ColorTile {
       fill: 0x000000,
       align: 'center',
       wordWrap: true,
-      wordWrapWidth: width
+      wordWrapWidth: width,
     });
     title.pivot.x = title.width / 2;
     title.x = width / 2;
@@ -58,7 +63,7 @@ export class ColorTile {
       fill: 0x000000,
       align: 'center',
       wordWrap: true,
-      wordWrapWidth: width
+      wordWrapWidth: width,
     });
     price.pivot.x = price.width / 2;
     price.x = width / 2;
