@@ -36,6 +36,9 @@ export class GameTests {
     const game = new Game([player1, player2]);
 
     game.rollDice(player1.id);
+    while (game.getGameState().diceRoll1 === game.getGameState().diceRoll2) {
+      game.rollDice(player1.id);
+    }
 
     Assert.equal(player1.hasRolledDice, true);
     Assert.equal(game.currentPlayer(), player1);
