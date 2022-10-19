@@ -1,8 +1,11 @@
+const PIXI = window.PIXI;
+
 export class FreeParkingTile {
-  constructor() {}
+  update(gameState) { }
 
   draw(container, x, y, rotation = 0) {
     const tileContainer = new PIXI.Container();
+    this.tileContainer = tileContainer;
 
     const width = 150;
     const height = 150;
@@ -13,11 +16,11 @@ export class FreeParkingTile {
     this.tile.endFill();
     tileContainer.addChild(this.tile);
 
-    const title = new PIXI.Text("Free Parking", {
-      fontFamily: "Arial",
+    const title = new PIXI.Text('Free Parking', {
+      fontFamily: 'Arial',
       fontSize: 24,
       fill: 0x000000,
-      align: "center",
+      align: 'center',
       wordWrap: true,
       wordWrapWidth: width,
     });

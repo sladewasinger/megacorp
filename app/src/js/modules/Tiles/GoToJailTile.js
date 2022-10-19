@@ -1,8 +1,11 @@
+const PIXI = window.PIXI;
+
 export class GoToJailTile {
-  constructor() {}
+  update(gameState) { }
 
   draw(container, x, y, rotation = 0) {
     const tileContainer = new PIXI.Container();
+    this.tileContainer = tileContainer;
 
     const width = 150;
     const height = 150;
@@ -13,11 +16,11 @@ export class GoToJailTile {
     this.tile.endFill();
     tileContainer.addChild(this.tile);
 
-    const title = new PIXI.Text("Go to Jail", {
-      fontFamily: "Arial",
+    const title = new PIXI.Text('Go to Jail', {
+      fontFamily: 'Arial',
       fontSize: 24,
       fill: 0x000000,
-      align: "center",
+      align: 'center',
       wordWrap: true,
       wordWrapWidth: width,
     });
