@@ -1,8 +1,6 @@
-const PIXI = window.PIXI;
-
-export class FreeParkingTile {
+export class CommunityChestTile {
   constructor() {
-    this.width = 150;
+    this.width = 100;
     this.height = 150;
   }
 
@@ -22,9 +20,9 @@ export class FreeParkingTile {
     this.tile.endFill();
     tileContainer.addChild(this.tile);
 
-    const title = new PIXI.Text('Free Parking', {
+    const title = new PIXI.Text('Community Chest', {
       fontFamily: 'Arial',
-      fontSize: 24,
+      fontSize: 18,
       fill: 0x000000,
       align: 'center',
       wordWrap: true,
@@ -32,8 +30,18 @@ export class FreeParkingTile {
     });
     title.pivot.x = title.width / 2;
     title.x = this.width / 2;
-    title.y = this.height / 2 - title.height / 2;
+    title.y = title.height / 2;
     tileContainer.addChild(title);
+
+    // eslint-disable-next-line new-cap
+    const image = new PIXI.Sprite.from('src/assets/community_chest.png');
+    // scale image to fit within tile
+    const scale = 0.75 * Math.min(this.width / image.width, this.height / image.height);
+    image.width *= scale;
+    image.height *= scale;
+    image.x = this.width / 2 - image.width / 2;
+    image.y = this.height / 2 - 10;
+    tileContainer.addChild(image);
 
     tileContainer.x = x;
     tileContainer.y = y;

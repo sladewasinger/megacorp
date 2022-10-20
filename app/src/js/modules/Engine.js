@@ -42,18 +42,18 @@ export class Engine {
       console.log('lobbyUpdated', lobby);
       this.lobby = lobby;
     });
-    this.socket.on('gameUpdate', (gameState) => this.onGameStateUpdate(gameState));
+    this.socket.on('gameUpdate', async (gameState) => await this.onGameStateUpdate(gameState));
     this.board.socketId = this.socketId;
   }
 
-  onGameStateUpdate(gameState) {
+  async onGameStateUpdate(gameState) {
     console.log('gameUpdated', gameState);
     this.gameState = gameState;
     if (!this.gameRunning) {
       this.gameRunning = true;
     }
 
-    this.board.update(gameState);
+    await this.board.update(gameState);
   }
 
   registerUser(name) {
@@ -136,7 +136,7 @@ export class Engine {
   }
 
   auctionProperty() {
-    this.socket.emit('auctionProperty', this.lobby.id, (error, result) => {
+    this.socket.emit('auctionProperty', (error, result) => {
       if (error) {
         console.error(error);
         return;

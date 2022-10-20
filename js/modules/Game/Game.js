@@ -14,6 +14,7 @@ export class Game {
       diceRoll2: 0,
       players,
       tiles: [],
+      auctionProperty: null,
     };
   }
 
@@ -79,8 +80,11 @@ export class Game {
     if (player !== this.currentPlayer()) {
       throw new Error('Not your turn');
     }
-    if (player.hasRolledDice) {
+    if (player.hasRolledDice && player.diceDoublesInRow == 0) {
       throw new Error('You have already rolled the dice');
+    }
+    if (player.requiresPropertyAction) {
+      throw new Error('You must take an action on a property');
     }
 
     const diceRoll1 = diceRoll1Override || Math.floor(Math.random() * 6) + 1;
@@ -94,11 +98,12 @@ export class Game {
     player.prevPosition = player.position;
 
     if (diceRoll1 === diceRoll2) {
-      player.diceRollsInARow += 1;
-      player.hasRolledDice = false; // Player gets another turn
+      player.diceDoublesInRow += 1;
+    } else {
+      player.diceDoublesInRow = 0;
     }
 
-    if (player.diceRollsInARow > 2) {
+    if (player.diceDoublesInRow > 2) {
       player.hasRolledDice = true;
       player.position = 10; // Jail
       player.isInJail = true;
@@ -117,7 +122,8 @@ export class Game {
       })
       .filter((property) => property instanceof ColorTile ||
         property instanceof RailroadTile ||
-        property instanceof UtilityTile);
+        property instanceof UtilityTile)
+      .filter((property) => !property.ownerId);
     if (propertySpaces.some((property) => property.index === player.position)) {
       player.requiresPropertyAction = true;
     }
@@ -173,5 +179,32 @@ export class Game {
     player.requiresPropertyAction = false;
     player.money -= property.price;
     property.ownerId = player.id;
+  }
+
+  auctionProperty(playerId) {
+    const player = this.gameState.players.find((player) => player.id === playerId);
+    if (!player) {
+      throw new Error('Player not found');
+    }
+    if (player !== this.currentPlayer()) {
+      throw new Error('Not your turn');
+    }
+    if (!player.hasRolledDice) {
+      throw new Error('You have not rolled the dice');
+    }
+
+    const property = this.board.tiles.find((property, index) => index === player.position);
+    if (!property) {
+      throw new Error('Property not found');
+    }
+    if (property.ownerId) {
+      throw new Error('Property already owned');
+    }
+    if (!property.isBuyable) {
+      throw new Error('Property not buyable');
+    }
+
+    player.requiresPropertyAction = false;
+    this.gameState.auctionProperty = property;
   }
 }
