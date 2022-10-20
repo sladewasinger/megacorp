@@ -19,6 +19,30 @@ export class Buttons {
     this.buttonsContainer.y = y;
   }
 
+  disable() {
+    this.buyPropertyButton.interactive = false;
+    this.buyPropertyButton.buttonMode = false;
+    this.buyPropertyButton.alpha = 0.5;
+    this.auctionPropertyButton.interactive = false;
+    this.auctionPropertyButton.buttonMode = false;
+    this.auctionPropertyButton.alpha = 0.5;
+    this.endTurnButton.interactive = false;
+    this.endTurnButton.buttonMode = false;
+    this.endTurnButton.alpha = 0.5;
+  }
+
+  enable() {
+    this.buyPropertyButton.interactive = true;
+    this.buyPropertyButton.buttonMode = true;
+    this.buyPropertyButton.alpha = 1;
+    this.auctionPropertyButton.interactive = true;
+    this.auctionPropertyButton.buttonMode = true;
+    this.auctionPropertyButton.alpha = 1;
+    this.endTurnButton.interactive = true;
+    this.endTurnButton.buttonMode = true;
+    this.endTurnButton.alpha = 1;
+  }
+
   drawBuyPropertyButton() {
     const container = new PIXI.Container();
     container.x = 0;

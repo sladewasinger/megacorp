@@ -43,6 +43,7 @@ export class Engine {
       this.lobby = lobby;
     });
     this.socket.on('gameUpdate', (gameState) => this.onGameStateUpdate(gameState));
+    this.board.socketId = this.socketId;
   }
 
   onGameStateUpdate(gameState) {
@@ -111,7 +112,9 @@ export class Engine {
   }
 
   rollDice() {
-    this.socket.emit('rollDice', (error, result) => {
+    const dice1 = Math.floor(Math.random() * 6) + 1;
+    const dice2 = Math.floor(Math.random() * 6) + 1;
+    this.socket.emit('rollDice', dice1, dice2, (error, result) => {
       if (error) {
         console.error(error);
         return;

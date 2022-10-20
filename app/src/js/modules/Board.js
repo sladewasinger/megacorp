@@ -15,7 +15,9 @@ function sleep(ms) {
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 export class Board {
-  constructor(canvas, container,
+  constructor(
+    canvas,
+    container,
     rollDiceCallback,
     buyPropertyCallback,
     auctionPropertyCallback,
@@ -28,6 +30,8 @@ export class Board {
     this.auctionPropertyCallback = auctionPropertyCallback;
     this.endTurnCallback = endTurnCallback;
     this.dice = null;
+
+    this.socketId = null;
 
     this.container.sortableChildren = true;
     this.boardContainer = new PIXI.Container();
@@ -53,10 +57,21 @@ export class Board {
     if (!this.players) {
       this.drawPlayersInitial();
     }
+
+    console.log(this.gameState.currentPlayer.id, this.gameState.myId);
+    if (this.gameState.currentPlayer.id !== this.gameState.myId) {
+      this.dice.disable();
+      this.buttons.disable();
+    } else {
+      this.dice.enable();
+      this.buttons.enable();
+    }
+
     this.gameState.players.forEach(async (gamePlayer) => {
       let prevPosition = this.prevGameState.players.find((player) => player.id === gamePlayer.id).position;
-      while (prevPosition <= gamePlayer.position) {
-        await sleep(10);
+      let counter0 = 0;
+      while (prevPosition <= gamePlayer.position && counter0 < 100) {
+        counter0++;
         const tile = this.tiles.find((t, i) => i === prevPosition);
         if (!tile) {
           console.error('could not find tile matching player position');
@@ -76,27 +91,39 @@ export class Board {
         //   targetPos.y = tile.tileContainer.y + tile.tileContainer.width / 2;
         // }
         let counter = 0;
-        const clampMinX = -5;
-        const clampMaxX = 5;
-        const clampMinY = -5;
-        const clampMaxY = 5;
+        const speed = 5;
+        const damping = 0.2;
+        const clampMinX = -speed;
+        const clampMaxX = speed;
+        const clampMinY = -speed;
+        const clampMaxY = speed;
         while (Math.abs(player.x - targetPos.x) > 1 || Math.abs(player.y - targetPos.y) > 1 && counter < 100) {
           counter++;
-          player.x += clamp((targetPos.x - player.x) * 0.1, clampMinX, clampMaxX);
-          player.y += clamp((targetPos.y - player.y) * 0.1, clampMinY, clampMaxY);
+          player.x += clamp((targetPos.x - player.x) * damping, clampMinX, clampMaxX);
+          player.y += clamp((targetPos.y - player.y) * damping, clampMinY, clampMaxY);
           await sleep(10);
         }
         player.x = targetPos.x;
         player.y = targetPos.y;
+
+        const playersOnSameTile = this.gameState.players.filter((p) => p.position === prevPosition);
+        if (playersOnSameTile.length > 1) {
+          console.log('playersOnSameTile', playersOnSameTile);
+          const playerIndex = playersOnSameTile.findIndex((p) => p.id === gamePlayer.id);
+          const offset = -25 + playerIndex * 20;
+          player.x += offset;
+          player.y += offset;
+          await sleep(10);
+        }
+
         prevPosition++;
       }
 
-      const playersOnSameTile = this.gameState.players.filter((p) => p.position === gamePlayer.position);
-      if (playersOnSameTile.length > 1) {
-        const playerIndex = playersOnSameTile.findIndex((p) => p.id === gamePlayer.id);
-        const offset = playerIndex * 20;
-        player.x += offset;
-        player.y += offset;
+      if (counter0 > 100) {
+        console.error('counter0 > 100');
+        const tile = this.tiles.find((t, i) => i === prevPosition);
+        player.x = tile.x;
+        player.y = tile.y;
       }
     });
 

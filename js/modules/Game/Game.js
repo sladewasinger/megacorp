@@ -24,6 +24,8 @@ export class Game {
         ...player,
       })),
       tiles: this.board.tiles,
+      currentPlayer: this.currentPlayer(),
+      myId: user.id,
     };
 
     return gameState;
@@ -69,7 +71,7 @@ export class Game {
     return this.gameState.players[0];
   }
 
-  rollDice(playerId) {
+  rollDice(playerId, diceRoll1Override, diceRoll2Override) {
     const player = this.gameState.players.find((player) => player.id === playerId);
     if (!player) {
       throw new Error('Player not found');
@@ -81,8 +83,8 @@ export class Game {
       throw new Error('You have already rolled the dice');
     }
 
-    const diceRoll1 = Math.floor(Math.random() * 6) + 1;
-    const diceRoll2 = Math.floor(Math.random() * 6) + 1;
+    const diceRoll1 = diceRoll1Override || Math.floor(Math.random() * 6) + 1;
+    const diceRoll2 = diceRoll2Override || Math.floor(Math.random() * 6) + 1;
     this.gameState.diceRoll1 = diceRoll1;
     this.gameState.diceRoll2 = diceRoll2;
 

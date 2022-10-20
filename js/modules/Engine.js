@@ -20,7 +20,8 @@ export class Engine {
         socket.on('createLobby', (callbackFn) => this.createLobby(socket, callbackFn));
         socket.on('joinLobby', (lobbyId, callbackFn) => this.joinLobby(socket, lobbyId, callbackFn));
         socket.on('startGame', (lobbyId, callbackFn) => this.startGame(socket, lobbyId, callbackFn));
-        socket.on('rollDice', (callbackFn) => this.rollDice(socket, callbackFn));
+        socket.on('rollDice', (diceRoll1Override, diceRoll2Override, callbackFn) =>
+          this.rollDice(socket, diceRoll1Override, diceRoll2Override, callbackFn));
         socket.on('buyProperty', (callbackFn) => this.buyProperty(socket, callbackFn));
         socket.on('auctionProperty', (callbackFn) => this.auctionProperty(socket, callbackFn));
         socket.on('endTurn', (callbackFn) => this.endTurn(socket, callbackFn));
@@ -97,6 +98,10 @@ export class Engine {
       callbackFn('You have not registered a name');
       return;
     }
+    if (!lobbyId) {
+      callbackFn('LobbyId is required');
+      return;
+    }
     const lobby = this.lobbies.find((lobby) => lobby.id.toUpperCase() === lobbyId.toUpperCase());
     if (!lobby) {
       callbackFn('Lobby not found');
@@ -140,7 +145,7 @@ export class Engine {
     callbackFn(null, lobby);
   }
 
-  rollDice(socket, callbackFn) {
+  rollDice(socket, diceRoll1Override, diceRoll2Override, callbackFn) {
     const user = this.users.find((user) => user.id === socket.id);
     if (!user) {
       callbackFn('User not found');
@@ -161,7 +166,7 @@ export class Engine {
     let number2;
 
     try {
-      [number1, number2] = lobby.game.rollDice(player.id);
+      [number1, number2] = lobby.game.rollDice(player.id, diceRoll1Override, diceRoll2Override);
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {
