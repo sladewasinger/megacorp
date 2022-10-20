@@ -43,6 +43,7 @@ export class Engine {
       this.lobby = lobby;
     });
     this.socket.on('gameUpdate', (gameState) => this.onGameStateUpdate(gameState));
+    this.board.socketId = this.socketId;
   }
 
   onGameStateUpdate(gameState) {
@@ -99,12 +100,21 @@ export class Engine {
   createBoard() {
     const container = new PIXI.Container();
     this.app.stage.addChild(container);
-    this.board = new Board(this.canvas, container, this.rollDice.bind(this));
+    this.board = new Board(
+      this.canvas,
+      container,
+      this.rollDice.bind(this),
+      this.buyProperty.bind(this),
+      this.auctionProperty.bind(this),
+      this.endTurn.bind(this),
+    );
     this.board.draw(container);
   }
 
   rollDice() {
-    this.socket.emit('rollDice', this.lobby.id, (error, result) => {
+    const dice1 = Math.floor(Math.random() * 6) + 1;
+    const dice2 = Math.floor(Math.random() * 6) + 1;
+    this.socket.emit('rollDice', dice1, dice2, (error, result) => {
       if (error) {
         console.error(error);
         return;
@@ -112,6 +122,36 @@ export class Engine {
       const [number1, number2] = result;
       this.board.dice.setNumber(number1, number2);
       console.log('Dice rolled');
+    });
+  }
+
+  buyProperty() {
+    this.socket.emit('buyProperty', (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Property bought');
+    });
+  }
+
+  auctionProperty() {
+    this.socket.emit('auctionProperty', this.lobby.id, (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Property auctioned');
+    });
+  }
+
+  endTurn() {
+    this.socket.emit('endTurn', (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Turn ended');
     });
   }
 

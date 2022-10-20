@@ -20,19 +20,21 @@ export class RailroadTile {
 
     this.color = color;
     this.price = price;
+    this.width = 100;
+    this.height = 150;
   }
 
   draw(container, x, y, rotation = 0) {
     const tileContainer = new PIXI.Container();
     this.tileContainer = tileContainer;
-
-    const width = 100;
-    const height = 150;
+    this.tileContainer.width = this.width;
+    this.tileContainer.height = this.height;
+    this.tileContainer.pivot = new PIXI.Point(this.width / 2, this.height / 2);
 
     this.tile = new PIXI.Graphics();
     this.tile.beginFill(0xffffff);
     this.tile.lineStyle(2, 0x000000, 1);
-    this.tile.drawRect(0, 0, width, height);
+    this.tile.drawRect(0, 0, this.width, this.height);
     this.tile.endFill();
     tileContainer.addChild(this.tile);
 
@@ -42,18 +44,18 @@ export class RailroadTile {
       fill: 0x000000,
       align: 'center',
       wordWrap: true,
-      wordWrapWidth: width,
+      wordWrapWidth: this.width,
     });
     title.pivot.x = title.width / 2;
-    title.x = width / 2;
+    title.x = this.width / 2;
     tileContainer.addChild(title);
 
     // eslint-disable-next-line new-cap
     const image = new PIXI.Sprite.from('src/assets/railroad.png');
     image.width = 69;
     image.height = 50;
-    image.x = width / 2 - image.width / 2;
-    image.y = height / 2 - image.height / 2;
+    image.x = this.width / 2 - image.width / 2;
+    image.y = this.height / 2 - image.height / 2;
     tileContainer.addChild(image);
 
     const price = new PIXI.Text(`$${this.price}`, {
@@ -62,11 +64,11 @@ export class RailroadTile {
       fill: 0x000000,
       align: 'center',
       wordWrap: true,
-      wordWrapWidth: width,
+      wordWrapWidth: this.width,
     });
     price.pivot.x = price.width / 2;
-    price.x = width / 2;
-    price.y = height - 30;
+    price.x = this.width / 2;
+    price.y = this.height - 30;
     tileContainer.addChild(price);
 
     tileContainer.x = x;

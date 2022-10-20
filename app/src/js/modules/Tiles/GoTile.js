@@ -1,18 +1,24 @@
 const PIXI = window.PIXI;
 
 export class GoTile {
+  constructor() {
+    this.width = 150;
+    this.height = 150;
+  }
+
   update(gameState) { }
 
   draw(container, x, y, rotation = 0) {
     const tileContainer = new PIXI.Container();
     this.tileContainer = tileContainer;
+    this.tileContainer.width = this.width;
+    this.tileContainer.height = this.height;
+    this.tileContainer.pivot = new PIXI.Point(this.width / 2, this.height / 2);
 
-    const width = 150;
-    const height = 150;
     this.tile = new PIXI.Graphics();
     this.tile.beginFill(0xffffff);
     this.tile.lineStyle(2, 0x000000, 1);
-    this.tile.drawRect(0, 0, width, height);
+    this.tile.drawRect(0, 0, this.width, this.height);
     this.tile.endFill();
     tileContainer.addChild(this.tile);
 
@@ -22,11 +28,11 @@ export class GoTile {
       fill: 0x000000,
       align: 'center',
       wordWrap: true,
-      wordWrapWidth: width,
+      wordWrapWidth: this.width,
     });
     title.pivot.x = title.width / 2;
-    title.x = width / 2;
-    title.y = height / 2 - title.height / 2;
+    title.x = this.width / 2;
+    title.y = this.height / 2 - title.height / 2;
     tileContainer.addChild(title);
 
     tileContainer.x = x;

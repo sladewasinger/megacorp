@@ -14,6 +14,18 @@ export class Dice {
     this.diceNumber2.text = number2;
   }
 
+  disable() {
+    this.diceContainer.interactive = false;
+    this.diceContainer.buttonMode = false;
+    this.diceContainer.alpha = 0.5;
+  }
+
+  enable() {
+    this.diceContainer.interactive = true;
+    this.diceContainer.buttonMode = true;
+    this.diceContainer.alpha = 1;
+  }
+
   draw() {
     this.diceContainer = new PIXI.Container();
     const diceWidth = 50;
