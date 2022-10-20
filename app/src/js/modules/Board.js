@@ -357,40 +357,40 @@ export class Board {
       this.freeParking.draw(this.boardContainer, 0, 0);
 
       this.kentuckyAvenue = new ColorTile('Kentucky Avenue', 0xed1b24, 220);
-      this.kentuckyAvenue.draw(this.boardContainer, 150, 0, 0);
+      this.kentuckyAvenue.draw(this.boardContainer, 200, 75, 0);
 
       this.chance2 = new ColorTile('Chance', 0x000000, 0);
-      this.chance2.draw(this.boardContainer, 150 + 100, 0, 0);
+      this.chance2.draw(this.boardContainer, 200 + 100, 75, 0);
 
       this.indianaAvenue = new ColorTile('Indiana Avenue', 0xed1b24, 220);
-      this.indianaAvenue.draw(this.boardContainer, 150 + 100 * 2, 0, 0);
+      this.indianaAvenue.draw(this.boardContainer, 200 + 100 * 2, 75, 0);
 
       this.illinoisAvenue = new ColorTile('Illinois Avenue', 0xed1b24, 240);
-      this.illinoisAvenue.draw(this.boardContainer, 150 + 100 * 3, 0, 0);
+      this.illinoisAvenue.draw(this.boardContainer, 200 + 100 * 3, 75, 0);
 
       this.bAndORailroad = new RailroadTile('B & O Railroad', 0x000000, 200);
-      this.bAndORailroad.draw(this.boardContainer, 150 + 100 * 4, 0, 0);
+      this.bAndORailroad.draw(this.boardContainer, 200 + 100 * 4, 75, 0);
 
       this.atlanticAvenue = new ColorTile('Atlantic Avenue', 0xfef200, 260);
-      this.atlanticAvenue.draw(this.boardContainer, 150 + 100 * 5, 0, 0);
+      this.atlanticAvenue.draw(this.boardContainer, 200 + 100 * 5, 75, 0);
 
       this.ventnorAvenue = new ColorTile('Ventnor Avenue', 0xfef200, 260);
-      this.ventnorAvenue.draw(this.boardContainer, 150 + 100 * 6, 0, 0);
+      this.ventnorAvenue.draw(this.boardContainer, 200 + 100 * 6, 75, 0);
 
       this.waterWorks = new ColorTile('Water Works', 0x000000, 150);
-      this.waterWorks.draw(this.boardContainer, 150 + 100 * 7, 0, 0);
+      this.waterWorks.draw(this.boardContainer, 200 + 100 * 7, 75, 0);
 
       this.marvinGardens = new ColorTile('Marvin Gardens', 0xfef200, 280);
-      this.marvinGardens.draw(this.boardContainer, 150 + 100 * 8, 0, 0);
+      this.marvinGardens.draw(this.boardContainer, 200 + 100 * 8, 75, 0);
 
       this.goToJail = new GoToJailTile('Go To Jail', 0x000000, 0);
-      this.goToJail.draw(this.boardContainer, 150 + 100 * 9, 0, 0);
+      this.goToJail.draw(this.boardContainer, this.width - 75, 75, 0);
 
       this.pacificAvenue = new ColorTile('Pacific Avenue', 0x1fb25a, 300);
       this.pacificAvenue.draw(
         this.boardContainer,
-        this.width - 100,
-        150 + 100,
+        this.width - 75,
+        200,
         -Math.PI / 2,
       );
 
@@ -401,16 +401,16 @@ export class Board {
       );
       this.northCarolinaAvenue.draw(
         this.boardContainer,
-        this.width - 100,
-        150 + 100 * 2,
+        this.width - 75,
+        200 + 100,
         -Math.PI / 2,
       );
 
       this.communityChest3 = new ColorTile('Community Chest', 0x000000, 0);
       this.communityChest3.draw(
         this.boardContainer,
-        this.width - 100,
-        150 + 100 * 3,
+        this.width - 75,
+        200 + 100 * 2,
         -Math.PI / 2,
       );
 
@@ -421,48 +421,48 @@ export class Board {
       );
       this.pennsylvaniaAvenue.draw(
         this.boardContainer,
-        this.width - 100,
-        150 + 100 * 4,
+        this.width - 75,
+        200 + 100 * 3,
         -Math.PI / 2,
       );
 
       this.shortLine = new RailroadTile('Short Line', 0x000000, 200);
       this.shortLine.draw(
         this.boardContainer,
-        this.width - 100,
-        150 + 100 * 5,
+        this.width - 75,
+        200 + 100 * 4,
         -Math.PI / 2,
       );
 
       this.chance3 = new ColorTile('Chance', 0x000000, 0);
       this.chance3.draw(
         this.boardContainer,
-        this.width - 100,
-        150 + 100 * 6,
+        this.width - 75,
+        200 + 100 * 5,
         -Math.PI / 2,
       );
 
       this.parkPlace = new ColorTile('Park Place', 0x0072bb, 350);
       this.parkPlace.draw(
         this.boardContainer,
-        this.width - 100,
-        150 + 100 * 7,
+        this.width - 75,
+        200 + 100 * 6,
         -Math.PI / 2,
       );
 
       this.luxuryTax = new ColorTile('Luxury Tax', 0x000000, 0);
       this.luxuryTax.draw(
         this.boardContainer,
-        this.width - 100,
-        150 + 100 * 8,
+        this.width - 75,
+        200 + 100 * 7,
         -Math.PI / 2,
       );
 
       this.boardwalk = new ColorTile('Boardwalk', 0x0072bb, 400);
       this.boardwalk.draw(
         this.boardContainer,
-        this.width - 100,
-        150 + 100 * 9,
+        this.width - 75,
+        200 + 100 * 8,
         -Math.PI / 2,
       );
 

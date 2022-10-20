@@ -24,16 +24,26 @@ export class GoTile {
 
     const title = new PIXI.Text('Go', {
       fontFamily: 'Arial',
-      fontSize: 24,
+      fontSize: 60,
       fill: 0x000000,
       align: 'center',
-      wordWrap: true,
-      wordWrapWidth: this.width,
     });
     title.pivot.x = title.width / 2;
     title.x = this.width / 2;
     title.y = this.height / 2 - title.height / 2;
     tileContainer.addChild(title);
+
+    const arrow = new PIXI.Text('<--', {
+      fontFamily: 'monospace',
+      fontSize: 48,
+      fill: 0xff0000,
+      align: 'center',
+    });
+    arrow.pivot.x = arrow.width / 2;
+    arrow.pivot.y = arrow.height / 2;
+    arrow.x = this.width / 2;
+    arrow.y = this.height / 2 + title.height / 2 + 10;
+    tileContainer.addChild(arrow);
 
     tileContainer.x = x;
     tileContainer.y = y;
