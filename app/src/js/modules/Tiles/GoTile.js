@@ -22,28 +22,16 @@ export class GoTile {
     this.tile.endFill();
     tileContainer.addChild(this.tile);
 
-    const title = new PIXI.Text('Go', {
-      fontFamily: 'Arial',
-      fontSize: 60,
-      fill: 0x000000,
-      align: 'center',
-    });
-    title.pivot.x = title.width / 2;
-    title.x = this.width / 2;
-    title.y = this.height / 2 - title.height / 2;
-    tileContainer.addChild(title);
-
-    const arrow = new PIXI.Text('<--', {
-      fontFamily: 'monospace',
-      fontSize: 48,
-      fill: 0xff0000,
-      align: 'center',
-    });
-    arrow.pivot.x = arrow.width / 2;
-    arrow.pivot.y = arrow.height / 2;
-    arrow.x = this.width / 2;
-    arrow.y = this.height / 2 + title.height / 2 + 10;
-    tileContainer.addChild(arrow);
+    // eslint-disable-next-line new-cap
+    const image = new PIXI.Sprite.from('src/assets/GO.png');
+    image.width = 189;
+    image.height = 159;
+    const scale = 0.8 * Math.min(this.width / image.width, this.height / image.height);
+    image.width *= scale;
+    image.height *= scale;
+    image.x = this.width / 2 - image.width / 2;
+    image.y = this.height / 2 - image.height / 2;
+    tileContainer.addChild(image);
 
     tileContainer.x = x;
     tileContainer.y = y;

@@ -6,6 +6,8 @@ import { GoToJailTile } from './Tiles/GoToJailTile.js';
 import { RailroadTile } from './Tiles/RailroadTile.js';
 import { Dice } from './Dice.js';
 import { Buttons } from './Buttons.js';
+import { CommunityChestTile } from './Tiles/CommunityChestTile.js';
+import { ChanceTile } from './Tiles/ChanceTile.js';
 const PIXI = window.PIXI;
 
 function sleep(ms) {
@@ -41,6 +43,7 @@ export class Board {
     this.tiles = [];
     this.players = null;
     this.prevGameState = null;
+    this.animationInProgress = false;
 
     window.addEventListener('resize', this.resize.bind(this));
   }
@@ -67,11 +70,23 @@ export class Board {
       this.buttons.enable();
     }
 
-    this.gameState.players.forEach(async (gamePlayer) => {
-      let prevPosition = this.prevGameState.players.find((player) => player.id === gamePlayer.id).position;
+    while (this.animationInProgress) {
+      await sleep(100);
+    }
+    this.animationInProgress = true;
+    this.buttons.disable();
+    this.dice.disable();
+
+    for (const gamePlayer of this.gameState.players) {
+      let prevPosition = this.prevGameState.players.find((player) => player.id === gamePlayer.id)?.position || -1;
+
       let counter0 = 0;
-      while (prevPosition <= gamePlayer.position && counter0 < 100) {
+      while (prevPosition != gamePlayer.position && counter0 < 13) {
         counter0++;
+        prevPosition++;
+        if (prevPosition >= this.tiles.length) {
+          prevPosition = 0;
+        }
         const tile = this.tiles.find((t, i) => i === prevPosition);
         if (!tile) {
           console.error('could not find tile matching player position');
@@ -115,17 +130,12 @@ export class Board {
           player.y += offset;
           await sleep(10);
         }
-
-        prevPosition++;
       }
+    };
 
-      if (counter0 > 100) {
-        console.error('counter0 > 100');
-        const tile = this.tiles.find((t, i) => i === prevPosition);
-        player.x = tile.x;
-        player.y = tile.y;
-      }
-    });
+    this.animationInProgress = false;
+    this.buttons.enable();
+    this.dice.enable();
 
     // Set controls:
     this.dice.setNumber(this.gameState.diceRoll1, this.gameState.diceRoll2);
@@ -218,7 +228,7 @@ export class Board {
         this.height - 75,
       );
 
-      this.communityChest1 = new ColorTile('Community Chest', 0x000000, 0);
+      this.communityChest1 = new CommunityChestTile();
       this.communityChest1.draw(
         this.boardContainer,
         this.width - 100 - 100 - 100,
@@ -253,7 +263,7 @@ export class Board {
         this.height - 75,
       );
 
-      this.chance1 = new ColorTile('Chance', 0x000000, 0);
+      this.chance1 = new ChanceTile();
       this.chance1.draw(this.boardContainer, this.width - 100 - 100 * 7, this.height - 75);
 
       this.vermontAvenue = new ColorTile('Vermont Avenue', 0xace2fc, 100);
@@ -329,7 +339,7 @@ export class Board {
         Math.PI / 2,
       );
 
-      this.communityChest2 = new ColorTile('Community Chest', 0x000000, 0);
+      this.communityChest2 = new CommunityChestTile();
       this.communityChest2.draw(
         this.boardContainer,
         75,
@@ -354,12 +364,12 @@ export class Board {
       );
 
       this.freeParking = new FreeParkingTile('Free Parking', 0x000000, 0);
-      this.freeParking.draw(this.boardContainer, 0, 0);
+      this.freeParking.draw(this.boardContainer, 75, 75);
 
       this.kentuckyAvenue = new ColorTile('Kentucky Avenue', 0xed1b24, 220);
       this.kentuckyAvenue.draw(this.boardContainer, 200, 75, 0);
 
-      this.chance2 = new ColorTile('Chance', 0x000000, 0);
+      this.chance2 = new ChanceTile();
       this.chance2.draw(this.boardContainer, 200 + 100, 75, 0);
 
       this.indianaAvenue = new ColorTile('Indiana Avenue', 0xed1b24, 220);
@@ -406,7 +416,7 @@ export class Board {
         -Math.PI / 2,
       );
 
-      this.communityChest3 = new ColorTile('Community Chest', 0x000000, 0);
+      this.communityChest3 = new CommunityChestTile();
       this.communityChest3.draw(
         this.boardContainer,
         this.width - 75,
@@ -434,7 +444,7 @@ export class Board {
         -Math.PI / 2,
       );
 
-      this.chance3 = new ColorTile('Chance', 0x000000, 0);
+      this.chance3 = new ChanceTile();
       this.chance3.draw(
         this.boardContainer,
         this.width - 75,
