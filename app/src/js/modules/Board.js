@@ -5,6 +5,7 @@ import { JailTile } from './Tiles/JailTile.js';
 import { GoToJailTile } from './Tiles/GoToJailTile.js';
 import { RailroadTile } from './Tiles/RailroadTile.js';
 import { Dice } from './Dice.js';
+import { Buttons } from './Buttons.js';
 const PIXI = window.PIXI;
 
 function sleep(ms) {
@@ -14,10 +15,18 @@ function sleep(ms) {
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 export class Board {
-  constructor(canvas, container, rollDiceCallback) {
+  constructor(canvas, container,
+    rollDiceCallback,
+    buyPropertyCallback,
+    auctionPropertyCallback,
+    endTurnCallback,
+  ) {
     this.canvas = canvas;
     this.container = container;
     this.rollDiceCallback = rollDiceCallback;
+    this.buyPropertyCallback = buyPropertyCallback;
+    this.auctionPropertyCallback = auctionPropertyCallback;
+    this.endTurnCallback = endTurnCallback;
     this.dice = null;
 
     this.container.sortableChildren = true;
@@ -27,34 +36,59 @@ export class Board {
     this.height = 1200;
     this.tiles = [];
     this.players = null;
+    this.prevGameState = null;
 
     window.addEventListener('resize', this.resize.bind(this));
   }
 
   async update(gameState) {
     this.gameState = gameState;
-    this.tiles.forEach((tile) => {
-      tile.update(gameState);
+    if (!this.prevGameState) {
+      this.prevGameState = gameState;
+    }
+    this.tiles.forEach((tile, index) => {
+      tile.update(index, gameState);
     });
 
     if (!this.players) {
       this.drawPlayersInitial();
     }
     this.gameState.players.forEach(async (gamePlayer) => {
-      const tile = this.tiles.find((t, i) => i === gamePlayer.position);
-      if (!tile) {
-        console.error('could not find tile matching player position');
-        return;
-      }
-      const player = this.players.find((p) => p.id === gamePlayer.id);
-      const targetPos = {
-        x: tile.tileContainer.x + 25,
-        y: tile.tileContainer.y + 75,
-      };
-      while (Math.abs(player.x - targetPos.x) > 1 || Math.abs(player.y - targetPos.y) > 1) {
-        player.x += clamp((targetPos.x - player.x) * 0.1, -5, 5);
-        player.y += clamp((targetPos.y - player.y) * 0.1, -5, 5);
+      let prevPosition = this.prevGameState.players.find((player) => player.id === gamePlayer.id).position;
+      while (prevPosition <= gamePlayer.position) {
         await sleep(10);
+        const tile = this.tiles.find((t, i) => i === prevPosition);
+        if (!tile) {
+          console.error('could not find tile matching player position');
+          return;
+        }
+        const player = this.players.find((p) => p.id === gamePlayer.id);
+
+        const targetPos = {
+          x: tile.tileContainer.x,
+          y: tile.tileContainer.y,
+        };
+        // if (tile.tileContainer.rotation == Math.PI / 2) {
+        //   targetPos.x = tile.tileContainer.x - 100;
+        //   targetPos.y = tile.tileContainer.y + tile.tileContainer.width / 2;
+        // } else if (tile.tileContainer.rotation == - Math.PI / 2) {
+        //   targetPos.x = tile.tileContainer.x + 75;
+        //   targetPos.y = tile.tileContainer.y + tile.tileContainer.width / 2;
+        // }
+        let counter = 0;
+        const clampMinX = -5;
+        const clampMaxX = 5;
+        const clampMinY = -5;
+        const clampMaxY = 5;
+        while (Math.abs(player.x - targetPos.x) > 1 || Math.abs(player.y - targetPos.y) > 1 && counter < 100) {
+          counter++;
+          player.x += clamp((targetPos.x - player.x) * 0.1, clampMinX, clampMaxX);
+          player.y += clamp((targetPos.y - player.y) * 0.1, clampMinY, clampMaxY);
+          await sleep(10);
+        }
+        player.x = targetPos.x;
+        player.y = targetPos.y;
+        prevPosition++;
       }
 
       const playersOnSameTile = this.gameState.players.filter((p) => p.position === gamePlayer.position);
@@ -68,6 +102,8 @@ export class Board {
 
     // Set controls:
     this.dice.setNumber(this.gameState.diceRoll1, this.gameState.diceRoll2);
+
+    this.prevGameState = gameState;
   }
 
   drawPlayersInitial() {
@@ -81,7 +117,8 @@ export class Board {
       playerContainer.y = this.height;
 
       const graphics = new PIXI.Graphics();
-      graphics.beginFill(0xff0000);
+      graphics.beginFill(player.color);
+      graphics.lineStyle(2, 0x000000, 1);
       graphics.drawCircle(0, 0, 15);
       graphics.endFill();
       graphics.zIndex = 1001;
@@ -123,14 +160,25 @@ export class Board {
       title.y = this.height / 2 - title.height / 2;
       this.boardContainer.addChild(title);
 
+      // ********************************************* //
       // Controls:
       this.dice = new Dice(this.boardContainer, this.rollDiceCallback);
       this.dice.draw();
       this.dice.setPosition(200, this.height - 250);
 
+      this.buttons = new Buttons(
+        this.boardContainer,
+        this.buyPropertyCallback,
+        this.auctionPropertyCallback,
+        this.endTurnCallback,
+      );
+      this.buttons.draw();
+      this.buttons.setPosition(200, this.height - 310);
+
+      // ********************************************* //
       // Tiles:
       this.goTile = new GoTile();
-      this.goTile.draw(this.boardContainer, this.width - 150, this.height - 150);
+      this.goTile.draw(this.boardContainer, this.width - 75, this.height - 75);
 
       this.mediterraneanAvenue = new ColorTile(
         'Mediterranean Avenue',
@@ -139,26 +187,26 @@ export class Board {
       );
       this.mediterraneanAvenue.draw(
         this.boardContainer,
-        this.width - 150 - 100,
-        this.height - 150,
+        this.width - 100 - 100,
+        this.height - 75,
       );
 
       this.communityChest1 = new ColorTile('Community Chest', 0x000000, 0);
       this.communityChest1.draw(
         this.boardContainer,
-        this.width - 100 - 150 - 100,
-        this.height - 150,
+        this.width - 100 - 100 - 100,
+        this.height - 75,
       );
 
       this.balticAvenue = new ColorTile('Baltic Avenue', 0x955436, 60);
       this.balticAvenue.draw(
         this.boardContainer,
-        this.width - 100 - 150 - 100 - 100,
-        this.height - 150,
+        this.width - 100 - 100 - 100 - 100,
+        this.height - 75,
       );
 
       this.incomeTax = new ColorTile('Income Tax', 0x000000, 0);
-      this.incomeTax.draw(this.boardContainer, this.width - 150 - 100 * 4, this.height - 150);
+      this.incomeTax.draw(this.boardContainer, this.width - 100 - 100 * 4, this.height - 75);
 
       this.readingRailroad = new RailroadTile(
         'Reading Railroad',
@@ -167,25 +215,25 @@ export class Board {
       );
       this.readingRailroad.draw(
         this.boardContainer,
-        this.width - 150 - 100 * 5,
-        this.height - 150,
+        this.width - 100 - 100 * 5,
+        this.height - 75,
       );
 
       this.orientalAvenue = new ColorTile('Oriental Avenue', 0xace2fc, 100);
       this.orientalAvenue.draw(
         this.boardContainer,
-        this.width - 150 - 100 * 6,
-        this.height - 150,
+        this.width - 100 - 100 * 6,
+        this.height - 75,
       );
 
       this.chance1 = new ColorTile('Chance', 0x000000, 0);
-      this.chance1.draw(this.boardContainer, this.width - 150 - 100 * 7, this.height - 150);
+      this.chance1.draw(this.boardContainer, this.width - 100 - 100 * 7, this.height - 75);
 
       this.vermontAvenue = new ColorTile('Vermont Avenue', 0xace2fc, 100);
       this.vermontAvenue.draw(
         this.boardContainer,
-        this.width - 150 - 100 * 8,
-        this.height - 150,
+        this.width - 100 - 100 * 8,
+        this.height - 75,
       );
 
       this.connecticutAvenue = new ColorTile(
@@ -195,42 +243,42 @@ export class Board {
       );
       this.connecticutAvenue.draw(
         this.boardContainer,
-        this.width - 150 - 100 * 9,
-        this.height - 150,
+        this.width - 100 - 100 * 9,
+        this.height - 75,
       );
 
       this.jail = new JailTile('Jail', 0x000000, 0);
-      this.jail.draw(this.boardContainer, 0, this.height - 150);
+      this.jail.draw(this.boardContainer, 75, this.height - 75);
 
       this.stCharlesPlace = new ColorTile('St. Charles Place', 0xd93a96, 140);
       this.stCharlesPlace.draw(
         this.boardContainer,
-        150,
-        this.height - 150 - 100,
+        75,
+        this.height - 200,
         Math.PI / 2,
       );
 
       this.electricCompany = new ColorTile('Electric Company', 0x000000, 150);
       this.electricCompany.draw(
         this.boardContainer,
-        150,
-        this.height - 150 - 100 * 2,
+        75,
+        this.height - 200 - 100,
         Math.PI / 2,
       );
 
       this.statesAvenue = new ColorTile('States Avenue', 0xd93a96, 140);
       this.statesAvenue.draw(
         this.boardContainer,
-        150,
-        this.height - 150 - 100 * 3,
+        75,
+        this.height - 200 - 100 * 2,
         Math.PI / 2,
       );
 
       this.virginiaAvenue = new ColorTile('Virginia Avenue', 0xd93a96, 160);
       this.virginiaAvenue.draw(
         this.boardContainer,
-        150,
-        this.height - 150 - 100 * 4,
+        75,
+        this.height - 200 - 100 * 3,
         Math.PI / 2,
       );
 
@@ -241,40 +289,40 @@ export class Board {
       );
       this.pennsylvaniaRailroad.draw(
         this.boardContainer,
-        150,
-        this.height - 150 - 100 * 5,
+        75,
+        this.height - 200 - 100 * 4,
         Math.PI / 2,
       );
 
       this.stJamesPlace = new ColorTile('St. James Place', 0xf7941d, 180);
       this.stJamesPlace.draw(
         this.boardContainer,
-        150,
-        this.height - 150 - 100 * 6,
+        75,
+        this.height - 200 - 100 * 5,
         Math.PI / 2,
       );
 
       this.communityChest2 = new ColorTile('Community Chest', 0x000000, 0);
       this.communityChest2.draw(
         this.boardContainer,
-        150,
-        this.height - 150 - 100 * 7,
+        75,
+        this.height - 200 - 100 * 6,
         Math.PI / 2,
       );
 
       this.tennesseeAvenue = new ColorTile('Tennessee Avenue', 0xf7941d, 180);
       this.tennesseeAvenue.draw(
         this.boardContainer,
-        150,
-        this.height - 150 - 100 * 8,
+        75,
+        this.height - 200 - 100 * 7,
         Math.PI / 2,
       );
 
       this.newYorkAvenue = new ColorTile('New York Avenue', 0xf7941d, 200);
       this.newYorkAvenue.draw(
         this.boardContainer,
-        150,
-        this.height - 150 - 100 * 9,
+        75,
+        this.height - 200 - 100 * 8,
         Math.PI / 2,
       );
 
@@ -314,7 +362,7 @@ export class Board {
       this.pacificAvenue = new ColorTile('Pacific Avenue', 0x1fb25a, 300);
       this.pacificAvenue.draw(
         this.boardContainer,
-        this.width - 150,
+        this.width - 100,
         150 + 100,
         -Math.PI / 2,
       );
@@ -326,7 +374,7 @@ export class Board {
       );
       this.northCarolinaAvenue.draw(
         this.boardContainer,
-        this.width - 150,
+        this.width - 100,
         150 + 100 * 2,
         -Math.PI / 2,
       );
@@ -334,7 +382,7 @@ export class Board {
       this.communityChest3 = new ColorTile('Community Chest', 0x000000, 0);
       this.communityChest3.draw(
         this.boardContainer,
-        this.width - 150,
+        this.width - 100,
         150 + 100 * 3,
         -Math.PI / 2,
       );
@@ -346,7 +394,7 @@ export class Board {
       );
       this.pennsylvaniaAvenue.draw(
         this.boardContainer,
-        this.width - 150,
+        this.width - 100,
         150 + 100 * 4,
         -Math.PI / 2,
       );
@@ -354,7 +402,7 @@ export class Board {
       this.shortLine = new RailroadTile('Short Line', 0x000000, 200);
       this.shortLine.draw(
         this.boardContainer,
-        this.width - 150,
+        this.width - 100,
         150 + 100 * 5,
         -Math.PI / 2,
       );
@@ -362,7 +410,7 @@ export class Board {
       this.chance3 = new ColorTile('Chance', 0x000000, 0);
       this.chance3.draw(
         this.boardContainer,
-        this.width - 150,
+        this.width - 100,
         150 + 100 * 6,
         -Math.PI / 2,
       );
@@ -370,7 +418,7 @@ export class Board {
       this.parkPlace = new ColorTile('Park Place', 0x0072bb, 350);
       this.parkPlace.draw(
         this.boardContainer,
-        this.width - 150,
+        this.width - 100,
         150 + 100 * 7,
         -Math.PI / 2,
       );
@@ -378,7 +426,7 @@ export class Board {
       this.luxuryTax = new ColorTile('Luxury Tax', 0x000000, 0);
       this.luxuryTax.draw(
         this.boardContainer,
-        this.width - 150,
+        this.width - 100,
         150 + 100 * 8,
         -Math.PI / 2,
       );
@@ -386,7 +434,7 @@ export class Board {
       this.boardwalk = new ColorTile('Boardwalk', 0x0072bb, 400);
       this.boardwalk.draw(
         this.boardContainer,
-        this.width - 150,
+        this.width - 100,
         150 + 100 * 9,
         -Math.PI / 2,
       );

@@ -6,14 +6,15 @@ import { UtilityTile } from './tiles/UtilityTile.js';
 
 export class Game {
   constructor(players) {
+    this.board = new Board();
     this.gameState = {
       started: false,
       finished: false,
       diceRoll1: 0,
       diceRoll2: 0,
       players,
+      tiles: [],
     };
-    this.board = new Board();
   }
 
   getGameState(user) {
@@ -22,15 +23,39 @@ export class Game {
       players: this.gameState.players.map((player) => ({
         ...player,
       })),
+      tiles: this.board.tiles,
     };
 
     return gameState;
   }
 
   startGame() {
+    function selectColor(number) {
+      const hue = number * 137.508; // use golden angle approximation
+      return [hue, 100, 50];
+    }
+
+    function hslToHex([h, s, l]) {
+      s /= 100;
+      l /= 100;
+      const a = s * Math.min(l, 1 - l);
+      const f = (n) => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color)
+          .toString(16)
+          .padStart(2, '0'); // convert to Hex and prefix "0" if needed
+      };
+      const color = +`0x${f(0)}${f(8)}${f(4)}`;
+      console.log(color);
+      return color;
+    }
+
     this.gameState.players = this.gameState.players.sort(() => Math.random() - 0.5);
     this.gameState.players.forEach((player) => {
       player.position = 0;
+      player.money = 1500;
+      player.color = hslToHex(selectColor(this.gameState.players.indexOf(player)));
     });
     this.gameState.started = true;
   }
@@ -64,6 +89,7 @@ export class Game {
     const diceRoll = diceRoll1 + diceRoll2;
 
     player.hasRolledDice = true;
+    player.prevPosition = player.position;
 
     if (diceRoll1 === diceRoll2) {
       player.diceRollsInARow += 1;
@@ -116,7 +142,7 @@ export class Game {
     this.gameState.players.push(this.gameState.players.shift());
   }
 
-  buyProperty(playerId, tileIndex) {
+  buyProperty(playerId) {
     const player = this.gameState.players.find((player) => player.id === playerId);
     if (!player) {
       throw new Error('Player not found');
@@ -128,7 +154,7 @@ export class Game {
       throw new Error('You have not rolled the dice');
     }
 
-    const property = this.board.tiles.find((property, index) => index === tileIndex);
+    const property = this.board.tiles.find((property, index) => index === player.position);
     if (!property) {
       throw new Error('Property not found');
     }

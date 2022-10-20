@@ -20,7 +20,10 @@ export class Engine {
         socket.on('createLobby', (callbackFn) => this.createLobby(socket, callbackFn));
         socket.on('joinLobby', (lobbyId, callbackFn) => this.joinLobby(socket, lobbyId, callbackFn));
         socket.on('startGame', (lobbyId, callbackFn) => this.startGame(socket, lobbyId, callbackFn));
-        socket.on('rollDice', (lobbyId, callbackFn) => this.rollDice(socket, lobbyId, callbackFn));
+        socket.on('rollDice', (callbackFn) => this.rollDice(socket, callbackFn));
+        socket.on('buyProperty', (callbackFn) => this.buyProperty(socket, callbackFn));
+        socket.on('auctionProperty', (callbackFn) => this.auctionProperty(socket, callbackFn));
+        socket.on('endTurn', (callbackFn) => this.endTurn(socket, callbackFn));
         socket.on('Error', (error) => {
           console.log(error);
           socket.emit('Error', error);
@@ -137,13 +140,13 @@ export class Engine {
     callbackFn(null, lobby);
   }
 
-  rollDice(socket, lobbyId, callbackFn) {
+  rollDice(socket, callbackFn) {
     const user = this.users.find((user) => user.id === socket.id);
     if (!user) {
       callbackFn('User not found');
       return;
     }
-    const lobby = this.lobbies.find((lobby) => lobby.id === lobbyId);
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
     if (!lobby) {
       callbackFn('Lobby not found');
       return;
@@ -172,5 +175,114 @@ export class Engine {
       this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
     });
     callbackFn(null, [number1, number2]);
+  }
+
+  buyProperty(socket, callbackFn) {
+    const user = this.users.find((user) => user.id === socket.id);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+
+    console.log('buyProperty');
+
+    try {
+      lobby.game.buyProperty(player.id);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    lobby.users.forEach((user) => {
+      console.log('gameUpdate, sent to ', user.id);
+      this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
+    });
+    callbackFn(null, lobby.game.getGameState(user));
+  }
+
+  auctionProperty(socket, callbackFn) {
+    const user = this.users.find((user) => user.id === socket.id);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+
+    try {
+      lobby.game.auctionProperty(player.id);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    lobby.users.forEach((user) => {
+      console.log('gameUpdate, sent to ', user.id);
+      this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
+    });
+    callbackFn(null, lobby.game.getGameState(user));
+  }
+
+
+  endTurn(socket, callbackFn) {
+    const user = this.users.find((user) => user.id === socket.id);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+
+    console.log('endTurn');
+    try {
+      lobby.game.endTurn(player.id);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    lobby.users.forEach((user) => {
+      console.log('gameUpdate, sent to ', user.id);
+      this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
+    });
+    callbackFn(null, lobby.game.getGameState(user));
   }
 }
