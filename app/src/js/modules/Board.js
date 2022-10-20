@@ -35,6 +35,10 @@ export class Board {
 
     this.socketId = null;
 
+    this.renderState = {
+      animationInProgress: false,
+    };
+
     this.container.sortableChildren = true;
     this.boardContainer = new PIXI.Container();
     this.boardContainer.sortableChildren = true;
@@ -43,7 +47,6 @@ export class Board {
     this.tiles = [];
     this.players = null;
     this.prevGameState = null;
-    this.animationInProgress = false;
 
     window.addEventListener('resize', this.resize.bind(this));
   }
@@ -53,6 +56,7 @@ export class Board {
     if (!this.prevGameState) {
       this.prevGameState = gameState;
     }
+
     this.tiles.forEach((tile, index) => {
       tile.update(index, gameState);
     });
@@ -70,12 +74,15 @@ export class Board {
       this.buttons.enable();
     }
 
-    while (this.animationInProgress) {
+    while (this.renderState.animationInProgress) {
       await sleep(100);
     }
     this.animationInProgress = true;
-    this.buttons.disable();
-    this.dice.disable();
+    // this.buttons.disable();
+    // this.dice.disable();
+
+    this.buttons.update(gameState, this.prevGameState, this.renderState);
+
 
     for (const gamePlayer of this.gameState.players) {
       let prevPosition = this.prevGameState.players.find((player) => player.id === gamePlayer.id)?.position || -1;
@@ -135,10 +142,11 @@ export class Board {
 
     this.animationInProgress = false;
 
-    if (this.gameState.currentPlayer.id === this.gameState.myId) {
-      this.buttons.enable();
-      this.dice.enable();
-    }
+    this.buttons.update(gameState, this.prevGameState, this.renderState);
+    // if (this.gameState.currentPlayer.id === this.gameState.myId) {
+    //   this.buttons.enable();
+    //   this.dice.enable();
+    // }
 
     // Set controls:
     this.dice.setNumber(this.gameState.diceRoll1, this.gameState.diceRoll2);

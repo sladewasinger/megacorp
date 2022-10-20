@@ -110,7 +110,7 @@ export class Game {
     } else {
       player.position += diceRoll;
       if (player.position >= 40) {
-        player.position = 0;
+        player.position -= 40;
         player.money += 200; // Passed Go
       }
     }
