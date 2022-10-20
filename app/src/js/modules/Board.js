@@ -134,8 +134,11 @@ export class Board {
     };
 
     this.animationInProgress = false;
-    this.buttons.enable();
-    this.dice.enable();
+
+    if (this.gameState.currentPlayer.id === this.gameState.myId) {
+      this.buttons.enable();
+      this.dice.enable();
+    }
 
     // Set controls:
     this.dice.setNumber(this.gameState.diceRoll1, this.gameState.diceRoll2);
