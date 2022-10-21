@@ -43,7 +43,10 @@ export class Engine {
       this.lobby = lobby;
     });
     this.socket.on('gameUpdate', async (gameState) => await this.onGameStateUpdate(gameState));
+    this.socket.on('diceRoll', (playerId, prevPos, pos) => this.onDiceRoll(playerId, prevPos, pos));
     this.board.socketId = this.socketId;
+
+    this.update();
   }
 
   async onGameStateUpdate(gameState) {
@@ -52,8 +55,21 @@ export class Engine {
     if (!this.gameRunning) {
       this.gameRunning = true;
     }
+  }
 
-    await this.board.update(gameState);
+  update() {
+    if (!this.gameState || !this.gameRunning) {
+      requestAnimationFrame(this.update.bind(this));
+      return;
+    }
+
+    this.board.update(this.gameState);
+    window.requestAnimationFrame(this.update.bind(this));
+  }
+
+  onDiceRoll(playerId, prevPos, pos) {
+    console.log('diceRoll', playerId, prevPos, pos);
+    this.board.drawPlayerMoveAnimation(this.gameState, playerId, prevPos, pos);
   }
 
   registerUser(name) {

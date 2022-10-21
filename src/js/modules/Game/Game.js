@@ -1,6 +1,6 @@
 import { Board } from './Board.js';
 import { Player } from './models/Player.js';
-import { ColorTile } from './tiles/ColorTile.js';
+import { ColorTile } from './tiles/ColorTiles.js';
 import { RailroadTile } from './tiles/RailroadTile.js';
 import { UtilityTile } from './tiles/UtilityTile.js';
 
@@ -15,10 +15,11 @@ export class Game {
       players,
       tiles: [],
       auctionProperty: null,
+      state: 'turnStart',
     };
   }
 
-  getGameState(user) {
+  getClientGameState(user) {
     const gameState = {
       ...this.gameState,
       players: this.gameState.players.map((player) => ({
@@ -61,6 +62,7 @@ export class Game {
       player.color = hslToHex(selectColor(this.gameState.players.indexOf(player)));
     });
     this.gameState.started = true;
+    this.gameState.state = 'rollDice';
   }
 
   static createPlayer(name, id) {
@@ -80,6 +82,9 @@ export class Game {
     if (player !== this.currentPlayer()) {
       throw new Error('Not your turn');
     }
+    if (player.state !== 'turnStart') {
+      throw new Error('Wrong action');
+    }
     if (player.hasRolledDice && player.diceDoublesInRow == 0) {
       throw new Error('You have already rolled the dice');
     }
@@ -94,17 +99,15 @@ export class Game {
 
     const diceRoll = diceRoll1 + diceRoll2;
 
-    player.hasRolledDice = true;
     player.prevPosition = player.position;
 
     if (diceRoll1 === diceRoll2) {
       player.diceDoublesInRow += 1;
     } else {
-      player.diceDoublesInRow = 0;
+      this.diceDoublesInRow = 0;
     }
 
-    if (player.diceDoublesInRow > 2) {
-      player.hasRolledDice = true;
+    if (player.diceDoublesInRow >= 3) {
       player.position = 10; // Jail
       player.isInJail = true;
     } else {
@@ -126,6 +129,9 @@ export class Game {
       .filter((property) => !property.ownerId);
     if (propertySpaces.some((property) => property.index === player.position)) {
       player.requiresPropertyAction = true;
+      this.gameState.state = 'propertyAction';
+    } else {
+      this.gameState.state = 'endTurn';
     }
 
     return [diceRoll1, diceRoll2];
@@ -138,6 +144,9 @@ export class Game {
     }
     if (player !== this.currentPlayer()) {
       throw new Error('Not your turn');
+    }
+    if (this.gameState.state !== 'endTurn') {
+      throw new Error('Wrong action');
     }
     if (!player.hasRolledDice) {
       throw new Error('You have not rolled the dice');

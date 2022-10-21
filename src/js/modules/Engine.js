@@ -175,9 +175,14 @@ export class Engine {
       }
       return;
     }
+    const prevPosition = player.position - number1 - number2;
+    if (prevPosition < 0) {
+      prevPosition += 40;
+    }
     lobby.users.forEach((user) => {
       console.log('gameUpdate, sent to ', user.id);
       this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
+      this.io.to(user.id).emit('diceRoll', player.id, prevPosition, player.position);
     });
     callbackFn(null, [number1, number2]);
   }

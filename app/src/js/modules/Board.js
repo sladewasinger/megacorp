@@ -52,112 +52,78 @@ export class Board {
   }
 
   async update(gameState) {
-    this.gameState = gameState;
-    if (!this.prevGameState) {
-      this.prevGameState = gameState;
-    }
-
     this.tiles.forEach((tile, index) => {
       tile.update(index, gameState);
     });
 
     if (!this.players) {
-      this.drawPlayersInitial();
+      this.drawPlayersInitial(gameState);
     }
 
-    console.log(this.gameState.currentPlayer.id, this.gameState.myId);
-    if (this.gameState.currentPlayer.id !== this.gameState.myId) {
-      this.dice.disable();
-      this.buttons.disable();
-    } else {
-      this.dice.enable();
-      this.buttons.enable();
-    }
-
-    while (this.renderState.animationInProgress) {
-      await sleep(100);
-    }
-    this.animationInProgress = true;
-    // this.buttons.disable();
-    // this.dice.disable();
-
-    this.buttons.update(gameState, this.prevGameState, this.renderState);
-
-
-    for (const gamePlayer of this.gameState.players) {
-      let prevPosition = this.prevGameState.players.find((player) => player.id === gamePlayer.id)?.position || -1;
-
-      let counter0 = 0;
-      while (prevPosition != gamePlayer.position && counter0 < 13) {
-        counter0++;
-        prevPosition++;
-        if (prevPosition >= this.tiles.length) {
-          prevPosition = 0;
-        }
-        const tile = this.tiles.find((t, i) => i === prevPosition);
-        if (!tile) {
-          console.error('could not find tile matching player position');
-          return;
-        }
-        const player = this.players.find((p) => p.id === gamePlayer.id);
-
-        const targetPos = {
-          x: tile.tileContainer.x,
-          y: tile.tileContainer.y,
-        };
-        // if (tile.tileContainer.rotation == Math.PI / 2) {
-        //   targetPos.x = tile.tileContainer.x - 100;
-        //   targetPos.y = tile.tileContainer.y + tile.tileContainer.width / 2;
-        // } else if (tile.tileContainer.rotation == - Math.PI / 2) {
-        //   targetPos.x = tile.tileContainer.x + 75;
-        //   targetPos.y = tile.tileContainer.y + tile.tileContainer.width / 2;
-        // }
-        let counter = 0;
-        const speed = 5;
-        const damping = 0.2;
-        const clampMinX = -speed;
-        const clampMaxX = speed;
-        const clampMinY = -speed;
-        const clampMaxY = speed;
-        while (Math.abs(player.x - targetPos.x) > 1 || Math.abs(player.y - targetPos.y) > 1 && counter < 100) {
-          counter++;
-          player.x += clamp((targetPos.x - player.x) * damping, clampMinX, clampMaxX);
-          player.y += clamp((targetPos.y - player.y) * damping, clampMinY, clampMaxY);
-          await sleep(10);
-        }
-        player.x = targetPos.x;
-        player.y = targetPos.y;
-
-        const playersOnSameTile = this.gameState.players.filter((p) => p.position === prevPosition);
-        if (playersOnSameTile.length > 1) {
-          console.log('playersOnSameTile', playersOnSameTile);
-          const playerIndex = playersOnSameTile.findIndex((p) => p.id === gamePlayer.id);
-          const offset = -25 + playerIndex * 20;
-          player.x += offset;
-          player.y += offset;
-          await sleep(10);
-        }
-      }
-    };
-
-    this.animationInProgress = false;
-
-    this.buttons.update(gameState, this.prevGameState, this.renderState);
-    // if (this.gameState.currentPlayer.id === this.gameState.myId) {
-    //   this.buttons.enable();
-    //   this.dice.enable();
-    // }
+    this.buttons.update(gameState, this.renderState);
 
     // Set controls:
-    this.dice.setNumber(this.gameState.diceRoll1, this.gameState.diceRoll2);
-
-    this.prevGameState = gameState;
+    this.dice.setNumber(gameState.diceRoll1, gameState.diceRoll2);
   }
 
-  drawPlayersInitial() {
+  async drawPlayerMoveAnimation(gameState, playerId, prevPos, pos) {
+    this.renderState.animationInProgress = true;
+
+    const playerGraphics = this.players.find((player) => player.id === playerId);
+
+    let counter0 = 0;
+    while (prevPos != pos && counter0 < 13) {
+      counter0++;
+      prevPos++;
+      if (prevPos >= this.tiles.length) {
+        prevPos = 0;
+      }
+      const tile = this.tiles.find((t, i) => i === prevPos);
+      if (!tile) {
+        console.error('could not find tile matching player position');
+        return;
+      }
+
+      const targetPos = {
+        x: tile.tileContainer.x,
+        y: tile.tileContainer.y,
+      };
+
+      let counter = 0;
+      const speed = 5;
+      const damping = 0.2;
+      const clampMinX = -speed;
+      const clampMaxX = speed;
+      const clampMinY = -speed;
+      const clampMaxY = speed;
+      while (Math.abs(playerGraphics.x - targetPos.x) > 1 ||
+        Math.abs(playerGraphics.y - targetPos.y) > 1 && counter < 100
+      ) {
+        counter++;
+        playerGraphics.x += clamp((targetPos.x - playerGraphics.x) * damping, clampMinX, clampMaxX);
+        playerGraphics.y += clamp((targetPos.y - playerGraphics.y) * damping, clampMinY, clampMaxY);
+        await sleep(10);
+      }
+      playerGraphics.x = targetPos.x;
+      playerGraphics.y = targetPos.y;
+
+      const playersOnSameTile = gameState.players.filter((p) => p.position === prevPos);
+      if (playersOnSameTile.length > 1) {
+        const playerIndex = playersOnSameTile.findIndex((p) => p.id === gamePlayer.id);
+        const offset = -25 + playerIndex * 20;
+        playerGraphics.x += offset;
+        playerGraphics.y += offset;
+        await sleep(10);
+      }
+    }
+
+    this.renderState.animationInProgress = false;
+  }
+
+  drawPlayersInitial(gameState) {
     console.log('drawPlayersInitial');
     this.players = [];
-    this.gameState.players.forEach((player) => {
+    gameState.players.forEach((player) => {
       const playerContainer = new PIXI.Container();
       playerContainer.id = player.id;
       playerContainer.zIndex = 1000;

@@ -19,12 +19,14 @@ export class Buttons {
     this.buttonsContainer.y = y;
   }
 
-  update(gameState, prevGameState, renderState) {
-    if (renderState.animationInProgress) {
+  update(gameState, renderState) {
+    if (renderState.animationInProgress || renderState.auctionInProgress || gameState.state !== 'rollDice') {
       this.disable();
+      return;
     } else {
       this.enable();
     }
+
     if (gameState.currentPlayer.id == gameState.myId) {
       if (gameState.currentPlayer.requiresPropertyAction || !gameState.currentPlayer.hasRolledDice) {
         this.disableEndTurnButton();

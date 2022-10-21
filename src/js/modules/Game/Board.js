@@ -1,5 +1,5 @@
 import { GoTile } from './tiles/GoTile.js';
-import { ColorTile } from './tiles/ColorTile.js';
+import { ColorTile } from './tiles/ColorTiles.js';
 import { CommunityChest } from './tiles/CommunityChest.js';
 import { IncomeTaxTile } from './tiles/IncomeTaxTile.js';
 import { ChanceTile } from './tiles/ChanceTile.js';

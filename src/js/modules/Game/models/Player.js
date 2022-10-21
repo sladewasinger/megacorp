@@ -14,5 +14,6 @@ export class Player {
     this.diceDoublesInRow = 0;
     this.isInJail = false;
     this.requiresPropertyAction = false;
+    this.state = 'turnStart';
   }
 }

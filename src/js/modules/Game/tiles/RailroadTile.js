@@ -3,6 +3,5 @@ export class RailroadTile {
     this.name = name;
     this.cost = cost;
     this.type = 'railroad';
-    this.isBuyable = true;
   }
 }
