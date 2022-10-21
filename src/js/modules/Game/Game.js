@@ -144,6 +144,7 @@ export class Game {
     for (const player of this.gameState.players) {
       index++;
       player.money = 1500;
+      player.prevPosition = -1;
       player.position = 0;
       player.color = hslToHex(selectColor(index));
       console.log(player.color);
