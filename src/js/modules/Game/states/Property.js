@@ -4,12 +4,12 @@ export class Property {
     this.type = 'property';
 
     this.title = name;
-    this.color;
-    this.cost;
-    this.rents;
-    this.mortgageValue;
-    this.houseCost;
-    this.hotelCost;
+    this.color = color;
+    this.cost = cost;
+    this.rents = rents;
+    this.mortgageValue = mortgageValue;
+    this.houseCost = houseCost;
+    this.hotelCost = hotelCost;
     this.owner = null;
     this.houses = 0;
     this.hotel = false;

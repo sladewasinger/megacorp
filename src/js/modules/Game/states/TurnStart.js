@@ -1,10 +1,6 @@
 export class TurnStart {
   constructor() {
     this.name = 'TurnStart';
-    this.dice1 = 0;
-    this.dice2 = 0;
-    this.diceTotal = 0;
-    this.doublesInARow = 0;
   }
 
   onEnter(stateMachine, gameState) {
@@ -19,20 +15,20 @@ export class TurnStart {
   rollDice(dice1Override, dice2Override) {
     console.log('rollDice');
 
-    this.dice1 = dice1Override || Math.floor(Math.random() * 6) + 1;
-    this.dice2 = dice2Override || Math.floor(Math.random() * 6) + 1;
-    this.diceTotal = this.dice1 + this.dice2;
+    this.gameState.dice1 = dice1Override || Math.floor(Math.random() * 6) + 1;
+    this.gameState.dice2 = dice2Override || Math.floor(Math.random() * 6) + 1;
+    const diceTotal = this.gameState.dice1 + this.gameState.dice2;
 
-    if (this.dice1 === this.dice2) {
-      this.doublesInARow += 1;
+    if (this.gameState.dice1 === this.gameState.dice2) {
+      this.gameState.doubleDiceRollCount += 1;
     }
 
-    if (this.doublesInARow >= 3) {
-      this.doublesInARow = 0;
+    if (this.gameState.doubleDiceRollCount >= 3) {
+      this.doubleDiceRollCount = 0;
       return 'jail';
     }
 
-    this.gameState.currentPlayer.position += this.diceTotal;
+    this.gameState.currentPlayer.position += diceTotal;
     if (this.gameState.currentPlayer.position >= this.gameState.tiles.length) {
       this.gameState.currentPlayer.position -= this.gameState.tiles.length;
       this.gameState.currentPlayer.money += 200;

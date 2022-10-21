@@ -36,6 +36,16 @@ export class Game {
     this.stateMachine.setState(nextState, this.gameState);
   }
 
+  buyProperty() {
+    if (this.stateMachine.currentState.type !== 'property') {
+      throw new Error('Cannot buy property outside of Property state');
+    }
+
+    const nextState = this.stateMachine.currentState.buyProperty(this.gameState);
+    this.stateMachine.setState(nextState, this.gameState);
+  }
+
+
   endTurn() {
     if (this.stateMachine.currentState.type !== 'TurnEnd') {
       throw new Error('Cannot end turn outside of TurnEnd state');
