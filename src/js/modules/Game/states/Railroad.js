@@ -1,39 +1,19 @@
-export class Property {
-  constructor(name, color, cost, rents, houseCost, hotelCost) {
-    this.name = name;
-    this.type = 'property';
-
-    this.title = name;
-    this.color = color;
+export class Railroad {
+  constructor(cost, rent) {
+    this.name = 'Railroad';
     this.cost = cost;
-    this.rents = rents;
-    this.houseCost = houseCost;
-    this.hotelCost = hotelCost;
+    this.rent = rent;
     this.mortgage = cost / 2;
     this.buybackFee = this.mortgage * 1.1;
-    this.owner = null;
-    this.houses = 0;
-    this.hotel = false;
-  }
-
-  get rent() {
-    if (this.owner === null) {
-      return 0;
-    }
-    let index = this.houses;
-    if (this.hotel) {
-      index++;
-    }
-    return this.rents[index];
   }
 
   onEnter(stateMachine, gameState) {
-    console.log('Property');
+    console.log('Railroad');
     this.gameState = gameState;
   }
 
   onExit() {
-    console.log('Property exit');
+    console.log('Railroad exit');
   }
 
   buyProperty() {
