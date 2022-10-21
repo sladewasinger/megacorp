@@ -1,9 +1,18 @@
+import { CommunityChestDeck } from '../Models/CommunityChestDeck.js';
+import { ChanceDeck } from '../Models/ChanceDeck.js';
+
 export class GameState {
   constructor() {
     this.dice1 = 0;
     this.dice2 = 0;
     this.doubleDiceRollCount = 0;
     this.players = [];
+
+    this.communityChestDeck = new CommunityChestDeck();
+    this.chanceDeck = new ChanceDeck();
+    this.communityChestMessage = '';
+    this.chanceMessage = '';
+
     this.tiles = [
       'Go',
       'Mediterranean Avenue',

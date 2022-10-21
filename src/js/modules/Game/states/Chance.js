@@ -6,6 +6,8 @@ export class Chance {
   onEnter(stateMachine, gameState) {
     console.log('Chance');
     this.gameState = gameState;
+
+    stateMachine.setState('TurnEnd', gameState);
   }
 
   onExit() {

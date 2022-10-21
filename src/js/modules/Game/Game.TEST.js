@@ -38,9 +38,12 @@ export class GameTests {
       new Player('2', 'Player 2'),
     ];
     const game = new Game(players);
-    game.rollDice(-1, 3); // Land on Community Chest
+    game.rollDice(-1, 3); // Land on 1st Community Chest
     Assert.equal(players[0], game.gameState.currentPlayer);
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    // First card is Advance to Go
+    Assert.equal('Advance to Go', game.gameState.communityChestMessage);
+    Assert.equal(0, game.gameState.currentPlayer.position);
   }
 
   incomeTaxTest() {
