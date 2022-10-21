@@ -1,9 +1,9 @@
 export class GameState {
-  constructor(players) {
+  constructor() {
     this.dice1 = 0;
     this.dice2 = 0;
     this.doubleDiceRollCount = 0;
-    this.players = players;
+    this.players = [];
     this.tiles = [
       'Go',
       'Mediterranean Avenue',

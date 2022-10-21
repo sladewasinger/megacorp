@@ -1,8 +1,14 @@
 import { GameState } from './GameState.js';
+import { StateMachine } from './StateMachine.js';
+import { TurnStart } from './States/TurnStart.js';
+import { TurnEnd } from './States/TurnEnd.js';
+import { Go } from './States/Go.js';
+import { Property } from './States/Property.js';
 
 export class Game {
-  constructor() {
+  constructor(players) {
     this.gameState = new GameState();
+    this.gameState.players = players;
 
     this.stateMachine = new StateMachine();
     this.stateMachine.addState(new TurnStart());
@@ -18,7 +24,7 @@ export class Game {
     );
     this.stateMachine.addState(new Go());
 
-    this.stateMachine.setState('TurnStart');
+    this.stateMachine.setState('TurnStart', this.gameState);
   }
 
   rollDice(dice1Override, dice2Override) {
@@ -27,7 +33,7 @@ export class Game {
     }
 
     const nextState = this.stateMachine.currentState.rollDice(dice1Override, dice2Override);
-    this.stateMachine.setState(nextState);
+    this.stateMachine.setState(nextState, this.gameState);
   }
 
   endTurn() {
@@ -35,6 +41,6 @@ export class Game {
       throw new Error('Cannot end turn outside of TurnEnd state');
     }
 
-    this.stateMachine.setState('TurnStart');
+    this.stateMachine.setState('TurnStart', this.gameState);
   }
 }

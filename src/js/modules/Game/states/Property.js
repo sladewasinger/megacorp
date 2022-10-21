@@ -1,20 +1,18 @@
 export class Property {
-  constructor(name, color, cost, rent, mortgageValue, houseCost, hotelCost) {
+  constructor(name, color, cost, rents, mortgageValue, houseCost, hotelCost) {
     this.name = name;
     this.type = 'property';
 
-    this.state = {
-      title: name,
-      color,
-      cost,
-      rent,
-      mortgageValue,
-      houseCost,
-      hotelCost,
-      owner: null,
-      houses: 0,
-      hotel: false,
-    };
+    this.title = name;
+    this.color;
+    this.cost;
+    this.rents;
+    this.mortgageValue;
+    this.houseCost;
+    this.hotelCost;
+    this.owner = null;
+    this.houses = 0;
+    this.hotel = false;
   }
 
   get rent() {

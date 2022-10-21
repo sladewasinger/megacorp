@@ -1,27 +1,18 @@
 export class TurnStart {
   constructor() {
-    this.transitions = {
-      rollDice: this.rollDice,
-    };
-    this.state = {
-      dice1: 0,
-      dice2: 0,
-      diceTotal: 0,
-      doublesInARow: 0,
-    };
-  }
-
-  get name() {
-    return 'TurnStart';
+    this.name = 'TurnStart';
+    this.dice1 = 0;
+    this.dice2 = 0;
+    this.diceTotal = 0;
+    this.doublesInARow = 0;
   }
 
   onEnter(gameState) {
-    super.onEnter(gameState);
     console.log('TurnStart');
+    this.gameState = gameState;
   }
 
   onExit() {
-    super.onExit();
     console.log('TurnStart exit');
   }
 
@@ -32,23 +23,23 @@ export class TurnStart {
     this.dice2 = dice2Override || Math.floor(Math.random() * 6) + 1;
     this.diceTotal = this.dice1 + this.dice2;
 
-    if (dice1 === dice2) {
-      this.state.doublesInARow += 1;
+    if (this.dice1 === this.dice2) {
+      this.doublesInARow += 1;
     }
 
-    if (this.state.doublesInARow >= 3) {
-      this.state.doublesInARow = 0;
+    if (this.doublesInARow >= 3) {
+      this.doublesInARow = 0;
       return 'jail';
     }
 
-    this.gameState.currentPlayer.position += this.state.diceTotal;
-    if (this.gameState.currentPlayer.position >= 40) {
-      this.gameState.currentPlayer.position -= 40;
+    this.gameState.currentPlayer.position += this.diceTotal;
+    if (this.gameState.currentPlayer.position >= this.gameState.tiles.length) {
+      this.gameState.currentPlayer.position -= this.gameState.tiles.length;
       this.gameState.currentPlayer.money += 200;
     }
 
-    const tile = this.gameState.board.tiles[this.gameState.currentPlayer.position];
+    const tile = this.gameState.tiles[this.gameState.currentPlayer.position];
 
-    return tile.name;
+    return tile;
   }
 }
