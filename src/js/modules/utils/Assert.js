@@ -1,5 +1,11 @@
 
 export class Assert {
+  static true(actual) {
+    if (!actual) {
+      throw new Error(`Expected true, but was ${actual}`);
+    }
+  }
+
   static equal(expected, actual) {
     if (actual !== expected) {
       // console.error('\nAssert.equal failed');
@@ -22,5 +28,9 @@ export class Assert {
       // console.error('Expected:\n', 'not null', '\nActual:\n', actual);
       throw new Error(`\nExpected\n \tnot null\n but got\n \t${JSON.stringify(actual)}`);
     }
+  }
+
+  static fail(error) {
+    throw new Error(error);
   }
 }

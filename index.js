@@ -3,7 +3,8 @@ import express from 'express';
 import { createServer } from 'http';
 import { Engine } from './js/modules/Engine.js';
 
-const port = process.env.PORT || 3000; // Use the port that AWS provides or default to 3000. Without this, the deployment will fail.
+// Use the port that AWS provides or default to 3000. Without this, the deployment will fail:
+const port = process.env.PORT || 3000;
 
 const app = express();
 app.use(express.static('app'));

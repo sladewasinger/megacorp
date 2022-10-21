@@ -66,6 +66,7 @@ try {
         exceptionThrown = true;
         console.log(chalk.bgRed(`[${testName}]`));
         console.log(chalk.bgRed(e));
+        console.log(e);
       }
       if (!exceptionThrown) {
         passedTests++;

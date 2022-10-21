@@ -15,8 +15,8 @@ export class Engine {
         console.log('user connected', socket.id);
         this.users.push(new User(socket.id));
 
-        socket.on('disconnect', () => this.userDisconnected(socket));
-        socket.on('registerName', (name, callbackFn) => this.registerName(socket, name, callbackFn));
+        socket.on('disconnect', () => this.userDisconnected(socket.id));
+        socket.on('registerName', (name, callbackFn) => this.registerName(socket.id, name, callbackFn));
         socket.on('createLobby', (callbackFn) => this.createLobby(socket, callbackFn));
         socket.on('joinLobby', (lobbyId, callbackFn) => this.joinLobby(socket, lobbyId, callbackFn));
         socket.on('startGame', (lobbyId, callbackFn) => this.startGame(socket, lobbyId, callbackFn));
@@ -36,13 +36,13 @@ export class Engine {
     });
   }
 
-  userDisconnected(socket) {
-    const user = this.users.find((user) => user.id === socket.id);
+  userDisconnected(socketId) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       console.log('User not found');
       return;
     }
-    console.log('user disconnected', socket.id);
+    console.log('user disconnected', socketId);
     this.users = this.users.filter((u) => u.id !== user.id);
     this.lobbies.forEach((lobby) => {
       lobby.removeUser(user);
@@ -54,8 +54,8 @@ export class Engine {
     this.lobbies = this.lobbies.filter((lobby) => lobby.users.length > 0);
   }
 
-  registerName(socket, name, callbackFn) {
-    const user = this.users.find((user) => user.id === socket.id);
+  registerName(socketId, name, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       callbackFn('User not found');
       return;
@@ -69,8 +69,8 @@ export class Engine {
     callbackFn(null, user);
   }
 
-  createLobby(socket, callbackFn) {
-    const user = this.users.find((user) => user.id === socket.id);
+  createLobby(socketId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       callbackFn('User not found');
       return;
@@ -83,13 +83,13 @@ export class Engine {
 
     const lobby = new Lobby();
     this.lobbies.push(lobby);
-    this.joinLobby(socket, lobby.id, callbackFn);
+    this.joinLobby(socketId, lobby.id, callbackFn);
     lobby.owner = user;
     callbackFn(null, lobby);
   }
 
-  joinLobby(socket, lobbyId, callbackFn) {
-    const user = this.users.find((user) => user.id === socket.id);
+  joinLobby(socketId, lobbyId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       callbackFn('User not found');
       return;

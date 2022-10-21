@@ -3,9 +3,6 @@ import { Game } from './Game.js';
 import { Player } from './Player.js';
 
 export default class GameTests {
-  constructor() {
-  }
-
   endTurnTest() {
     const player1 = new Player('1', 'Player 1');
     const player2 = new Player('2', 'Player 2');
