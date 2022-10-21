@@ -7,6 +7,7 @@ export class Go {
   onEnter(stateMachine, gameState) {
     console.log('Go');
     this.gameState = gameState;
+    stateMachine.setState('TurnEnd', gameState);
   }
 
   onExit() {

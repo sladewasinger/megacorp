@@ -1,6 +1,6 @@
-import { Assert } from './utils/Assert.js';
-import { Game } from './Game/Game.js';
-import { Player } from './Game/Player.js';
+import { Assert } from '../utils/Assert.js';
+import { Game } from './Game.js';
+import { Player } from './Player.js';
 
 export class GameTests {
   constructor() {
@@ -12,8 +12,8 @@ export class GameTests {
       new Player('2', 'Player 2'),
     ];
     const game = new Game(players);
-    game.rollDice(1, 3);
-    Assert.equal('Go', game.stateMachine.currentState.name);
+    game.rollDice(1, 3); // Land on GO
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
   }
 
   rollDiceTest2() {
@@ -30,6 +30,6 @@ export class GameTests {
       exceptionThrown = true;
     }
     Assert.equal(true, exceptionThrown);
-    Assert.equal('Go', game.stateMachine.currentState.name);
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
   }
 }

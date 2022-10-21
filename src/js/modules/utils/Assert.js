@@ -1,6 +1,6 @@
 
 export class Assert {
-  static equal(actual, expected) {
+  static equal(expected, actual) {
     if (actual !== expected) {
       console.error('\nAssert.equal failed');
       console.error('Expected:\n', expected, '\nActual:\n', actual);
@@ -8,7 +8,7 @@ export class Assert {
     }
   }
 
-  static notEqual(actual, expected) {
+  static notEqual(expected, actual) {
     if (actual === expected) {
       console.error('\nAssert.notEqual failed');
       console.error('Expected:\n', expected, '\nActual:\n', actual);
