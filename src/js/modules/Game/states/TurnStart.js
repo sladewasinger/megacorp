@@ -28,6 +28,7 @@ export class TurnStart {
       return 'jail';
     }
 
+    this.gameState.currentPlayer.prevPosition = this.gameState.currentPlayer.position;
     this.gameState.currentPlayer.position += diceTotal;
     if (this.gameState.currentPlayer.position >= this.gameState.tiles.length) {
       this.gameState.currentPlayer.position -= this.gameState.tiles.length;

@@ -4,5 +4,6 @@ export class Player {
     this.name = name;
     this.money = 1500;
     this.position = 0;
+    this.properties = [];
   }
 }

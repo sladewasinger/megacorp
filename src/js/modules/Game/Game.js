@@ -12,7 +12,7 @@ import { Jail } from './states/Jail.js';
 import { FreeParking } from './states/FreeParking.js';
 import { GoToJail } from './states/GoToJail.js';
 import { LuxuryTax } from './states/LuxuryTax.js';
-import { Player } from './Player.js';
+import { Player } from './models/Player.js';
 
 export class Game {
   constructor(players) {
@@ -112,6 +112,22 @@ export class Game {
 
   static createPlayer(id, name) {
     return new Player(id, name);
+  }
+
+  getClientGameState() {
+    return {
+      gameState: this.gameState,
+      stateMachine: this.stateMachine,
+    };
+  }
+
+  startGame() {
+    for (const player of this.gameState.players) {
+      player.money = 1500;
+      player.position = 0;
+    }
+
+    this.stateMachine.setState('TurnStart', this.gameState);
   }
 
   rollDice(dice1Override, dice2Override) {

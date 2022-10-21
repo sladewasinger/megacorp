@@ -45,6 +45,7 @@ export class Property {
 
     this.owner = this.gameState.currentPlayer;
     this.gameState.currentPlayer.money -= this.rent;
+    this.gameState.currentPlayer.properties.push(this);
 
     if (this.gameState.doubleDiceRoll) {
       return 'TurnStart';

@@ -87,4 +87,27 @@ export default class EngineTests {
     Assert.equal(1, engine.lobbies[0].users.length);
     Assert.equal(user1.id, engine.lobbies[0].users[0].id);
   }
+
+  testBuyProperty() {
+    const engine = new Engine(ioMock);
+    const user1 = new User(randomUUID());
+    engine.users.push(user1);
+    engine.registerName(user1.id, 'UserName', callbackFn);
+    engine.createLobby(user1.id, callbackFn);
+
+    const user2 = new User(randomUUID());
+    engine.users.push(user2);
+    engine.registerName(user2.id, 'UserName2', callbackFn);
+    engine.joinLobby(user2.id, engine.lobbies[0].id, callbackFn);
+
+    engine.startGame(user1.id, callbackFn);
+
+    const currentUser = engine.lobbies[0].game.gameState.currentPlayer;
+    Assert.notNull(currentUser);
+
+    engine.rollDice(user1.id, 1, 2, callbackFn);
+    engine.buyProperty(user2.id, callbackFn);
+
+    Assert.equal(1, currentUser.properties.length);
+  }
 }

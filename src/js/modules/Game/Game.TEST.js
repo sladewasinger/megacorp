@@ -1,6 +1,6 @@
 import { Assert } from '../utils/Assert.js';
 import { Game } from './Game.js';
-import { Player } from './Player.js';
+import { Player } from './models/Player.js';
 
 export default class GameTests {
   endTurnTest() {

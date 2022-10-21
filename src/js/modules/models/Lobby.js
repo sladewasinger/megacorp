@@ -12,7 +12,7 @@ export class Lobby {
   }
 
   startGame() {
-    const players = this.users.map((user) => Game.createPlayer(user.name, user.id));
+    const players = this.users.map((user) => Game.createPlayer(user.id, user.name));
     this.game = new Game(players);
     this.game.startGame();
   }

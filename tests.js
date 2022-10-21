@@ -52,7 +52,7 @@ try {
   for (const file of files) {
     console.log(chalk.cyan(`Importing tests from file`), file);
 
-    const test = await import(path.join(__dirname, file));
+    const test = await import(path.join('file://', __dirname, file));
     const tests = getAllMethods(test.default.prototype);
     totalTests += tests.length;
 
