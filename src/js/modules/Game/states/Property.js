@@ -45,7 +45,19 @@ export class Property {
 
     this.owner = this.gameState.currentPlayer;
     this.gameState.currentPlayer.money -= this.rent;
-    this.gameState.currentPlayer.properties.push(this);
+    this.gameState.currentPlayer.properties.push({
+      name: this.name,
+      type: this.type,
+      color: this.color,
+      cost: this.cost,
+      rents: this.rents,
+      houseCost: this.houseCost,
+      hotelCost: this.hotelCost,
+      mortgage: this.mortgage,
+      buybackFee: this.buybackFee,
+      houses: this.houses,
+      hotel: this.hotel,
+    });
 
     if (this.gameState.doubleDiceRoll) {
       return 'TurnStart';

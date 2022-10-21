@@ -62,7 +62,7 @@ export class Board {
 
     // Set controls:
     this.buttons.update(gameState, this.renderState);
-    this.dice.setNumber(gameState.dice1, gameState.dice2);
+    this.dice.update(gameState, this.renderState);
   }
 
   async drawPlayerMoveAnimation(gameState, playerId, prevPos, pos) {

@@ -1,6 +1,7 @@
 export class Utility {
-  constructor() {
-    this.name = 'Utility';
+  constructor(name) {
+    this.name = name;
+    this.type = 'property';
   }
 
   onEnter(stateMachine, gameState) {

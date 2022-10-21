@@ -20,21 +20,22 @@ export class Buttons {
   }
 
   update(gameState, renderState) {
-    if (renderState.animationInProgress || renderState.auctionInProgress || gameState.state !== 'rollDice') {
+    if (renderState.animationInProgress ||
+      renderState.auctionInProgress ||
+      gameState.currentPlayer.id !== gameState.myId ||
+      gameState.state.name == 'TurnStart') {
       this.disable();
       return;
     } else {
       this.enable();
     }
 
-    if (gameState.currentPlayer.id == gameState.myId) {
-      if (gameState.currentPlayer.requiresPropertyAction || !gameState.currentPlayer.hasRolledDice) {
-        this.disableEndTurnButton();
-        this.enableBuyAndAuctionButtons();
-      } else {
-        this.enableEndTurnButton();
-        this.disableBuyAndAuctionButtons();
-      }
+    if (gameState.state.type == 'property') {
+      this.disableEndTurnButton();
+      this.enableBuyAndAuctionButtons();
+    } else {
+      this.enableEndTurnButton();
+      this.disableBuyAndAuctionButtons();
     }
   }
 

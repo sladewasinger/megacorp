@@ -1,6 +1,8 @@
 export class Railroad {
   constructor(name, cost, rent) {
     this.name = name;
+    this.type = 'property';
+
     this.cost = cost;
     this.rent = rent;
     this.mortgage = cost / 2;

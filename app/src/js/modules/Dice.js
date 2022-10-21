@@ -14,6 +14,20 @@ export class Dice {
     this.diceNumber2.text = number2;
   }
 
+  update(gameState, renderState) {
+    this.setNumber(gameState.dice1, gameState.dice2);
+
+    if (renderState.animationInProgress ||
+      renderState.auctionInProgress ||
+      gameState.currentPlayer.id !== gameState.myId ||
+      gameState.state.name !== 'TurnStart') {
+      this.disable();
+      return;
+    } else {
+      this.enable();
+    }
+  }
+
   disable() {
     this.diceContainer.interactive = false;
     this.diceContainer.buttonMode = false;

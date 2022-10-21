@@ -114,16 +114,39 @@ export class Game {
     return new Player(id, name);
   }
 
-  getClientGameState() {
-    return {
+  getClientGameState(user) {
+    const gameState = {
       ...this.gameState,
+      state: this.stateMachine.currentState,
+      currentPlayer: this.gameState.currentPlayer,
+      myId: user.id,
     };
+    return gameState;
   }
 
   startGame() {
+    const selectColor = (number) => {
+      const hue = number * 137.508; // use golden angle approximation
+      return [hue, 100, 60];
+    };
+    const hslToHex = ([h, s, l]) => {
+      l /= 100;
+      const a = s * Math.min(l, 1 - l) / 100;
+      const f = (n) => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0'); // convert to Hex and prefix "0" if needed
+      };
+      return +(`0x${f(0)}${f(8)}${f(4)}`);
+    };
+
+    let index = 0;
     for (const player of this.gameState.players) {
+      index++;
       player.money = 1500;
       player.position = 0;
+      player.color = hslToHex(selectColor(index));
+      console.log(player.color);
     }
 
     this.stateMachine.setState('TurnStart', this.gameState);
