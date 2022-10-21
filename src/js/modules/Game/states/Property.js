@@ -28,7 +28,7 @@ export class Property {
   }
 
   onEnter(stateMachine, gameState) {
-    console.log('Property');
+    console.log(`${this.name}: Enter`);
     this.gameState = gameState;
 
     if (this.owner !== null) {

@@ -81,9 +81,22 @@ export default class GameTests {
     game.endTurn();
     game.rollDice(5, 5);
     game.endTurn();
-    game.rollDice(3, 3);
+    game.rollDice(5, 5);
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
     Assert.true(game.gameState.currentPlayer.inJail);
+    game.endTurn();
+    Assert.equal('JailDecision', game.stateMachine.currentState.name);
+    game.rollDice(3, 3);
+    Assert.equal('St. James Place', game.stateMachine.currentState.name);
+    Assert.false(game.gameState.currentPlayer.inJail);
+    game.buyProperty();
+    game.rollDice(1, 2);
+    Assert.equal('New York Avenue', game.stateMachine.currentState.name);
+    game.buyProperty();
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    game.endTurn();
+    game.rollDice(1, 2);
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
   }
 
   goToJailTest_payFine() {

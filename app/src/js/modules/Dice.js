@@ -20,7 +20,8 @@ export class Dice {
     if (renderState.animationInProgress ||
       renderState.auctionInProgress ||
       gameState.currentPlayer.id !== gameState.myId ||
-      gameState.state.name !== 'TurnStart') {
+      (gameState.state.name !== 'TurnStart' && gameState.state.name !== 'JailDecision')
+    ) {
       this.disable();
       return;
     } else {

@@ -77,7 +77,7 @@ export class Game {
     this.stateMachine.addState(
       new Property('Illinois Avenue', 0xff00ff, 240, [20, 100, 300, 750, 925, 1100], 150, 150),
     );
-    this.stateMachine.addState(new Railroad('B&O Railroad', 200));
+    this.stateMachine.addState(new Railroad('B. & O. Railroad', 200));
     this.stateMachine.addState(
       new Property('Atlantic Avenue', 0x00ffff, 260, [22, 110, 330, 800, 975, 1150], 150, 150),
     );
@@ -170,7 +170,7 @@ export class Game {
     if (this.stateMachine.currentState.type !== 'property') {
       throw new Error('Cannot buy property outside of Property state');
     }
-    if (this.stateMachine.currentState.owner !== null) {
+    if (this.stateMachine.currentState.owner) {
       throw new Error('Cannot buy property that is already owned');
     }
 

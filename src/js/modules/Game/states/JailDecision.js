@@ -9,7 +9,7 @@ export class JailDecision {
     this.gameState = gameState;
 
     if (stateMachine.previousState.name == 'Go To Jail') {
-      stateMachine.setState('EndTurn', gameState);
+      stateMachine.setState('TurnEnd', gameState);
     }
   }
 
@@ -48,16 +48,18 @@ export class JailDecision {
 
     this.gameState.currentPlayer.jailTurns--;
 
-    console.log('rollDice');
+    console.log(`--${this.name}: rollDice`);
 
-    const dice1 = dice1override || Math.floor(Math.random() * 6) + 1;
-    const dice2 = dice2override || Math.floor(Math.random() * 6) + 1;
-    const diceTotal = dice1 + dice2;
+    this.gameState.dice1 = dice1override || Math.floor(Math.random() * 6) + 1;
+    this.gameState.dice2 = dice2override || Math.floor(Math.random() * 6) + 1;
+    const diceTotal = this.gameState.dice1 + this.gameState.dice2;
 
-    if (dice1 === dice2 || this.gameState.currentPlayer.jailTurns <= 0) {
-      if (!(dice1 === dice2)) {
+    if (this.gameState.doubleDiceRoll || this.gameState.currentPlayer.jailTurns <= 0) {
+      if (!this.gameState.doubleDiceRoll) {
         console.log('Auto paying jail fine');
         this.gameState.currentPlayer.money -= this.exitJailFine;
+      } else {
+        console.log('Rolled doubles -- exiting jail');
       }
 
       this.gameState.currentPlayer.jailTurns = 3;

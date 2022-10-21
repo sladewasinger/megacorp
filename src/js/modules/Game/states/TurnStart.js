@@ -24,17 +24,18 @@ export class TurnStart {
     this.gameState.dice2 = dice2Override || Math.floor(Math.random() * 6) + 1;
     const diceTotal = this.gameState.dice1 + this.gameState.dice2;
 
+    this.gameState.currentPlayer.prevPosition = this.gameState.currentPlayer.position;
+    this.gameState.currentPlayer.position += diceTotal;
+
     if (this.gameState.dice1 === this.gameState.dice2) {
       this.gameState.doubleDiceRollCount += 1;
     }
 
     if (this.gameState.doubleDiceRollCount >= 3) {
-      this.doubleDiceRollCount = 0;
+      this.gameState.doubleDiceRollCount = 0;
       return 'Go To Jail';
     }
 
-    this.gameState.currentPlayer.prevPosition = this.gameState.currentPlayer.position;
-    this.gameState.currentPlayer.position += diceTotal;
     if (this.gameState.currentPlayer.position >= this.gameState.tiles.length) {
       this.gameState.currentPlayer.position -= this.gameState.tiles.length;
       this.gameState.currentPlayer.money += 200;

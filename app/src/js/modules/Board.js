@@ -82,6 +82,10 @@ export class Board {
         if (prevPos >= this.tiles.length) {
           prevPos = 0;
         }
+        if (gameState.currentPlayer.inJail) {
+          prevPos = 10;
+        }
+
         const tile = this.tiles.find((t, i) => i === prevPos);
         if (!tile) {
           console.error('could not find tile matching player position');

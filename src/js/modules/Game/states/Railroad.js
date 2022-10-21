@@ -7,6 +7,7 @@ export class Railroad {
     this.rent = rent;
     this.mortgage = cost / 2;
     this.buybackFee = this.mortgage * 1.1;
+    this.owner = null;
   }
 
   onEnter(stateMachine, gameState) {
