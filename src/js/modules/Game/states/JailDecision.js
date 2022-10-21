@@ -7,7 +7,10 @@ export class JailDecision {
   onEnter(stateMachine, gameState) {
     console.log('JailDecision');
     this.gameState = gameState;
-    this.stateMachine = stateMachine;
+
+    if (stateMachine.previousState.name == 'Go To Jail') {
+      stateMachine.setState('EndTurn', gameState);
+    }
   }
 
   onExit() {
@@ -23,7 +26,7 @@ export class JailDecision {
 
     this.gameState.currentPlayer.money -= this.exitJailFine;
     this.gameState.currentPlayer.jailTurns = 0;
-    this.stateMachine.setState('TurnEnd', this.gameState);
+    return 'TurnEnd';
   }
 
   useCard() {
@@ -35,7 +38,7 @@ export class JailDecision {
 
     this.gameState.currentPlayer.getOutOfJailFreeCards--;
     this.gameState.currentPlayer.jailTurns = 0;
-    this.stateMachine.setState('TurnEnd', this.gameState);
+    return 'TurnEnd';
   }
 
   rollDice(dice1override, dice2override) {

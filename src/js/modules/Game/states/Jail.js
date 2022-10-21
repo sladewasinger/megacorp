@@ -9,6 +9,7 @@ export class Jail {
 
     if (!this.gameState.currentPlayer.inJail) {
       stateMachine.setState('TurnEnd', gameState);
+      return;
     }
 
     if (stateMachine.previousState.name == 'Go To Jail') {

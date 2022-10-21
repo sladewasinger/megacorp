@@ -18,7 +18,7 @@ export class TurnStart {
   }
 
   rollDice(dice1Override, dice2Override) {
-    console.log('rollDice');
+    console.log(`-- ${this.name}: rollDice`);
 
     this.gameState.dice1 = dice1Override || Math.floor(Math.random() * 6) + 1;
     this.gameState.dice2 = dice2Override || Math.floor(Math.random() * 6) + 1;
@@ -30,7 +30,7 @@ export class TurnStart {
 
     if (this.gameState.doubleDiceRollCount >= 3) {
       this.doubleDiceRollCount = 0;
-      return 'jail';
+      return 'Go To Jail';
     }
 
     this.gameState.currentPlayer.prevPosition = this.gameState.currentPlayer.position;

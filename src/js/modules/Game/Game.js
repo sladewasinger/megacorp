@@ -159,7 +159,7 @@ export class Game {
   rollDice(dice1Override, dice2Override) {
     if (this.stateMachine.currentState.name !== 'TurnStart' &&
       this.stateMachine.currentState.name !== 'JailDecision') {
-      throw new Error('Cannot roll dice outside of TurnStart state');
+      throw new Error('Cannot roll dice outside of TurnStart/JailDecision state');
     }
 
     const nextState = this.stateMachine.currentState.rollDice(dice1Override, dice2Override);

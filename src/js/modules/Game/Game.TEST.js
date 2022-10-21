@@ -74,6 +74,18 @@ export default class GameTests {
     Assert.equal(player1money + 200, game.gameState.currentPlayer.money);
   }
 
+  goToJailForSpeedingTest() {
+    const player = new Player('1', 'Player 1');
+    const game = new Game([player]);
+    game.rollDice(5, 5);
+    game.endTurn();
+    game.rollDice(5, 5);
+    game.endTurn();
+    game.rollDice(3, 3);
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    Assert.true(game.gameState.currentPlayer.inJail);
+  }
+
   goToJailTest_payFine() {
     const players = [
       new Player('1', 'Player 1'),
