@@ -1,17 +1,18 @@
-import { GameState } from './States/GameState.js';
+import { GameState } from './states/GameState.js';
 import { StateMachine } from './StateMachine.js';
-import { TurnStart } from './States/TurnStart.js';
-import { TurnEnd } from './States/TurnEnd.js';
-import { Go } from './States/Go.js';
-import { Property } from './States/Property.js';
-import { CommunityChest } from './States/CommunityChest.js';
-import { IncomeTax } from './States/IncomeTax.js';
-import { Railroad } from './Railroad.js';
-import { Chance } from './States/Chance.js';
-import { Jail } from './States/Jail.js';
-import { FreeParking } from './States/FreeParking.js';
-import { GoToJail } from './States/GoToJail.js';
-import { LuxuryTax } from './States/LuxuryTax.js';
+import { TurnStart } from './states/TurnStart.js';
+import { TurnEnd } from './states/TurnEnd.js';
+import { Go } from './states/Go.js';
+import { Property } from './states/Property.js';
+import { CommunityChest } from './states/CommunityChest.js';
+import { IncomeTax } from './states/IncomeTax.js';
+import { Railroad } from './states/Railroad.js';
+import { Chance } from './states/Chance.js';
+import { Jail } from './states/Jail.js';
+import { FreeParking } from './states/FreeParking.js';
+import { GoToJail } from './states/GoToJail.js';
+import { LuxuryTax } from './states/LuxuryTax.js';
+import { Player } from './Player.js';
 
 export class Game {
   constructor(players) {
@@ -107,6 +108,10 @@ export class Game {
     );
 
     this.stateMachine.setState('TurnStart', this.gameState);
+  }
+
+  static createPlayer(id, name) {
+    return new Player(id, name);
   }
 
   rollDice(dice1Override, dice2Override) {

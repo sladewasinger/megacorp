@@ -2,7 +2,7 @@ import { Assert } from '../utils/Assert.js';
 import { Game } from './Game.js';
 import { Player } from './Player.js';
 
-export class GameTests {
+export default class GameTests {
   constructor() {
   }
 

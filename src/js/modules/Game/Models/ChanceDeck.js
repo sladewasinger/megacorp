@@ -1,4 +1,4 @@
-import { AdvanceToGo } from './AdvanceToGo.js';
+import { AdvanceToGo } from './cards/AdvanceToGo.js';
 
 export class ChanceDeck {
   constructor() {

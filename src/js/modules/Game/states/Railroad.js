@@ -1,6 +1,6 @@
 export class Railroad {
-  constructor(cost, rent) {
-    this.name = 'Railroad';
+  constructor(name, cost, rent) {
+    this.name = name;
     this.cost = cost;
     this.rent = rent;
     this.mortgage = cost / 2;
@@ -8,7 +8,7 @@ export class Railroad {
   }
 
   onEnter(stateMachine, gameState) {
-    console.log('Railroad');
+    console.log(this.name);
     this.gameState = gameState;
   }
 

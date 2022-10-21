@@ -1,5 +1,5 @@
-import { CommunityChestDeck } from '../Models/CommunityChestDeck.js';
-import { ChanceDeck } from '../Models/ChanceDeck.js';
+import { CommunityChestDeck } from '../models/CommunityChestDeck.js';
+import { ChanceDeck } from '../models/ChanceDeck.js';
 
 export class GameState {
   constructor() {
