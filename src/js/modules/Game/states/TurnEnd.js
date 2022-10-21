@@ -3,7 +3,7 @@ export class TurnEnd {
     this.name = 'TurnEnd';
   }
 
-  onEnter(gameState) {
+  onEnter(stateMachine, gameState) {
     console.log('TurnEnd');
     this.gameState = gameState;
   }

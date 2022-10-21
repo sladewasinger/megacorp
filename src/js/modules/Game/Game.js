@@ -1,4 +1,4 @@
-import { GameState } from './GameState.js';
+import { GameState } from './States/GameState.js';
 import { StateMachine } from './StateMachine.js';
 import { TurnStart } from './States/TurnStart.js';
 import { TurnEnd } from './States/TurnEnd.js';

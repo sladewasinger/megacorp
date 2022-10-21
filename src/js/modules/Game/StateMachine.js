@@ -13,7 +13,6 @@ export class StateMachine {
       this.currentState.onExit();
     }
     this.currentState = this.states[stateName];
-    console.log(stateName, this.currentState);
-    this.currentState.onEnter(gameState);
+    this.currentState.onEnter(this, gameState);
   }
 }

@@ -26,7 +26,7 @@ export class Property {
     return this.rents[index];
   }
 
-  onEnter(gameState) {
+  onEnter(stateMachine, gameState) {
     console.log('Property');
     this.gameState = gameState;
   }

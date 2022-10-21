@@ -4,9 +4,8 @@ export class Go {
     this.gameState = null;
   }
 
-  onEnter(gameState) {
+  onEnter(stateMachine, gameState) {
     console.log('Go');
-
     this.gameState = gameState;
   }
 

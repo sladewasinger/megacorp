@@ -7,7 +7,7 @@ export class TurnStart {
     this.doublesInARow = 0;
   }
 
-  onEnter(gameState) {
+  onEnter(stateMachine, gameState) {
     console.log('TurnStart');
     this.gameState = gameState;
   }
@@ -39,7 +39,6 @@ export class TurnStart {
     }
 
     const tile = this.gameState.tiles[this.gameState.currentPlayer.position];
-
     return tile;
   }
 }

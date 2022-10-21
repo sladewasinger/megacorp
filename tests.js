@@ -27,10 +27,11 @@ try {
   const gameTester = new GameTests();
   const tests = getAllMethods(gameTester);
   tests.forEach((testName) => {
-    console.log(`Running test ${testName}`);
+    console.log(`\n[Running test ${testName}]`);
     gameTester[testName]();
   });
-  console.log('All tests passed!');
+  console.log('\n-----------------------');
+  console.log('\nAll tests passed!');
 } catch (error) {
-  console.error('Test failed! ', error);
+  console.error('\nTest failed! ', error);
 }
