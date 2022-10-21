@@ -103,7 +103,7 @@ export class Engine {
   }
 
   startGame() {
-    this.socket.emit('startGame', this.lobby.id, (error, result) => {
+    this.socket.emit('startGame', (error, result) => {
       if (error) {
         console.error(error);
         return;
@@ -135,8 +135,7 @@ export class Engine {
         console.error(error);
         return;
       }
-      const [number1, number2] = result;
-      this.board.dice.setNumber(number1, number2);
+
       console.log('Dice rolled');
     });
   }

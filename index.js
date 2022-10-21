@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import express from 'express';
 import { createServer } from 'http';
-import { Engine } from './js/modules/Engine.js';
+import { Engine } from './src/js/modules/Engine.js';
 
 // Use the port that AWS provides or default to 3000. Without this, the deployment will fail:
 const port = process.env.PORT || 3000;

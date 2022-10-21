@@ -17,7 +17,7 @@ export class Engine {
 
         socket.on('disconnect', () => this.userDisconnected(socket.id));
         socket.on('registerName', (name, callbackFn) => this.registerName(socket.id, name, callbackFn));
-        socket.on('createLobby', (callbackFn) => this.createLobby(socket, callbackFn));
+        socket.on('createLobby', (callbackFn) => this.createLobby(socket.id, callbackFn));
         socket.on('joinLobby', (lobbyId, callbackFn) => this.joinLobby(socket.id, lobbyId, callbackFn));
         socket.on('startGame', (callbackFn) => this.startGame(socket.id, callbackFn));
         socket.on('rollDice', (diceRoll1Override, diceRoll2Override, callbackFn) =>

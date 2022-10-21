@@ -116,8 +116,7 @@ export class Game {
 
   getClientGameState() {
     return {
-      gameState: this.gameState,
-      stateMachine: this.stateMachine,
+      ...this.gameState,
     };
   }
 
