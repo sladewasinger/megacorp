@@ -209,6 +209,7 @@ export class Engine {
       callbackFn(error);
       return;
     }
+
     this.emitClientGameStateToLobby(lobby);
     callbackFn(null, this.getClientGameState(lobby, user));
   }

@@ -6,6 +6,11 @@ export class TurnStart {
   onEnter(stateMachine, gameState) {
     console.log('TurnStart');
     this.gameState = gameState;
+
+    if (this.gameState.currentPlayer.inJail) {
+      stateMachine.setState('Jail', gameState);
+      return;
+    }
   }
 
   onExit() {

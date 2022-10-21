@@ -5,5 +5,8 @@ export class Player {
     this.money = 1500;
     this.position = 0;
     this.properties = [];
+    this.inJail = false;
+    this.jailTurns = 3;
+    this.getOutOfJailFreeCards = 0;
   }
 }

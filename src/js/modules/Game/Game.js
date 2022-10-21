@@ -13,6 +13,7 @@ import { FreeParking } from './states/FreeParking.js';
 import { GoToJail } from './states/GoToJail.js';
 import { LuxuryTax } from './states/LuxuryTax.js';
 import { Player } from './models/Player.js';
+import { JailDecision } from './states/JailDecision.js';
 
 export class Game {
   constructor(players) {
@@ -22,6 +23,7 @@ export class Game {
     this.stateMachine = new StateMachine();
     this.stateMachine.addState(new TurnStart());
     this.stateMachine.addState(new TurnEnd());
+    this.stateMachine.addState(new JailDecision());
     this.stateMachine.addState(new Go());
     this.stateMachine.addState(
       new Property('Mediterranean Avenue', 0x00ff00, 60, [2, 10, 30, 90, 160, 250], 50, 50),
@@ -117,6 +119,7 @@ export class Game {
   getClientGameState(user) {
     const gameState = {
       ...this.gameState,
+      tiles: this.gameState.tiles.map((tile) => this.stateMachine.states[tile]),
       state: this.stateMachine.currentState,
       currentPlayer: this.gameState.currentPlayer,
       myId: user.id,
@@ -154,7 +157,8 @@ export class Game {
   }
 
   rollDice(dice1Override, dice2Override) {
-    if (this.stateMachine.currentState.name !== 'TurnStart') {
+    if (this.stateMachine.currentState.name !== 'TurnStart' &&
+      this.stateMachine.currentState.name !== 'JailDecision') {
       throw new Error('Cannot roll dice outside of TurnStart state');
     }
 
@@ -165,6 +169,9 @@ export class Game {
   buyProperty() {
     if (this.stateMachine.currentState.type !== 'property') {
       throw new Error('Cannot buy property outside of Property state');
+    }
+    if (this.stateMachine.currentState.owner !== null) {
+      throw new Error('Cannot buy property that is already owned');
     }
 
     const nextState = this.stateMachine.currentState.buyProperty(this.gameState);
