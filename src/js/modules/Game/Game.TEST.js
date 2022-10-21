@@ -6,6 +6,19 @@ export class GameTests {
   constructor() {
   }
 
+  endTurnTest() {
+    const player1 = new Player('1', 'Player 1');
+    const player2 = new Player('2', 'Player 2');
+
+    const game = new Game([player1, player2]);
+    game.rollDice(1, 3); // Land on Income Tax
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+
+    game.endTurn();
+    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal(player2, game.gameState.currentPlayer);
+  }
+
   propertyStateTest() {
     const players = [
       new Player('1', 'Player 1'),
@@ -37,23 +50,6 @@ export class GameTests {
     ];
     const game = new Game(players);
     game.rollDice(1, 3); // Land on GO
-    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
-  }
-
-  rollDiceTest2() {
-    const players = [
-      new Player('1', 'Player 1'),
-      new Player('2', 'Player 2'),
-    ];
-    const game = new Game(players);
-    game.rollDice(1, 3);
-    let exceptionThrown = false;
-    try {
-      game.rollDice(1, 3);
-    } catch (e) {
-      exceptionThrown = true;
-    }
-    Assert.equal(true, exceptionThrown);
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
   }
 }
