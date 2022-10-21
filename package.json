@@ -4,7 +4,7 @@
   "description": "A monopoly-like game",
   "main": "index.js",
   "scripts": {
-    "test": "tsc src/tests/*.ts && node src/tests/*.js",
+    "test": "node tests.js",
     "start": "node index.js"
   },
   "repository": {

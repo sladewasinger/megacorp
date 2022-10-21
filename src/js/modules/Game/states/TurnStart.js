@@ -1,9 +1,5 @@
-import { IState } from './State.js';
-
-export class TurnStart extends IState {
+export class TurnStart {
   constructor() {
-    super();
-
     this.transitions = {
       rollDice: this.rollDice,
     };

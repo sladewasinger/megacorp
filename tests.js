@@ -1,4 +1,4 @@
-import { GameTests } from './js/modules/Game.TEST.js';
+import { GameTests } from './src/js/modules/Game.TEST.js';
 
 const getAllMethods = (obj) => {
   let props = [];

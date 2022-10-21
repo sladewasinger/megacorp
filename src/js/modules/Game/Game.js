@@ -1,219 +1,40 @@
-import { Board } from './Board.js';
-import { Player } from './models/Player.js';
-import { ColorTile } from './tiles/ColorTiles.js';
-import { RailroadTile } from './tiles/RailroadTile.js';
-import { UtilityTile } from './tiles/UtilityTile.js';
+import { GameState } from './GameState.js';
 
 export class Game {
-  constructor(players) {
-    this.board = new Board();
-    this.gameState = {
-      started: false,
-      finished: false,
-      diceRoll1: 0,
-      diceRoll2: 0,
-      players,
-      tiles: [],
-      auctionProperty: null,
-      state: 'turnStart',
-    };
+  constructor() {
+    this.gameState = new GameState();
+
+    this.stateMachine = new StateMachine();
+    this.stateMachine.addState(new TurnStart());
+    this.stateMachine.addState(new TurnEnd());
+    this.stateMachine.addState(
+      new Property('Mediterranean Avenue', 0x00ff00, 60, [2, 10, 30, 90, 160, 250], 30, 50, 50)
+    );
+    this.stateMachine.addState(
+      new Property('Baltic Avenue', 0x00ff00, 60, [4, 20, 60, 180, 320, 450], 30, 50, 50)
+    );
+    this.stateMachine.addState(
+      new Property('Oriental Avenue', 0x0000ff, 100, [6, 30, 90, 270, 400, 550], 50, 50, 50)
+    );
+    this.stateMachine.addState(new Go());
+
+    this.stateMachine.setState('TurnStart');
   }
 
-  getClientGameState(user) {
-    const gameState = {
-      ...this.gameState,
-      players: this.gameState.players.map((player) => ({
-        ...player,
-      })),
-      tiles: this.board.tiles,
-      currentPlayer: this.currentPlayer(),
-      myId: user.id,
-    };
+  rollDice(dice1Override, dice2Override) {
+    if (this.stateMachine.currentState.name !== 'TurnStart') {
+      throw new Error('Cannot roll dice outside of TurnStart state');
+    }
 
-    return gameState;
+    const nextState = this.stateMachine.currentState.rollDice(dice1Override, dice2Override);
+    this.stateMachine.setState(nextState);
   }
 
-  startGame() {
-    function selectColor(number) {
-      const hue = number * 137.508; // use golden angle approximation
-      return [hue, 100, 50];
+  endTurn() {
+    if (this.stateMachine.currentState.name !== 'TurnEnd') {
+      throw new Error('Cannot end turn outside of TurnEnd state');
     }
 
-    function hslToHex([h, s, l]) {
-      s /= 100;
-      l /= 100;
-      const a = s * Math.min(l, 1 - l);
-      const f = (n) => {
-        const k = (n + h / 30) % 12;
-        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-        return Math.round(255 * color)
-          .toString(16)
-          .padStart(2, '0'); // convert to Hex and prefix "0" if needed
-      };
-      const color = +`0x${f(0)}${f(8)}${f(4)}`;
-      console.log(color);
-      return color;
-    }
-
-    this.gameState.players = this.gameState.players.sort(() => Math.random() - 0.5);
-    this.gameState.players.forEach((player) => {
-      player.position = 0;
-      player.money = 1500;
-      player.color = hslToHex(selectColor(this.gameState.players.indexOf(player)));
-    });
-    this.gameState.started = true;
-    this.gameState.state = 'rollDice';
-  }
-
-  static createPlayer(name, id) {
-    const player = new Player(name, id);
-    return player;
-  }
-
-  currentPlayer() {
-    return this.gameState.players[0];
-  }
-
-  rollDice(playerId, diceRoll1Override, diceRoll2Override) {
-    const player = this.gameState.players.find((player) => player.id === playerId);
-    if (!player) {
-      throw new Error('Player not found');
-    }
-    if (player !== this.currentPlayer()) {
-      throw new Error('Not your turn');
-    }
-    if (player.state !== 'turnStart') {
-      throw new Error('Wrong action');
-    }
-    if (player.hasRolledDice && player.diceDoublesInRow == 0) {
-      throw new Error('You have already rolled the dice');
-    }
-    if (player.requiresPropertyAction) {
-      throw new Error('You must take an action on a property');
-    }
-
-    const diceRoll1 = diceRoll1Override || Math.floor(Math.random() * 6) + 1;
-    const diceRoll2 = diceRoll2Override || Math.floor(Math.random() * 6) + 1;
-    this.gameState.diceRoll1 = diceRoll1;
-    this.gameState.diceRoll2 = diceRoll2;
-
-    const diceRoll = diceRoll1 + diceRoll2;
-
-    player.prevPosition = player.position;
-
-    if (diceRoll1 === diceRoll2) {
-      player.diceDoublesInRow += 1;
-    } else {
-      this.diceDoublesInRow = 0;
-    }
-
-    if (player.diceDoublesInRow >= 3) {
-      player.position = 10; // Jail
-      player.isInJail = true;
-    } else {
-      player.position += diceRoll;
-      if (player.position >= 40) {
-        player.position -= 40;
-        player.money += 200; // Passed Go
-      }
-    }
-
-    const propertySpaces = this.board.tiles
-      .map((property, index) => {
-        property.index = index;
-        return property;
-      })
-      .filter((property) => property instanceof ColorTile ||
-        property instanceof RailroadTile ||
-        property instanceof UtilityTile)
-      .filter((property) => !property.ownerId);
-    if (propertySpaces.some((property) => property.index === player.position)) {
-      player.requiresPropertyAction = true;
-      this.gameState.state = 'propertyAction';
-    } else {
-      this.gameState.state = 'endTurn';
-    }
-
-    return [diceRoll1, diceRoll2];
-  }
-
-  endTurn(playerId) {
-    const player = this.gameState.players.find((player) => player.id === playerId);
-    if (!player) {
-      throw new Error('Player not found');
-    }
-    if (player !== this.currentPlayer()) {
-      throw new Error('Not your turn');
-    }
-    if (this.gameState.state !== 'endTurn') {
-      throw new Error('Wrong action');
-    }
-    if (!player.hasRolledDice) {
-      throw new Error('You have not rolled the dice');
-    }
-    if (player.requiresPropertyAction) {
-      throw new Error('You must take an action on the property you landed on');
-    }
-
-    player.hasRolledDice = false;
-    this.gameState.players.push(this.gameState.players.shift());
-  }
-
-  buyProperty(playerId) {
-    const player = this.gameState.players.find((player) => player.id === playerId);
-    if (!player) {
-      throw new Error('Player not found');
-    }
-    if (player !== this.currentPlayer()) {
-      throw new Error('Not your turn');
-    }
-    if (!player.hasRolledDice) {
-      throw new Error('You have not rolled the dice');
-    }
-
-    const property = this.board.tiles.find((property, index) => index === player.position);
-    if (!property) {
-      throw new Error('Property not found');
-    }
-    if (property.ownerId) {
-      throw new Error('Property already owned');
-    }
-    if (!property.isBuyable) {
-      throw new Error('Property not buyable');
-    }
-    if (player.money < property.price) {
-      throw new Error('Not enough money');
-    }
-
-    player.requiresPropertyAction = false;
-    player.money -= property.price;
-    property.ownerId = player.id;
-  }
-
-  auctionProperty(playerId) {
-    const player = this.gameState.players.find((player) => player.id === playerId);
-    if (!player) {
-      throw new Error('Player not found');
-    }
-    if (player !== this.currentPlayer()) {
-      throw new Error('Not your turn');
-    }
-    if (!player.hasRolledDice) {
-      throw new Error('You have not rolled the dice');
-    }
-
-    const property = this.board.tiles.find((property, index) => index === player.position);
-    if (!property) {
-      throw new Error('Property not found');
-    }
-    if (property.ownerId) {
-      throw new Error('Property already owned');
-    }
-    if (!property.isBuyable) {
-      throw new Error('Property not buyable');
-    }
-
-    player.requiresPropertyAction = false;
-    this.gameState.auctionProperty = property;
+    this.stateMachine.setState('TurnStart');
   }
 }

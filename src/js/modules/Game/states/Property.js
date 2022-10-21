@@ -15,19 +15,22 @@ export class Property {
       houses: 0,
       hotel: false,
     };
-
-    this.transitions = {
-      buyProperty: this.buyProperty,
-      auctionProperty: this.auctionProperty,
-    };
   }
 
-  get name() {
-    return 'Property';
+  get rent() {
+    if (this.owner === null) {
+      return 0;
+    }
+    let index = this.houses;
+    if (this.hotel) {
+      index++;
+    }
+    return this.rents[index];
   }
 
   onEnter(gameState) {
     console.log('Property');
+    this.gameState = gameState;
   }
 
   onExit() {
@@ -35,9 +38,16 @@ export class Property {
   }
 
   buyProperty() {
+    if (!this.gameState) {
+      throw new Error('Game state not set');
+    }
+
     console.log('buyProperty');
 
-    if (gameState.doubleDiceRoll) {
+    this.owner = this.gameState.currentPlayer;
+    this.gameState.currentPlayer.money -= this.rent;
+
+    if (this.gameState.doubleDiceRoll) {
       return 'TurnStart';
     }
 
@@ -45,6 +55,16 @@ export class Property {
   }
 
   auctionProperty() {
+    if (!this.gameState) {
+      throw new Error('Game state not set');
+    }
+
     console.log('auctionProperty');
+
+    if (this.gameState.doubleDiceRoll) {
+      return 'TurnStart';
+    }
+
+    return 'TurnEnd';
   }
 }
