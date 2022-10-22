@@ -14,7 +14,6 @@ import { GoToJail } from './states/GoToJail.js';
 import { LuxuryTax } from './states/LuxuryTax.js';
 import { Player } from './models/Player.js';
 import { JailDecision } from './states/JailDecision.js';
-import chalk from 'chalk';
 
 export class Game {
   constructor(players, gameStateUpdatedCallbackFn, playerMovementCallbackFn) {
@@ -139,8 +138,16 @@ export class Game {
           mortgaged: tile.mortgaged,
           type: tile.type,
         })),
-      state: this.stateMachine.currentState,
-      prevState: this.stateMachine.previousState,
+      state: {
+        ...this.stateMachine.currentState,
+        stateMachine: undefined,
+        gameState: undefined,
+      },
+      prevState: {
+        ...this.stateMachine.previousState,
+        stateMachine: undefined,
+        gameState: undefined,
+      },
       currentPlayer: this.gameState.currentPlayer,
       myId: user.id,
     };
@@ -183,6 +190,9 @@ export class Game {
         ];
       }
     }
+
+    this.gameState.communityChestDeck.shuffle();
+    this.gameState.chanceDeck.shuffle();
 
     this.stateMachine.setState('TurnStart', this.gameState);
   }

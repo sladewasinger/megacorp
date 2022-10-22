@@ -12,8 +12,8 @@ export class GameState {
 
     this.communityChestDeck = new CommunityChestDeck();
     this.chanceDeck = new ChanceDeck();
-    this.communityChestMessage = '';
-    this.chanceMessage = '';
+    this.communityChestCard = null;
+    this.chanceCard = null;
 
     this.tiles = [
       'Go',

@@ -65,6 +65,7 @@ export class Engine {
       this.gameRunning = true;
     }
 
+    this.board.update(this.gameState);
     // if (
     //   (
     //     gameState.currentPlayer?.directMovement ||

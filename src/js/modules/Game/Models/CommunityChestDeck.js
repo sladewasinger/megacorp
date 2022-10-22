@@ -1,10 +1,11 @@
 import { AdvanceToGo } from './communityChestCards/AdvanceToGo.js';
+import { BankErrorInYourFavor } from './communityChestCards/BankErrorInYourFavor.js';
 
 export class CommunityChestDeck {
   constructor() {
     this.cards = [
       new AdvanceToGo(),
-      // new BankErrorInYourFavor(),
+      new BankErrorInYourFavor(),
       // new DoctorFees(),
       // new FromSaleOfStockYouGet(),
       // new GetOutOfJailFree(),

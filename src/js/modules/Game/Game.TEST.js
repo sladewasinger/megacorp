@@ -1,5 +1,7 @@
 import { Assert } from '../utils/Assert.js';
 import { Game } from './Game.js';
+import { AdvanceToGo } from './models/communityChestCards/AdvanceToGo.js';
+import { BankErrorInYourFavor } from './models/communityChestCards/BankErrorInYourFavor.js';
 import { Player } from './models/Player.js';
 
 export default class GameTests {
@@ -108,7 +110,7 @@ export default class GameTests {
     Assert.equal(player2Money - game.stateMachine.states[game.gameState.tiles[3]].rent, player2.money);
   }
 
-  landOnOwnedRailroadTest() {
+  landOnOtherPlayerOwnedRailroadTest() {
     const player1 = new Player('1', 'Player 1');
     const player2 = new Player('2', 'Player 2');
     const players = [
@@ -239,18 +241,47 @@ export default class GameTests {
     Assert.false(game.gameState.currentPlayer.inJail);
   }
 
-  communityChestTest() {
+  communityChest_AdvanceToGo_Test() {
     const players = [
       new Player('1', 'Player 1'),
       new Player('2', 'Player 2'),
     ];
     const game = new Game(players);
+    const advanceToGo = new AdvanceToGo();
+    game.gameState.communityChestDeck.cards = [
+      advanceToGo,
+    ];
+
     game.rollDice(-1, 3); // Land on 1st Community Chest
+
     Assert.equal(players[0], game.gameState.currentPlayer);
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
-    // First card is Advance to Go
-    Assert.equal('Advance to Go', game.gameState.communityChestMessage);
+
+    Assert.equal(advanceToGo.name, game.gameState.communityChestCard.name);
+    Assert.equal(advanceToGo.msg, game.gameState.communityChestCard.msg);
     Assert.equal(0, game.gameState.currentPlayer.position);
+  }
+
+  communityChest_BankErrorInYourFavor_Test() {
+    const players = [
+      new Player('1', 'Player 1'),
+      new Player('2', 'Player 2'),
+    ];
+    const game = new Game(players);
+    const bankError = new BankErrorInYourFavor();
+    game.gameState.communityChestDeck.cards = [
+      bankError,
+    ];
+    const player1money = players[0].money;
+
+    game.rollDice(-1, 3); // Land on 1st Community Chest
+
+    Assert.equal(players[0], game.gameState.currentPlayer);
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+
+    Assert.equal(bankError.name, game.gameState.communityChestCard.name);
+    Assert.equal(bankError.msg, game.gameState.communityChestCard.msg);
+    Assert.equal(player1money + 200, game.gameState.currentPlayer.money);
   }
 
   incomeTaxTest() {

@@ -64,7 +64,7 @@ try {
         test.default.prototype[testName]();
       } catch (e) {
         exceptionThrown = true;
-        console.log(chalk.bgRed(`[${testName}]`));
+        console.log(chalk.red(`[TEST FAILED] ${testName}`));
         console.log(chalk.bgRed(e));
         console.log(e);
       }
