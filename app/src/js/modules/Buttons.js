@@ -21,6 +21,7 @@ export class Buttons {
 
   update(gameState, renderState) {
     if (renderState.animationInProgress ||
+      renderState.playerMovementInProgress ||
       renderState.auctionInProgress ||
       gameState.currentPlayer.id !== gameState.myId ||
       gameState.state.name == 'TurnStart') {

@@ -44,6 +44,8 @@ export class TurnStart {
 
     if (this.gameState.dice1 === this.gameState.dice2) {
       this.gameState.doubleDiceRollCount += 1;
+    } else {
+      this.gameState.doubleDiceRollCount = 0;
     }
 
     if (this.gameState.doubleDiceRollCount >= 3) {

@@ -85,7 +85,13 @@ export class Board {
     try {
       const playerGraphics = this.players.find((player) => player.id === playerId);
 
+      let lastPosition = positions[0] - 1;
       for (const position of positions) {
+        if (Math.abs(position - lastPosition) > 1 && !(lastPosition == 39 && position == 0)) {
+          // Big movement - delay
+          await sleep(1000);
+        }
+        lastPosition = position;
         const tile = this.tiles.find((t, i) => i === position);
         if (!tile) {
           console.error('could not find tile matching position ', position);
