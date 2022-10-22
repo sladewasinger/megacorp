@@ -104,15 +104,24 @@ export class Board {
         };
 
         let counter = 0;
-        const speed = 10;
-        const damping = 0.25;
+        const maxSpeed = 10;
+        const damping = 0.15;
         while (
           calcDistance(playerGraphics.x, playerGraphics.y, targetPos.x, targetPos.y) > 2 &&
-          counter < 100 // 1 second max of animation (per tile)
+          counter < 200 // 2 second max of animation (per tile)
         ) {
           counter++;
-          playerGraphics.x += clamp((targetPos.x - playerGraphics.x) * damping, -speed, speed);
-          playerGraphics.y += clamp((targetPos.y - playerGraphics.y) * damping, -speed, speed);
+          const vect = {
+            x: targetPos.x - playerGraphics.x,
+            y: targetPos.y - playerGraphics.y,
+          };
+          const dist = calcDistance(0, 0, vect.x, vect.y); // magnitude
+          vect.x /= dist;
+          vect.y /= dist;
+          vect.x *= Math.min(maxSpeed, dist * damping);
+          vect.y *= Math.min(maxSpeed, dist * damping);
+          playerGraphics.x += vect.x;
+          playerGraphics.y += vect.y;
           await sleep(10);
         }
 
