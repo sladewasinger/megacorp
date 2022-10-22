@@ -16,6 +16,7 @@ export class Engine {
     });
 
     window.addEventListener('resize', this.resize.bind(this));
+    this.resize();
     this.createBoard();
   }
 
