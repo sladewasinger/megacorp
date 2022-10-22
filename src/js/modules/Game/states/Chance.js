@@ -7,11 +7,6 @@ export class Chance {
     console.log('Chance');
     this.gameState = gameState;
 
-    if (this.gameState.doubleDiceRoll) {
-      stateMachine.setState('TurnStart', gameState);
-      return;
-    }
-
     stateMachine.setState('TurnEnd', gameState);
   }
 

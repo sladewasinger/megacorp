@@ -54,10 +54,6 @@ export class Property {
     this.gameState.currentPlayer.money -= this.rent;
     this.gameState.currentPlayer.properties.push(this.name);
 
-    if (this.gameState.doubleDiceRoll) {
-      return 'TurnStart';
-    }
-
     return 'TurnEnd';
   }
 
@@ -67,10 +63,6 @@ export class Property {
     }
 
     console.log('auctionProperty');
-
-    if (this.gameState.doubleDiceRoll) {
-      return 'TurnStart';
-    }
 
     return 'TurnEnd';
   }

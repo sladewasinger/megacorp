@@ -53,10 +53,6 @@ export class Railroad {
     this.gameState.currentPlayer.money -= this.rent;
     this.gameState.currentPlayer.properties.push(this.name);
 
-    if (this.gameState.doubleDiceRoll) {
-      return 'TurnStart';
-    }
-
     return 'TurnEnd';
   }
 
@@ -66,10 +62,6 @@ export class Railroad {
     }
 
     console.log('auctionProperty');
-
-    if (this.gameState.doubleDiceRoll) {
-      return 'TurnStart';
-    }
 
     return 'TurnEnd';
   }
