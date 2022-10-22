@@ -12,6 +12,11 @@ export class CommunityChest {
 
     card.onDraw(stateMachine, gameState);
 
+    if (this.gameState.doubleDiceRoll) {
+      stateMachine.setState('TurnStart', gameState);
+      return;
+    }
+
     stateMachine.setState('TurnEnd', this.gameState);
   }
 
