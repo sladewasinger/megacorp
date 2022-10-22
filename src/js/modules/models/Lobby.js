@@ -11,9 +11,9 @@ export class Lobby {
     this.owner = null;
   }
 
-  startGame(gameStateUpdatedCallbackFn) {
+  startGame(gameStateUpdatedCallbackFn, playerMovementCallbackFn) {
     const players = this.users.map((user) => Game.createPlayer(user.id, user.name));
-    this.game = new Game(players, gameStateUpdatedCallbackFn);
+    this.game = new Game(players, gameStateUpdatedCallbackFn, playerMovementCallbackFn);
     this.game.startGame();
   }
 

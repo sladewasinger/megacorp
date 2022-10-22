@@ -1,6 +1,7 @@
 export class StateMachine {
-  constructor(gameStateUpdatedCallbackFn) {
+  constructor(gameStateUpdatedCallbackFn, playerMovementCallbackFn) {
     this.gameStateUpdatedCallbackFn = gameStateUpdatedCallbackFn;
+    this.playerMovementCallbackFn = playerMovementCallbackFn;
     this.states = {};
     this.currentState = null;
     this.previousState = null;
@@ -22,7 +23,7 @@ export class StateMachine {
     if (!this.currentState) {
       throw new Error(`State ${stateName} not found! Did you forget to register it?`);
     }
-    this.currentState.onEnter(this, gameState);
+    this.currentState.onEnter(this, gameState, this.playerMovementCallbackFn);
     gameState.id++;
     this.gameStateUpdatedCallbackFn();
   }

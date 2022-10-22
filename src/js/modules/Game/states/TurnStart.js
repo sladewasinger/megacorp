@@ -6,6 +6,7 @@ export class TurnStart {
   onEnter(stateMachine, gameState) {
     console.log('TurnStart');
     this.gameState = gameState;
+    this.playerMovementCallbackFn = stateMachine.playerMovementCallbackFn;
 
     if (this.gameState.currentPlayer.inJail) {
       stateMachine.setState('Jail', gameState);
@@ -26,6 +27,19 @@ export class TurnStart {
 
     this.gameState.currentPlayer.prevPosition = this.gameState.currentPlayer.position;
     this.gameState.currentPlayer.position += diceTotal;
+
+    // get all positions between prev position and current position
+    const positions = [];
+    for (let i = this.gameState.currentPlayer.prevPosition; i <= this.gameState.currentPlayer.position; i++) {
+      positions.push(i % this.gameState.tiles.length); // If we go past 40, wrap around to 0
+    }
+    this.playerMovementCallbackFn(this.gameState.currentPlayer, positions);
+
+    if (this.gameState.currentPlayer.position >= this.gameState.tiles.length) {
+      this.gameState.currentPlayer.position -= this.gameState.tiles.length;
+      this.gameState.currentPlayer.money += 200;
+    }
+
     this.gameState.currentPlayer.directMovement = false;
 
     if (this.gameState.dice1 === this.gameState.dice2) {

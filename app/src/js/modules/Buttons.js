@@ -30,7 +30,7 @@ export class Buttons {
       this.enable();
     }
 
-    if (gameState.state.type == 'property') {
+    if (gameState.state.type == 'property' && !gameState.state.owner) {
       this.disableEndTurnButton();
       this.enableBuyAndAuctionButtons();
     } else {

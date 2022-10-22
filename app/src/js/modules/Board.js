@@ -15,6 +15,7 @@ function sleep(ms) {
 }
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+const calcDistance = (x1, y1, x2, y2) => Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 
 export class Board {
   constructor(
@@ -66,6 +67,68 @@ export class Board {
     // Set controls:
     this.buttons.update(gameState, this.renderState);
     this.dice.update(gameState, this.renderState);
+  }
+
+  async drawPlayerMovement(gameState, playerId, positions) {
+    console.log('drawPlayerMovement', playerId, positions);
+    if (!gameState) {
+      console.error('gameState is null');
+      return;
+    }
+
+    while (this.renderState.playerMovementInProgress) {
+      await sleep(100);
+    }
+
+    this.renderState.playerMovementInProgress = true;
+
+    try {
+      const playerGraphics = this.players.find((player) => player.id === playerId);
+
+      for (const position of positions) {
+        const tile = this.tiles.find((t, i) => i === position);
+        if (!tile) {
+          console.error('could not find tile matching position ', position);
+          return;
+        }
+
+        const targetPos = {
+          x: tile.tileContainer.x,
+          y: tile.tileContainer.y,
+        };
+
+        let counter = 0;
+        const speed = 10;
+        const damping = 0.25;
+        while (
+          calcDistance(playerGraphics.x, playerGraphics.y, targetPos.x, targetPos.y) > 2 &&
+          counter < 100 // 1 second max of animation (per tile)
+        ) {
+          counter++;
+          playerGraphics.x += clamp((targetPos.x - playerGraphics.x) * damping, -speed, speed);
+          playerGraphics.y += clamp((targetPos.y - playerGraphics.y) * damping, -speed, speed);
+          await sleep(10);
+        }
+
+        // set to exact position:
+        playerGraphics.x = targetPos.x;
+        playerGraphics.y = targetPos.y;
+
+        const playersOnSameTile = gameState.players
+          .filter((p) => p.id != playerId)
+          .filter((p) => p.position === position);
+        if (playersOnSameTile.length > 0) {
+          // const playerIndex = playersOnSameTile.findIndex((p) => p.id === gamePlayer.id);
+          const offset = Math.random() * 50 - 25;
+          playerGraphics.x += offset;
+          playerGraphics.y += offset;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    this.renderState.playerMovementInProgress = false;
   }
 
   async drawPlayerMoveAnimation(gameState, playerId, prevPos, pos) {

@@ -139,12 +139,11 @@ export class Engine {
     }
     lobby.startGame(() => {
       this.emitClientGameStateToLobby(lobby);
-      console.log('prevState: ', lobby.game?.gameState.prevState?.name);
-      if (lobby.game?.gameState.prevState?.name == 'Go To Jail') { // Assume dice movement
-        lobby.users.forEach((user) => {
-          this.io.to(user.id).emit('diceRoll', player.id, player.prevPosition, player.position);
-        });
-      }
+    }, (player, positions) => {
+      lobby.users.forEach((user) => {
+        console.log('Player moved across positions: ', positions);
+        this.io.to(user.id).emit('playerMovement', player.id, positions);
+      });
     });
 
     this.emitClientGameStateToLobby(lobby);
@@ -179,11 +178,11 @@ export class Engine {
       return;
     }
 
-    lobby.users.forEach((user) => {
-      console.log('gameUpdate, sent to ', user.id);
-      // this.io.to(user.id).emit('gameUpdate', this.getClientGameState(lobby, user));
-      this.io.to(user.id).emit('diceRoll', player.id, player.prevPosition, player.position);
-    });
+    // lobby.users.forEach((user) => {
+    //   console.log('gameUpdate, sent to ', user.id);
+    //   // this.io.to(user.id).emit('gameUpdate', this.getClientGameState(lobby, user));
+    //   this.io.to(user.id).emit('diceRoll', player.id, player.prevPosition, player.position);
+    // });
     callbackFn(null, this.getClientGameState(lobby, user));
   }
 

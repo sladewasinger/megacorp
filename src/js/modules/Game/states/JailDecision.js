@@ -7,6 +7,7 @@ export class JailDecision {
   onEnter(stateMachine, gameState) {
     console.log('JailDecision');
     this.gameState = gameState;
+    this.playerMovementCallbackFn = stateMachine.playerMovementCallbackFn;
 
     if (stateMachine.previousState.name == 'Go To Jail') {
       stateMachine.setState('TurnEnd', gameState);
@@ -64,9 +65,16 @@ export class JailDecision {
 
       this.gameState.currentPlayer.jailTurns = 3;
       this.gameState.currentPlayer.inJail = false;
+      this.gameState.currentPlayer.directMovement = false;
       this.gameState.currentPlayer.prevPosition = this.gameState.currentPlayer.position;
       this.gameState.currentPlayer.position += diceTotal;
-      this.gameState.currentPlayer.directMovement = false;
+
+      // get all positions between prev position and current position
+      const positions = [];
+      for (let i = this.gameState.currentPlayer.prevPosition; i <= this.gameState.currentPlayer.position; i++) {
+        positions.push(i % this.gameState.tiles.length); // If we go past 40, wrap around to 0
+      }
+      this.playerMovementCallbackFn(this.gameState.currentPlayer, positions);
 
       if (this.gameState.currentPlayer.position >= this.gameState.tiles.length) {
         this.gameState.currentPlayer.position -= this.gameState.tiles.length;

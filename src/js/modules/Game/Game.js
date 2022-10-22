@@ -16,13 +16,14 @@ import { Player } from './models/Player.js';
 import { JailDecision } from './states/JailDecision.js';
 
 export class Game {
-  constructor(players, gameStateUpdatedCallbackFn) {
+  constructor(players, gameStateUpdatedCallbackFn, playerMovementCallbackFn) {
     this.gameStateUpdatedCallbackFn = gameStateUpdatedCallbackFn || (() => { });
+    this.playerMovementCallbackFn = playerMovementCallbackFn || (() => { });
 
     this.gameState = new GameState();
     this.gameState.players = players;
 
-    this.stateMachine = new StateMachine(this.gameStateUpdatedCallbackFn);
+    this.stateMachine = new StateMachine(this.gameStateUpdatedCallbackFn, this.playerMovementCallbackFn);
     this.stateMachine.addState(new TurnStart());
     this.stateMachine.addState(new TurnEnd());
     this.stateMachine.addState(new JailDecision());

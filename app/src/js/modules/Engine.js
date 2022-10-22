@@ -44,6 +44,8 @@ export class Engine {
     });
     this.socket.on('gameUpdate', async (gameState) => await this.onGameStateUpdate(gameState));
     this.socket.on('diceRoll', (playerId, prevPos, pos) => this.onDiceRoll(playerId, prevPos, pos));
+    this.socket.on('playerMovement', (playerId, positions) =>
+      this.board.drawPlayerMovement(this.gameState, playerId, positions));
     this.board.socketId = this.socketId;
 
     this.update();
@@ -62,18 +64,18 @@ export class Engine {
       this.gameRunning = true;
     }
 
-    if (
-      (
-        gameState.currentPlayer?.directMovement ||
-        gameState.state.name == 'TurnStart' ||
-        gameState.prevState?.name == 'TurnEnd'
-      ) &&
-      (this.board.players?.length ?? 0) > 0 &&
-      this.board.renderState.lastGameStateProcessed != gameState.id
-    ) {
-      this.board.drawPlayerMoveAnimation(gameState,
-        gameState.currentPlayer.id, gameState.currentPlayer.prevPosition, gameState.currentPlayer.position);
-    }
+    // if (
+    //   (
+    //     gameState.currentPlayer?.directMovement ||
+    //     gameState.state.name == 'TurnStart' ||
+    //     gameState.prevState?.name == 'TurnEnd'
+    //   ) &&
+    //   (this.board.players?.length ?? 0) > 0 &&
+    //   this.board.renderState.lastGameStateProcessed != gameState.id
+    // ) {
+    //   this.board.drawPlayerMoveAnimation(gameState,
+    //     gameState.currentPlayer.id, gameState.currentPlayer.prevPosition, gameState.currentPlayer.position);
+    // }
   }
 
   update() {
@@ -88,7 +90,7 @@ export class Engine {
 
   onDiceRoll(playerId, prevPos, pos) {
     console.log('diceRoll', playerId, prevPos, pos);
-    this.board.drawPlayerMoveAnimation(this.gameState, playerId, prevPos, pos);
+    // this.board.drawPlayerMoveAnimation(this.gameState, playerId, prevPos, pos);
   }
 
   registerUser(name) {

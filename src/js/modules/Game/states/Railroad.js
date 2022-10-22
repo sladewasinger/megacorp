@@ -13,6 +13,13 @@ export class Railroad {
   onEnter(stateMachine, gameState) {
     console.log(this.name);
     this.gameState = gameState;
+
+    if (this.owner !== null) {
+      if (this.owner !== gameState.currentPlayer) {
+        this.gameState.currentPlayer.money -= this.rent;
+      }
+      stateMachine.setState('TurnEnd', gameState);
+    }
   }
 
   onExit() {

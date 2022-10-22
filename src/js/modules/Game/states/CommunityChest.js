@@ -10,7 +10,7 @@ export class CommunityChest {
     const card = this.gameState.communityChestDeck.cards.pop();
     this.gameState.communityChestDeck.cards.unshift(card);
 
-    card.onDraw(gameState);
+    card.onDraw(stateMachine, gameState);
 
     stateMachine.setState('TurnEnd', this.gameState);
   }
