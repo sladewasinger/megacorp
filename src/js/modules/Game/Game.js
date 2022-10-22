@@ -14,6 +14,7 @@ import { GoToJail } from './states/GoToJail.js';
 import { LuxuryTax } from './states/LuxuryTax.js';
 import { Player } from './models/Player.js';
 import { JailDecision } from './states/JailDecision.js';
+import chalk from 'chalk';
 
 export class Game {
   constructor(players, gameStateUpdatedCallbackFn, playerMovementCallbackFn) {
@@ -122,7 +123,22 @@ export class Game {
   getClientGameState(user) {
     const gameState = {
       ...this.gameState,
-      tiles: this.gameState.tiles.map((tile) => this.stateMachine.states[tile]),
+      chanceDeck: undefined,
+      communityChestDeck: undefined,
+      stateMachine: undefined,
+      tiles: this.gameState.tiles
+        .map((tile) => this.stateMachine.states[tile])
+        .map((tile) => ({
+          title: tile.title,
+          color: tile.color,
+          rent: tile.rent,
+          mortgage: tile.mortgage,
+          houseCost: tile.houseCost,
+          houses: tile.houses,
+          owner: tile.owner,
+          mortgaged: tile.mortgaged,
+          type: tile.type,
+        })),
       state: this.stateMachine.currentState,
       prevState: this.stateMachine.previousState,
       currentPlayer: this.gameState.currentPlayer,

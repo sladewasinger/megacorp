@@ -9,6 +9,7 @@ export class GoToJail {
 
     this.gameState.currentPlayer.inJail = true;
     this.gameState.currentPlayer.jailTurns = 3;
+    this.gameState.currentPlayer.prevPosition = this.gameState.currentPlayer.position;
     this.gameState.currentPlayer.position = 10;
     // get all positions between prev position and current position
     const positions = [this.gameState.currentPlayer.prevPosition, this.gameState.currentPlayer.position];
