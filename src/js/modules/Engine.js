@@ -137,7 +137,15 @@ export class Engine {
       callbackFn('You are not the owner of this lobby');
       return;
     }
-    lobby.startGame();
+    lobby.startGame(() => {
+      this.emitClientGameStateToLobby(lobby);
+      console.log('prevState: ', lobby.game?.gameState.prevState?.name);
+      if (lobby.game?.gameState.prevState?.name == 'Go To Jail') { // Assume dice movement
+        lobby.users.forEach((user) => {
+          this.io.to(user.id).emit('diceRoll', player.id, player.prevPosition, player.position);
+        });
+      }
+    });
 
     this.emitClientGameStateToLobby(lobby);
     callbackFn(null, this.getClientGameState(lobby, user));
@@ -173,7 +181,7 @@ export class Engine {
 
     lobby.users.forEach((user) => {
       console.log('gameUpdate, sent to ', user.id);
-      this.io.to(user.id).emit('gameUpdate', this.getClientGameState(lobby, user));
+      // this.io.to(user.id).emit('gameUpdate', this.getClientGameState(lobby, user));
       this.io.to(user.id).emit('diceRoll', player.id, player.prevPosition, player.position);
     });
     callbackFn(null, this.getClientGameState(lobby, user));
@@ -210,7 +218,7 @@ export class Engine {
       return;
     }
 
-    this.emitClientGameStateToLobby(lobby);
+    // this.emitClientGameStateToLobby(lobby);
     callbackFn(null, this.getClientGameState(lobby, user));
   }
 
@@ -242,7 +250,7 @@ export class Engine {
       callbackFn(error);
       return;
     }
-    this.emitClientGameStateToLobby(lobby);
+    // this.emitClientGameStateToLobby(lobby);
     callbackFn(null, this.getClientGameState(lobby, user));
   }
 
@@ -275,14 +283,14 @@ export class Engine {
       callbackFn(error);
       return;
     }
-    this.emitClientGameStateToLobby(lobby);
+    // this.emitClientGameStateToLobby(lobby);
     callbackFn(null, this.getClientGameState(lobby, user));
   }
 
   emitClientGameStateToLobby(lobby) {
     lobby.users.forEach((user) => {
       console.log('gameUpdate, sent to ', user.id);
-      this.io.to(user.id).emit('gameUpdate', lobby.game.getClientGameState(user));
+      this.io.to(user.id).emit('gameUpdate', lobby.game?.getClientGameState(user));
     });
   }
 

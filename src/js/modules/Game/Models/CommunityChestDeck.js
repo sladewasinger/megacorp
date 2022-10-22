@@ -1,4 +1,4 @@
-import { AdvanceToGo } from './cards/AdvanceToGo.js';
+import { AdvanceToGo } from './communityChestCards/AdvanceToGo.js';
 
 export class CommunityChestDeck {
   constructor() {

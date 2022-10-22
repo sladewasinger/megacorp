@@ -26,6 +26,7 @@ export class TurnStart {
 
     this.gameState.currentPlayer.prevPosition = this.gameState.currentPlayer.position;
     this.gameState.currentPlayer.position += diceTotal;
+    this.gameState.currentPlayer.directMovement = false;
 
     if (this.gameState.dice1 === this.gameState.dice2) {
       this.gameState.doubleDiceRollCount += 1;

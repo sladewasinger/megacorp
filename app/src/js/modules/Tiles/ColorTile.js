@@ -2,8 +2,7 @@ const PIXI = window.PIXI;
 
 export class ColorTile {
   constructor(title, color, price) {
-    this.title = title;
-    this.title = this.title
+    this.title = title
       .split(' ')
       .map((word) => {
         let newWord = '';

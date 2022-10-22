@@ -66,6 +66,7 @@ export class JailDecision {
       this.gameState.currentPlayer.inJail = false;
       this.gameState.currentPlayer.prevPosition = this.gameState.currentPlayer.position;
       this.gameState.currentPlayer.position += diceTotal;
+      this.gameState.currentPlayer.directMovement = false;
 
       if (this.gameState.currentPlayer.position >= this.gameState.tiles.length) {
         this.gameState.currentPlayer.position -= this.gameState.tiles.length;

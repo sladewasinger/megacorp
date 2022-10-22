@@ -69,14 +69,32 @@ export class Board {
   }
 
   async drawPlayerMoveAnimation(gameState, playerId, prevPos, pos) {
+    while (this.renderState.animationInProgress) {
+      await sleep(100);
+    }
+
     this.renderState.animationInProgress = true;
+    this.renderState.lastGameStateProcessed = gameState.id;
 
     try {
       const gamePlayer = gameState.players.find((player) => player.id === playerId);
       const playerGraphics = this.players.find((player) => player.id === playerId);
 
+      // get distance between playerGraphics and tile
+      const tile = this.tiles.find((t, i) => i === gamePlayer.position);
+      const dist = Math.sqrt(
+        Math.pow(playerGraphics.x - tile.tileContainer.x, 2) +
+        Math.pow(playerGraphics.y - tile.tileContainer.y, 2),
+      );
+      console.log('Distance: ', dist);
+      if (dist < 10) {
+        console.log('Player already where he should be');
+        this.renderState.animationInProgress = false;
+        return;
+      }
+
       let counter0 = 0;
-      while (prevPos != pos && counter0 < 13) {
+      while (prevPos != pos && counter0 < 41) {
         counter0++;
         prevPos++;
         if (prevPos >= this.tiles.length) {

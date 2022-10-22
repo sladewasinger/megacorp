@@ -1,9 +1,8 @@
-import { AdvanceToGo } from './cards/AdvanceToGo.js';
 
 export class ChanceDeck {
   constructor() {
     this.cards = [
-      new AdvanceToGo(),
+      // new AdvanceToGo(),
       // new AdvanceToIllinoisAvenue(),
       // new AdvanceToStCharlesPlace(),
       // new AdvanceToNearestUtility(),

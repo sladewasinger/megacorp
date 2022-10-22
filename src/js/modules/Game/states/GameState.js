@@ -3,6 +3,8 @@ import { ChanceDeck } from '../models/ChanceDeck.js';
 
 export class GameState {
   constructor() {
+    this.id = 0;
+
     this.dice1 = 0;
     this.dice2 = 0;
     this.doubleDiceRollCount = 0;

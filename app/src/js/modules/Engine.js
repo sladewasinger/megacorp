@@ -51,9 +51,28 @@ export class Engine {
 
   async onGameStateUpdate(gameState) {
     console.log('gameUpdated', gameState);
+    if (!gameState) {
+      console.log('game state is null');
+      return;
+    }
+
     this.gameState = gameState;
+
     if (!this.gameRunning) {
       this.gameRunning = true;
+    }
+
+    if (
+      (
+        gameState.currentPlayer?.directMovement ||
+        gameState.state.name == 'TurnStart' ||
+        gameState.prevState?.name == 'TurnEnd'
+      ) &&
+      (this.board.players?.length ?? 0) > 0 &&
+      this.board.renderState.lastGameStateProcessed != gameState.id
+    ) {
+      this.board.drawPlayerMoveAnimation(gameState,
+        gameState.currentPlayer.id, gameState.currentPlayer.prevPosition, gameState.currentPlayer.position);
     }
   }
 
