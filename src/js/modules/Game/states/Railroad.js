@@ -15,17 +15,20 @@ export class Railroad {
       return 0;
     }
 
-    const ownedRailroads = this.stateMachine
-      .getStates()
-      .filter((state) => state instanceof Railroad);
-    const rentTemp = 25 * (2 ** (ownedRailroads.length - 1));
+    const ownedRailroads = this.owner.properties
+      .filter((title) =>
+        title == 'Reading Railroad' ||
+        title == 'Pennsylvania Railroad' ||
+        title == 'B. & O. Railroad' ||
+        title == 'Short Line',
+      ).length;
+    const rentTemp = 25 * (2 ** (ownedRailroads - 1));
     return rentTemp;
   }
 
   onEnter(stateMachine, gameState) {
     console.log(this.name);
     this.gameState = gameState;
-    this.stateMachine = stateMachine;
 
     if (this.owner !== null) {
       if (this.owner !== gameState.currentPlayer) {
