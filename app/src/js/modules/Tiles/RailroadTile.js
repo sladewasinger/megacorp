@@ -4,8 +4,7 @@ export class RailroadTile {
   update(gameState) { }
 
   constructor(title, color, price) {
-    this.title = title;
-    this.title = this.title
+    this.title = title
       .split(' ')
       .map((word) => {
         let newWord = '';
@@ -22,6 +21,23 @@ export class RailroadTile {
     this.price = price;
     this.width = 100;
     this.height = 150;
+  }
+
+  update(index, gameState) {
+    const gameStateTile = gameState.tiles[index];
+    if (!gameStateTile) {
+      console.log('no game state tile');
+      return;
+    }
+    if (gameStateTile.owner) {
+      // const owner = gameState.players.find((player) => player.id === gameStateTile.ownerId);
+      // color tile to owner's color
+      this.tile.clear();
+      this.tile.beginFill(gameStateTile.owner.color);
+      this.tile.lineStyle(2, 0x000000, 1);
+      this.tile.drawRect(0, 0, this.width, this.height);
+      this.tile.endFill();
+    }
   }
 
   draw(container, x, y, rotation = 0) {

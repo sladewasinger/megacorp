@@ -15,6 +15,7 @@ function sleep(ms) {
 }
 
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+const calcDistance = (x1, y1, x2, y2) => Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 
 export class Board {
   constructor(
@@ -58,65 +59,155 @@ export class Board {
 
     if (!this.players) {
       this.drawPlayersInitial(gameState);
+      for (const gamePlayer of gameState.players) {
+        this.drawPlayerMoveAnimation(gameState, gamePlayer.id, -1, gamePlayer.position);
+      }
     }
 
-    this.buttons.update(gameState, this.renderState);
-
     // Set controls:
-    this.dice.setNumber(gameState.diceRoll1, gameState.diceRoll2);
+    this.buttons.update(gameState, this.renderState);
+    this.dice.update(gameState, this.renderState);
+  }
+
+  async drawPlayerMovement(gameState, playerId, positions) {
+    console.log('drawPlayerMovement', playerId, positions);
+    if (!gameState) {
+      console.error('gameState is null');
+      return;
+    }
+
+    while (this.renderState.playerMovementInProgress) {
+      await sleep(100);
+    }
+
+    this.renderState.playerMovementInProgress = true;
+
+    try {
+      const playerGraphics = this.players.find((player) => player.id === playerId);
+
+      for (const position of positions) {
+        const tile = this.tiles.find((t, i) => i === position);
+        if (!tile) {
+          console.error('could not find tile matching position ', position);
+          return;
+        }
+
+        const targetPos = {
+          x: tile.tileContainer.x,
+          y: tile.tileContainer.y,
+        };
+
+        let counter = 0;
+        const speed = 10;
+        const damping = 0.25;
+        while (
+          calcDistance(playerGraphics.x, playerGraphics.y, targetPos.x, targetPos.y) > 2 &&
+          counter < 100 // 1 second max of animation (per tile)
+        ) {
+          counter++;
+          playerGraphics.x += clamp((targetPos.x - playerGraphics.x) * damping, -speed, speed);
+          playerGraphics.y += clamp((targetPos.y - playerGraphics.y) * damping, -speed, speed);
+          await sleep(10);
+        }
+
+        // set to exact position:
+        playerGraphics.x = targetPos.x;
+        playerGraphics.y = targetPos.y;
+
+        const playersOnSameTile = gameState.players
+          .filter((p) => p.id != playerId)
+          .filter((p) => p.position === position);
+        if (playersOnSameTile.length > 0) {
+          // const playerIndex = playersOnSameTile.findIndex((p) => p.id === gamePlayer.id);
+          const offset = Math.random() * 50 - 25;
+          playerGraphics.x += offset;
+          playerGraphics.y += offset;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    this.renderState.playerMovementInProgress = false;
   }
 
   async drawPlayerMoveAnimation(gameState, playerId, prevPos, pos) {
+    while (this.renderState.animationInProgress) {
+      await sleep(100);
+    }
+
     this.renderState.animationInProgress = true;
+    this.renderState.lastGameStateProcessed = gameState.id;
 
-    const playerGraphics = this.players.find((player) => player.id === playerId);
+    try {
+      const gamePlayer = gameState.players.find((player) => player.id === playerId);
+      const playerGraphics = this.players.find((player) => player.id === playerId);
 
-    let counter0 = 0;
-    while (prevPos != pos && counter0 < 13) {
-      counter0++;
-      prevPos++;
-      if (prevPos >= this.tiles.length) {
-        prevPos = 0;
-      }
-      const tile = this.tiles.find((t, i) => i === prevPos);
-      if (!tile) {
-        console.error('could not find tile matching player position');
+      // get distance between playerGraphics and tile
+      const tile = this.tiles.find((t, i) => i === gamePlayer.position);
+      const dist = Math.sqrt(
+        Math.pow(playerGraphics.x - tile.tileContainer.x, 2) +
+        Math.pow(playerGraphics.y - tile.tileContainer.y, 2),
+      );
+      console.log('Distance: ', dist);
+      if (dist < 10) {
+        console.log('Player already where he should be');
+        this.renderState.animationInProgress = false;
         return;
       }
 
-      const targetPos = {
-        x: tile.tileContainer.x,
-        y: tile.tileContainer.y,
-      };
+      let counter0 = 0;
+      while (prevPos != pos && counter0 < 41) {
+        counter0++;
+        prevPos++;
+        if (prevPos >= this.tiles.length) {
+          prevPos = 0;
+        }
+        if (gameState.currentPlayer.inJail) {
+          prevPos = 10;
+        }
 
-      let counter = 0;
-      const speed = 5;
-      const damping = 0.2;
-      const clampMinX = -speed;
-      const clampMaxX = speed;
-      const clampMinY = -speed;
-      const clampMaxY = speed;
-      while (Math.abs(playerGraphics.x - targetPos.x) > 1 ||
-        Math.abs(playerGraphics.y - targetPos.y) > 1 && counter < 100
-      ) {
-        counter++;
-        playerGraphics.x += clamp((targetPos.x - playerGraphics.x) * damping, clampMinX, clampMaxX);
-        playerGraphics.y += clamp((targetPos.y - playerGraphics.y) * damping, clampMinY, clampMaxY);
-        await sleep(10);
-      }
-      playerGraphics.x = targetPos.x;
-      playerGraphics.y = targetPos.y;
+        const tile = this.tiles.find((t, i) => i === prevPos);
+        if (!tile) {
+          console.error('could not find tile matching player position');
+          return;
+        }
 
-      const playersOnSameTile = gameState.players.filter((p) => p.position === prevPos);
-      if (playersOnSameTile.length > 1) {
-        const playerIndex = playersOnSameTile.findIndex((p) => p.id === gamePlayer.id);
-        const offset = -25 + playerIndex * 20;
-        playerGraphics.x += offset;
-        playerGraphics.y += offset;
-        await sleep(10);
+        const targetPos = {
+          x: tile.tileContainer.x,
+          y: tile.tileContainer.y,
+        };
+
+        let counter = 0;
+        const speed = 5;
+        const damping = 0.2;
+        const clampMinX = -speed;
+        const clampMaxX = speed;
+        const clampMinY = -speed;
+        const clampMaxY = speed;
+        while (Math.abs(playerGraphics.x - targetPos.x) > 1 ||
+          Math.abs(playerGraphics.y - targetPos.y) > 1 && counter < 100
+        ) {
+          counter++;
+          playerGraphics.x += clamp((targetPos.x - playerGraphics.x) * damping, clampMinX, clampMaxX);
+          playerGraphics.y += clamp((targetPos.y - playerGraphics.y) * damping, clampMinY, clampMaxY);
+          await sleep(10);
+        }
+        playerGraphics.x = targetPos.x;
+        playerGraphics.y = targetPos.y;
+
+        const playersOnSameTile = gameState.players.filter((p) => p.position === prevPos);
+        if (playersOnSameTile.length > 1) {
+          const playerIndex = playersOnSameTile.findIndex((p) => p.id === gamePlayer.id);
+          const offset = -25 + playerIndex * 20;
+          playerGraphics.x += offset;
+          playerGraphics.y += offset;
+          await sleep(10);
+        }
       }
+    } catch (e) {
+      console.error(e);
     }
-
     this.renderState.animationInProgress = false;
   }
 

@@ -1,33 +1,42 @@
 export class Property {
-  constructor(name, color, cost, rent, mortgageValue, houseCost, hotelCost) {
+  constructor(name, color, cost, rents, houseCost, hotelCost) {
     this.name = name;
     this.type = 'property';
 
-    this.state = {
-      title: name,
-      color,
-      cost,
-      rent,
-      mortgageValue,
-      houseCost,
-      hotelCost,
-      owner: null,
-      houses: 0,
-      hotel: false,
-    };
-
-    this.transitions = {
-      buyProperty: this.buyProperty,
-      auctionProperty: this.auctionProperty,
-    };
+    this.title = name;
+    this.color = color;
+    this.cost = cost;
+    this.rents = rents;
+    this.houseCost = houseCost;
+    this.hotelCost = hotelCost;
+    this.mortgage = cost / 2;
+    this.buybackFee = this.mortgage * 1.1;
+    this.owner = null;
+    this.houses = 0;
+    this.hotel = false;
   }
 
-  get name() {
-    return 'Property';
+  get rent() {
+    if (this.owner === null) {
+      return 0;
+    }
+    let index = this.houses;
+    if (this.hotel) {
+      index++;
+    }
+    return this.rents[index];
   }
 
-  onEnter(gameState) {
-    console.log('Property');
+  onEnter(stateMachine, gameState) {
+    console.log(`${this.name}: Enter`);
+    this.gameState = gameState;
+
+    if (this.owner !== null) {
+      if (this.owner !== gameState.currentPlayer) {
+        this.gameState.currentPlayer.money -= this.rent;
+      }
+      stateMachine.setState('TurnEnd', gameState);
+    }
   }
 
   onExit() {
@@ -35,9 +44,17 @@ export class Property {
   }
 
   buyProperty() {
+    if (!this.gameState) {
+      throw new Error('Game state not set');
+    }
+
     console.log('buyProperty');
 
-    if (gameState.doubleDiceRoll) {
+    this.owner = this.gameState.currentPlayer;
+    this.gameState.currentPlayer.money -= this.rent;
+    this.gameState.currentPlayer.properties.push(this.name);
+
+    if (this.gameState.doubleDiceRoll) {
       return 'TurnStart';
     }
 
@@ -45,6 +62,16 @@ export class Property {
   }
 
   auctionProperty() {
+    if (!this.gameState) {
+      throw new Error('Game state not set');
+    }
+
     console.log('auctionProperty');
+
+    if (this.gameState.doubleDiceRoll) {
+      return 'TurnStart';
+    }
+
+    return 'TurnEnd';
   }
 }

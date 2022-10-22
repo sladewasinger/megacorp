@@ -1,219 +1,207 @@
-import { Board } from './Board.js';
+import { GameState } from './states/GameState.js';
+import { StateMachine } from './StateMachine.js';
+import { TurnStart } from './states/TurnStart.js';
+import { TurnEnd } from './states/TurnEnd.js';
+import { Go } from './states/Go.js';
+import { Property } from './states/Property.js';
+import { CommunityChest } from './states/CommunityChest.js';
+import { IncomeTax } from './states/IncomeTax.js';
+import { Railroad } from './states/Railroad.js';
+import { Chance } from './states/Chance.js';
+import { Jail } from './states/Jail.js';
+import { FreeParking } from './states/FreeParking.js';
+import { GoToJail } from './states/GoToJail.js';
+import { LuxuryTax } from './states/LuxuryTax.js';
 import { Player } from './models/Player.js';
-import { ColorTile } from './tiles/ColorTiles.js';
-import { RailroadTile } from './tiles/RailroadTile.js';
-import { UtilityTile } from './tiles/UtilityTile.js';
+import { JailDecision } from './states/JailDecision.js';
 
 export class Game {
-  constructor(players) {
-    this.board = new Board();
-    this.gameState = {
-      started: false,
-      finished: false,
-      diceRoll1: 0,
-      diceRoll2: 0,
-      players,
-      tiles: [],
-      auctionProperty: null,
-      state: 'turnStart',
-    };
+  constructor(players, gameStateUpdatedCallbackFn, playerMovementCallbackFn) {
+    this.gameStateUpdatedCallbackFn = gameStateUpdatedCallbackFn || (() => { });
+    this.playerMovementCallbackFn = playerMovementCallbackFn || (() => { });
+
+    this.gameState = new GameState();
+    this.gameState.players = players;
+
+    this.stateMachine = new StateMachine(this.gameStateUpdatedCallbackFn, this.playerMovementCallbackFn);
+    this.stateMachine.addState(new TurnStart());
+    this.stateMachine.addState(new TurnEnd());
+    this.stateMachine.addState(new JailDecision());
+    this.stateMachine.addState(new Go());
+    this.stateMachine.addState(
+      new Property('Mediterranean Avenue', 0x00ff00, 60, [2, 10, 30, 90, 160, 250], 50, 50),
+    );
+    this.stateMachine.addState(new CommunityChest());
+    this.stateMachine.addState(
+      new Property('Baltic Avenue', 0x00ff00, 60, [4, 20, 60, 180, 320, 450], 50, 50),
+    );
+    this.stateMachine.addState(new IncomeTax());
+    this.stateMachine.addState(new Railroad('Reading Railroad', 200));
+    this.stateMachine.addState(
+      new Property('Oriental Avenue', 0x0000ff, 100, [6, 30, 90, 270, 400, 550], 50, 50),
+    );
+    this.stateMachine.addState(new Chance());
+    this.stateMachine.addState(
+      new Property('Vermont Avenue', 0x0000ff, 100, [6, 30, 90, 270, 400, 550], 50, 50),
+    );
+    this.stateMachine.addState(
+      new Property('Connecticut Avenue', 0x0000ff, 120, [8, 40, 100, 300, 450, 600], 50, 50),
+    );
+    this.stateMachine.addState(new Jail());
+    this.stateMachine.addState(
+      new Property('St. Charles Place', 0xff0000, 140, [10, 50, 150, 450, 625, 750], 100, 100),
+    );
+    this.stateMachine.addState(new Property('Electric Company', 0x000000, 150, [4, 10], 75, 75));
+    this.stateMachine.addState(
+      new Property('States Avenue', 0xff0000, 140, [10, 50, 150, 450, 625, 750], 100, 100),
+    );
+    this.stateMachine.addState(
+      new Property('Virginia Avenue', 0xff0000, 160, [12, 60, 180, 500, 700, 900], 100, 100),
+    );
+    this.stateMachine.addState(new Railroad('Pennsylvania Railroad', 200));
+    this.stateMachine.addState(
+      new Property('St. James Place', 0xffff00, 180, [14, 70, 200, 550, 750, 950], 100, 100),
+    );
+    this.stateMachine.addState(new CommunityChest());
+    this.stateMachine.addState(
+      new Property('Tennessee Avenue', 0xffff00, 180, [14, 70, 200, 550, 750, 950], 100, 100),
+    );
+    this.stateMachine.addState(
+      new Property('New York Avenue', 0xffff00, 200, [16, 80, 220, 600, 800, 1000], 100, 100),
+    );
+    this.stateMachine.addState(new FreeParking());
+    this.stateMachine.addState(
+      new Property('Kentucky Avenue', 0xff00ff, 220, [18, 90, 250, 700, 875, 1050], 150, 150),
+    );
+    this.stateMachine.addState(new Chance());
+    this.stateMachine.addState(
+      new Property('Indiana Avenue', 0xff00ff, 220, [18, 90, 250, 700, 875, 1050], 150, 150),
+    );
+    this.stateMachine.addState(
+      new Property('Illinois Avenue', 0xff00ff, 240, [20, 100, 300, 750, 925, 1100], 150, 150),
+    );
+    this.stateMachine.addState(new Railroad('B. & O. Railroad', 200));
+    this.stateMachine.addState(
+      new Property('Atlantic Avenue', 0x00ffff, 260, [22, 110, 330, 800, 975, 1150], 150, 150),
+    );
+    this.stateMachine.addState(
+      new Property('Ventnor Avenue', 0x00ffff, 260, [22, 110, 330, 800, 975, 1150], 150, 150),
+    );
+    this.stateMachine.addState(new Property('Water Works', 0x000000, 150, [4, 10], 75, 75));
+    this.stateMachine.addState(
+      new Property('Marvin Gardens', 0x00ffff, 280, [24, 120, 360, 850, 1025, 1200], 150, 150),
+    );
+    this.stateMachine.addState(new GoToJail());
+    this.stateMachine.addState(
+      new Property('Pacific Avenue', 0x00ff00, 300, [26, 130, 390, 900, 1100, 1275], 200, 200),
+    );
+    this.stateMachine.addState(
+      new Property('North Carolina Avenue', 0x00ff00, 300, [26, 130, 390, 900, 1100, 1275], 200, 200),
+    );
+    this.stateMachine.addState(new CommunityChest());
+    this.stateMachine.addState(
+      new Property('Pennsylvania Avenue', 0x00ff00, 320, [28, 150, 450, 1000, 1200, 1400], 200, 200),
+    );
+    this.stateMachine.addState(new Railroad('Short Line', 200));
+    this.stateMachine.addState(new Chance());
+    this.stateMachine.addState(
+      new Property('Park Place', 0x0000ff, 350, [35, 175, 500, 1100, 1300, 1500], 200, 200),
+    );
+    this.stateMachine.addState(new LuxuryTax());
+    this.stateMachine.addState(
+      new Property('Boardwalk', 0x0000ff, 400, [50, 200, 600, 1400, 1700, 2000], 200, 200),
+    );
+
+    this.stateMachine.setState('TurnStart', this.gameState);
+  }
+
+  static createPlayer(id, name) {
+    return new Player(id, name);
   }
 
   getClientGameState(user) {
     const gameState = {
       ...this.gameState,
-      players: this.gameState.players.map((player) => ({
-        ...player,
-      })),
-      tiles: this.board.tiles,
-      currentPlayer: this.currentPlayer(),
+      tiles: this.gameState.tiles.map((tile) => this.stateMachine.states[tile]),
+      state: this.stateMachine.currentState,
+      prevState: this.stateMachine.previousState,
+      currentPlayer: this.gameState.currentPlayer,
       myId: user.id,
     };
-
     return gameState;
   }
 
-  startGame() {
-    function selectColor(number) {
+  startGame(shufflePlayers = false) {
+    const selectColor = (number) => {
       const hue = number * 137.508; // use golden angle approximation
-      return [hue, 100, 50];
-    }
-
-    function hslToHex([h, s, l]) {
-      s /= 100;
+      return [hue, 100, 60];
+    };
+    const hslToHex = ([h, s, l]) => {
       l /= 100;
-      const a = s * Math.min(l, 1 - l);
+      const a = s * Math.min(l, 1 - l) / 100;
       const f = (n) => {
         const k = (n + h / 30) % 12;
         const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-        return Math.round(255 * color)
-          .toString(16)
-          .padStart(2, '0'); // convert to Hex and prefix "0" if needed
+        return Math.round(255 * color).toString(16).padStart(2, '0'); // convert to Hex and prefix "0" if needed
       };
-      const color = +`0x${f(0)}${f(8)}${f(4)}`;
-      console.log(color);
-      return color;
-    }
+      return +(`0x${f(0)}${f(8)}${f(4)}`);
+    };
 
-    this.gameState.players = this.gameState.players.sort(() => Math.random() - 0.5);
-    this.gameState.players.forEach((player) => {
-      player.position = 0;
+    let index = 0;
+    for (const player of this.gameState.players) {
+      index++;
       player.money = 1500;
-      player.color = hslToHex(selectColor(this.gameState.players.indexOf(player)));
-    });
-    this.gameState.started = true;
-    this.gameState.state = 'rollDice';
-  }
-
-  static createPlayer(name, id) {
-    const player = new Player(name, id);
-    return player;
-  }
-
-  currentPlayer() {
-    return this.gameState.players[0];
-  }
-
-  rollDice(playerId, diceRoll1Override, diceRoll2Override) {
-    const player = this.gameState.players.find((player) => player.id === playerId);
-    if (!player) {
-      throw new Error('Player not found');
-    }
-    if (player !== this.currentPlayer()) {
-      throw new Error('Not your turn');
-    }
-    if (player.state !== 'turnStart') {
-      throw new Error('Wrong action');
-    }
-    if (player.hasRolledDice && player.diceDoublesInRow == 0) {
-      throw new Error('You have already rolled the dice');
-    }
-    if (player.requiresPropertyAction) {
-      throw new Error('You must take an action on a property');
+      player.prevPosition = -1;
+      player.position = 0;
+      player.color = hslToHex(selectColor(index));
+      console.log(player.color);
     }
 
-    const diceRoll1 = diceRoll1Override || Math.floor(Math.random() * 6) + 1;
-    const diceRoll2 = diceRoll2Override || Math.floor(Math.random() * 6) + 1;
-    this.gameState.diceRoll1 = diceRoll1;
-    this.gameState.diceRoll2 = diceRoll2;
-
-    const diceRoll = diceRoll1 + diceRoll2;
-
-    player.prevPosition = player.position;
-
-    if (diceRoll1 === diceRoll2) {
-      player.diceDoublesInRow += 1;
-    } else {
-      this.diceDoublesInRow = 0;
-    }
-
-    if (player.diceDoublesInRow >= 3) {
-      player.position = 10; // Jail
-      player.isInJail = true;
-    } else {
-      player.position += diceRoll;
-      if (player.position >= 40) {
-        player.position -= 40;
-        player.money += 200; // Passed Go
+    if (shufflePlayers) {
+      // shuffle players
+      for (let i = this.gameState.players.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [this.gameState.players[i], this.gameState.players[j]] = [
+          this.gameState.players[j],
+          this.gameState.players[i],
+        ];
       }
     }
 
-    const propertySpaces = this.board.tiles
-      .map((property, index) => {
-        property.index = index;
-        return property;
-      })
-      .filter((property) => property instanceof ColorTile ||
-        property instanceof RailroadTile ||
-        property instanceof UtilityTile)
-      .filter((property) => !property.ownerId);
-    if (propertySpaces.some((property) => property.index === player.position)) {
-      player.requiresPropertyAction = true;
-      this.gameState.state = 'propertyAction';
-    } else {
-      this.gameState.state = 'endTurn';
-    }
-
-    return [diceRoll1, diceRoll2];
+    this.stateMachine.setState('TurnStart', this.gameState);
   }
 
-  endTurn(playerId) {
-    const player = this.gameState.players.find((player) => player.id === playerId);
-    if (!player) {
-      throw new Error('Player not found');
-    }
-    if (player !== this.currentPlayer()) {
-      throw new Error('Not your turn');
-    }
-    if (this.gameState.state !== 'endTurn') {
-      throw new Error('Wrong action');
-    }
-    if (!player.hasRolledDice) {
-      throw new Error('You have not rolled the dice');
-    }
-    if (player.requiresPropertyAction) {
-      throw new Error('You must take an action on the property you landed on');
+  rollDice(dice1Override, dice2Override) {
+    if (this.stateMachine.currentState.name !== 'TurnStart' &&
+      this.stateMachine.currentState.name !== 'JailDecision') {
+      throw new Error('Cannot roll dice outside of TurnStart/JailDecision state');
     }
 
-    player.hasRolledDice = false;
+    const nextState = this.stateMachine.currentState.rollDice(dice1Override, dice2Override);
+    this.stateMachine.setState(nextState, this.gameState);
+  }
+
+  buyProperty() {
+    if (this.stateMachine.currentState.type !== 'property') {
+      throw new Error('Cannot buy property outside of Property state');
+    }
+    if (this.stateMachine.currentState.owner) {
+      throw new Error('Cannot buy property that is already owned');
+    }
+
+    const nextState = this.stateMachine.currentState.buyProperty(this.gameState);
+    this.stateMachine.setState(nextState, this.gameState);
+  }
+
+
+  endTurn() {
+    if (this.stateMachine.currentState.name !== 'TurnEnd') {
+      throw new Error('Cannot end turn outside of TurnEnd state');
+    }
+
+    // Switch to next player
     this.gameState.players.push(this.gameState.players.shift());
-  }
 
-  buyProperty(playerId) {
-    const player = this.gameState.players.find((player) => player.id === playerId);
-    if (!player) {
-      throw new Error('Player not found');
-    }
-    if (player !== this.currentPlayer()) {
-      throw new Error('Not your turn');
-    }
-    if (!player.hasRolledDice) {
-      throw new Error('You have not rolled the dice');
-    }
-
-    const property = this.board.tiles.find((property, index) => index === player.position);
-    if (!property) {
-      throw new Error('Property not found');
-    }
-    if (property.ownerId) {
-      throw new Error('Property already owned');
-    }
-    if (!property.isBuyable) {
-      throw new Error('Property not buyable');
-    }
-    if (player.money < property.price) {
-      throw new Error('Not enough money');
-    }
-
-    player.requiresPropertyAction = false;
-    player.money -= property.price;
-    property.ownerId = player.id;
-  }
-
-  auctionProperty(playerId) {
-    const player = this.gameState.players.find((player) => player.id === playerId);
-    if (!player) {
-      throw new Error('Player not found');
-    }
-    if (player !== this.currentPlayer()) {
-      throw new Error('Not your turn');
-    }
-    if (!player.hasRolledDice) {
-      throw new Error('You have not rolled the dice');
-    }
-
-    const property = this.board.tiles.find((property, index) => index === player.position);
-    if (!property) {
-      throw new Error('Property not found');
-    }
-    if (property.ownerId) {
-      throw new Error('Property already owned');
-    }
-    if (!property.isBuyable) {
-      throw new Error('Property not buyable');
-    }
-
-    player.requiresPropertyAction = false;
-    this.gameState.auctionProperty = property;
+    this.stateMachine.setState('TurnStart', this.gameState);
   }
 }
