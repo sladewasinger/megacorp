@@ -15,14 +15,14 @@ export class Engine {
         console.log('user connected', socket.id);
         this.users.push(new User(socket.id));
 
-        socket.on('disconnect', () => this.userDisconnected(socket));
-        socket.on('registerName', (name, callbackFn) => this.registerName(socket, name, callbackFn));
-        socket.on('createLobby', (callbackFn) => this.createLobby(socket, callbackFn));
-        socket.on('joinLobby', (lobbyId, callbackFn) => this.joinLobby(socket, lobbyId, callbackFn));
-        socket.on('startGame', (lobbyId, callbackFn) => this.startGame(socket, lobbyId, callbackFn));
+        socket.on('disconnect', () => this.userDisconnected(socket.id));
+        socket.on('registerName', (name, callbackFn) => this.registerName(socket.id, name, callbackFn));
+        socket.on('createLobby', (callbackFn) => this.createLobby(socket.id, callbackFn));
+        socket.on('joinLobby', (lobbyId, callbackFn) => this.joinLobby(socket.id, lobbyId, callbackFn));
+        socket.on('startGame', (callbackFn) => this.startGame(socket.id, callbackFn));
         socket.on('rollDice', (diceRoll1Override, diceRoll2Override, callbackFn) =>
-          this.rollDice(socket, diceRoll1Override, diceRoll2Override, callbackFn));
-        socket.on('buyProperty', (callbackFn) => this.buyProperty(socket, callbackFn));
+          this.rollDice(socket.id, diceRoll1Override, diceRoll2Override, callbackFn));
+        socket.on('buyProperty', (callbackFn) => this.buyProperty(socket.id, callbackFn));
         socket.on('auctionProperty', (callbackFn) => this.auctionProperty(socket, callbackFn));
         socket.on('endTurn', (callbackFn) => this.endTurn(socket, callbackFn));
         socket.on('Error', (error) => {
@@ -36,13 +36,13 @@ export class Engine {
     });
   }
 
-  userDisconnected(socket) {
-    const user = this.users.find((user) => user.id === socket.id);
+  userDisconnected(socketId) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       console.log('User not found');
       return;
     }
-    console.log('user disconnected', socket.id);
+    console.log('user disconnected', socketId);
     this.users = this.users.filter((u) => u.id !== user.id);
     this.lobbies.forEach((lobby) => {
       lobby.removeUser(user);
@@ -54,8 +54,8 @@ export class Engine {
     this.lobbies = this.lobbies.filter((lobby) => lobby.users.length > 0);
   }
 
-  registerName(socket, name, callbackFn) {
-    const user = this.users.find((user) => user.id === socket.id);
+  registerName(socketId, name, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       callbackFn('User not found');
       return;
@@ -69,8 +69,8 @@ export class Engine {
     callbackFn(null, user);
   }
 
-  createLobby(socket, callbackFn) {
-    const user = this.users.find((user) => user.id === socket.id);
+  createLobby(socketId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       callbackFn('User not found');
       return;
@@ -83,13 +83,13 @@ export class Engine {
 
     const lobby = new Lobby();
     this.lobbies.push(lobby);
-    this.joinLobby(socket, lobby.id, callbackFn);
+    this.joinLobby(socketId, lobby.id, callbackFn);
     lobby.owner = user;
     callbackFn(null, lobby);
   }
 
-  joinLobby(socket, lobbyId, callbackFn) {
-    const user = this.users.find((user) => user.id === socket.id);
+  joinLobby(socketId, lobbyId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       callbackFn('User not found');
       return;
@@ -122,13 +122,13 @@ export class Engine {
     callbackFn(null, lobby);
   }
 
-  startGame(socket, lobbyId, callbackFn) {
-    const user = this.users.find((user) => user.id === socket.id);
+  startGame(socketId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       callbackFn('User not found');
       return;
     }
-    const lobby = this.lobbies.find((lobby) => lobby.id === lobbyId);
+    const lobby = this.lobbies.find((lobby) => lobby.users.find((u) => u.id === user.id));
     if (!lobby) {
       callbackFn('Lobby not found');
       return;
@@ -137,16 +137,21 @@ export class Engine {
       callbackFn('You are not the owner of this lobby');
       return;
     }
-    lobby.startGame();
-    lobby.users.forEach((user) => {
-      console.log('gameUpdate, sent to ', user.id);
-      this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
+    lobby.startGame(() => {
+      this.emitClientGameStateToLobby(lobby);
+    }, (player, positions) => {
+      lobby.users.forEach((user) => {
+        console.log('Player moved across positions: ', positions);
+        this.io.to(user.id).emit('playerMovement', player.id, positions);
+      });
     });
-    callbackFn(null, lobby);
+
+    this.emitClientGameStateToLobby(lobby);
+    callbackFn(null, this.getClientGameState(lobby, user));
   }
 
-  rollDice(socket, diceRoll1Override, diceRoll2Override, callbackFn) {
-    const user = this.users.find((user) => user.id === socket.id);
+  rollDice(socketId, diceRoll1Override, diceRoll2Override, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       callbackFn('User not found');
       return;
@@ -162,11 +167,8 @@ export class Engine {
       return;
     }
 
-    let number1;
-    let number2;
-
     try {
-      [number1, number2] = lobby.game.rollDice(player.id, diceRoll1Override, diceRoll2Override);
+      lobby.game.rollDice(diceRoll1Override, diceRoll2Override);
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {
@@ -175,15 +177,17 @@ export class Engine {
       }
       return;
     }
-    lobby.users.forEach((user) => {
-      console.log('gameUpdate, sent to ', user.id);
-      this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
-    });
-    callbackFn(null, [number1, number2]);
+
+    // lobby.users.forEach((user) => {
+    //   console.log('gameUpdate, sent to ', user.id);
+    //   // this.io.to(user.id).emit('gameUpdate', this.getClientGameState(lobby, user));
+    //   this.io.to(user.id).emit('diceRoll', player.id, player.prevPosition, player.position);
+    // });
+    callbackFn(null, this.getClientGameState(lobby, user));
   }
 
-  buyProperty(socket, callbackFn) {
-    const user = this.users.find((user) => user.id === socket.id);
+  buyProperty(socketId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
     if (!user) {
       callbackFn('User not found');
       return;
@@ -212,11 +216,9 @@ export class Engine {
       callbackFn(error);
       return;
     }
-    lobby.users.forEach((user) => {
-      console.log('gameUpdate, sent to ', user.id);
-      this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
-    });
-    callbackFn(null, lobby.game.getGameState(user));
+
+    // this.emitClientGameStateToLobby(lobby);
+    callbackFn(null, this.getClientGameState(lobby, user));
   }
 
   auctionProperty(socket, callbackFn) {
@@ -247,13 +249,9 @@ export class Engine {
       callbackFn(error);
       return;
     }
-    lobby.users.forEach((user) => {
-      console.log('gameUpdate, sent to ', user.id);
-      this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
-    });
-    callbackFn(null, lobby.game.getGameState(user));
+    // this.emitClientGameStateToLobby(lobby);
+    callbackFn(null, this.getClientGameState(lobby, user));
   }
-
 
   endTurn(socket, callbackFn) {
     const user = this.users.find((user) => user.id === socket.id);
@@ -284,10 +282,18 @@ export class Engine {
       callbackFn(error);
       return;
     }
+    // this.emitClientGameStateToLobby(lobby);
+    callbackFn(null, this.getClientGameState(lobby, user));
+  }
+
+  emitClientGameStateToLobby(lobby) {
     lobby.users.forEach((user) => {
       console.log('gameUpdate, sent to ', user.id);
-      this.io.to(user.id).emit('gameUpdate', lobby.game.getGameState(user));
+      this.io.to(user.id).emit('gameUpdate', lobby.game?.getClientGameState(user));
     });
-    callbackFn(null, lobby.game.getGameState(user));
+  }
+
+  getClientGameState(lobby, user) {
+    return lobby.game.getClientGameState(user);
   }
 }

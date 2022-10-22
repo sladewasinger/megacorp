@@ -11,7 +11,7 @@
   },
   "rules": {
     "require-jsdoc": 0,
-    "indent": ["error", 2],
+    "indent": ["error", 2, { "SwitchCase": 1 }],
     "max-len": ["error", { "code": 120 }],
     "object-curly-spacing": ["error", "always"]
   }

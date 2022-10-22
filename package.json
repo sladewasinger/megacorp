@@ -18,15 +18,23 @@
   },
   "homepage": "https://github.com/sladewasinger/megacorp#readme",
   "dependencies": {
+    "chalk": "^5.1.2",
     "express": "^4.18.2",
     "socket.io": "^4.5.3"
   },
   "type": "module",
   "devDependencies": {
+    "@babel/core": "^7.19.6",
+    "@babel/preset-env": "^7.19.4",
+    "@babel/preset-typescript": "^7.18.6",
+    "@types/jest": "^29.2.0",
+    "babel-jest": "^29.2.1",
     "eslint": "^8.25.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.3.0",
-    "eslint-plugin-promise": "^6.1.0"
+    "eslint-plugin-promise": "^6.1.0",
+    "ts-jest": "^29.0.3",
+    "typescript": "^4.8.4"
   }
 }
