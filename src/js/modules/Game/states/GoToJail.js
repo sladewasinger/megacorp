@@ -15,7 +15,7 @@ export class GoToJail {
     const positions = [this.gameState.currentPlayer.prevPosition, this.gameState.currentPlayer.position];
     stateMachine.playerMovementCallbackFn(this.gameState.currentPlayer, positions);
 
-    stateMachine.setState('Jail', this.gameState);
+    stateMachine.setState('TurnEnd', this.gameState);
   }
 
   onExit() {

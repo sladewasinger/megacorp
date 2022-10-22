@@ -23,9 +23,55 @@ export default class GameTests {
     const game = new Game(players);
     game.rollDice(1, 2); // Land on Baltic Avenue
     Assert.equal('Baltic Avenue', game.stateMachine.currentState.name);
-
+    const cost = game.stateMachine.currentState.cost;
+    const player1money = players[0].money;
     game.buyProperty();
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    Assert.equal(player1money - cost, players[0].money);
+
+    game.endTurn();
+    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal(players[0], game.gameState.currentPlayer);
+    Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === players[0]).length);
+
+    game.rollDice(1, 39); // Land on same property
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+  }
+
+  buyRailroadTest() {
+    const players = [
+      new Player('1', 'Player 1'),
+    ];
+    const game = new Game(players);
+    game.rollDice(1, 4);
+    Assert.equal('Reading Railroad', game.stateMachine.currentState.name);
+    const cost = game.stateMachine.currentState.cost;
+    const player1money = players[0].money;
+    game.buyProperty();
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    Assert.equal(player1money - cost, players[0].money);
+
+    game.endTurn();
+    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal(players[0], game.gameState.currentPlayer);
+    Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === players[0]).length);
+
+    game.rollDice(1, 39); // Land on same property
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+  }
+
+  buyUtilityTest() {
+    const players = [
+      new Player('1', 'Player 1'),
+    ];
+    const game = new Game(players);
+    game.rollDice(1, 11); // Land on Electric Company
+    Assert.equal('Electric Company', game.stateMachine.currentState.name);
+    const cost = game.stateMachine.currentState.cost;
+    const player1money = players[0].money;
+    game.buyProperty();
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    Assert.equal(player1money - cost, players[0].money);
 
     game.endTurn();
     Assert.equal('TurnStart', game.stateMachine.currentState.name);
@@ -104,9 +150,7 @@ export default class GameTests {
     const player = new Player('1', 'Player 1');
     const game = new Game([player]);
     game.rollDice(5, 5);
-    game.endTurn();
     game.rollDice(5, 5);
-    game.endTurn();
     game.rollDice(5, 5);
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
     Assert.true(game.gameState.currentPlayer.inJail);

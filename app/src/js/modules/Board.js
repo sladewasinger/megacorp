@@ -8,6 +8,7 @@ import { Dice } from './Dice.js';
 import { Buttons } from './Buttons.js';
 import { CommunityChestTile } from './Tiles/CommunityChestTile.js';
 import { ChanceTile } from './Tiles/ChanceTile.js';
+import { Leaderboard } from './Leaderboard.js';
 const PIXI = window.PIXI;
 
 function sleep(ms) {
@@ -53,6 +54,11 @@ export class Board {
   }
 
   async update(gameState) {
+    if (!gameState) {
+      console.log('game state is null');
+      return;
+    }
+
     this.tiles.forEach((tile, index) => {
       tile.update(index, gameState);
     });
@@ -67,6 +73,7 @@ export class Board {
     // Set controls:
     this.buttons.update(gameState, this.renderState);
     this.dice.update(gameState, this.renderState);
+    this.leaderboard.update(gameState, this.renderState);
   }
 
   async drawPlayerMovement(gameState, playerId, positions) {
@@ -294,6 +301,9 @@ export class Board {
       );
       this.buttons.draw();
       this.buttons.setPosition(200, this.height - 310);
+
+      this.leaderboard = new Leaderboard(this.boardContainer);
+      this.leaderboard.draw(150 + 10, 150 + 10);
 
       // ********************************************* //
       // Tiles:

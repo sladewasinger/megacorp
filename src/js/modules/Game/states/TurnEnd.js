@@ -7,7 +7,7 @@ export class TurnEnd {
     console.log('TurnEnd');
     this.gameState = gameState;
 
-    if (this.gameState.doubleDiceRoll) {
+    if (this.gameState.doubleDiceRoll && !this.gameState.currentPlayer.inJail) {
       stateMachine.setState('TurnStart', gameState);
       return;
     }

@@ -212,7 +212,8 @@ export class Game {
 
   endTurn() {
     if (this.stateMachine.currentState.name !== 'TurnEnd') {
-      throw new Error('Cannot end turn outside of TurnEnd state');
+      throw new Error(`Cannot end turn outside of TurnEnd state` +
+        `current state: '${this.stateMachine.currentState.name}'`);
     }
 
     // Switch to next player
