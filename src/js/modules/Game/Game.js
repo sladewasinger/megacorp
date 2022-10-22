@@ -131,7 +131,7 @@ export class Game {
     return gameState;
   }
 
-  startGame() {
+  startGame(shufflePlayers = false) {
     const selectColor = (number) => {
       const hue = number * 137.508; // use golden angle approximation
       return [hue, 100, 60];
@@ -155,6 +155,17 @@ export class Game {
       player.position = 0;
       player.color = hslToHex(selectColor(index));
       console.log(player.color);
+    }
+
+    if (shufflePlayers) {
+      // shuffle players
+      for (let i = this.gameState.players.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [this.gameState.players[i], this.gameState.players[j]] = [
+          this.gameState.players[j],
+          this.gameState.players[i],
+        ];
+      }
     }
 
     this.stateMachine.setState('TurnStart', this.gameState);

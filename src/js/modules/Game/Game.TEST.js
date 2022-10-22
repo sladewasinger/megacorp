@@ -30,7 +30,7 @@ export default class GameTests {
     game.endTurn();
     Assert.equal('TurnStart', game.stateMachine.currentState.name);
     Assert.equal(players[0], game.gameState.currentPlayer);
-    Assert.equal(1, game.gameState.currentPlayer.properties.length);
+    Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === players[0]).length);
 
     game.rollDice(1, 39); // Land on same property
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
@@ -48,7 +48,7 @@ export default class GameTests {
     Assert.equal('Baltic Avenue', game.stateMachine.currentState.name);
 
     game.buyProperty();
-    Assert.equal(1, game.gameState.currentPlayer.properties.length);
+    Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === player1).length);
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
 
     game.endTurn();
@@ -60,6 +60,32 @@ export default class GameTests {
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
     Assert.equal(player2, game.gameState.currentPlayer);
     Assert.equal(player2Money - game.stateMachine.states[game.gameState.tiles[3]].rent, player2.money);
+  }
+
+  landOnOwnedRailroadTest() {
+    const player1 = new Player('1', 'Player 1');
+    const player2 = new Player('2', 'Player 2');
+    const players = [
+      player1,
+      player2,
+    ];
+    const game = new Game(players);
+    game.rollDice(1, 4); // Land on Reading Railroad
+    Assert.equal('Reading Railroad', game.stateMachine.currentState.name);
+
+    game.buyProperty();
+    Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === player1).length);
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+
+    game.endTurn();
+    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal(player2, game.gameState.currentPlayer);
+
+    const player2Money = player2.money;
+    game.rollDice(1, 4); // Land on Reading Railroad
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    Assert.equal(player2, game.gameState.currentPlayer);
+    Assert.equal(player2Money - game.stateMachine.states[game.gameState.tiles[5]].rent, player2.money);
   }
 
   passGoTest() {

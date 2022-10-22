@@ -11,6 +11,10 @@ export class StateMachine {
     this.states[state.name] = state;
   }
 
+  getStates() {
+    return Array.from(Object.values(this.states));
+  }
+
   setState(stateName, gameState) {
     if (this.currentState) {
       this.currentState.onExit();

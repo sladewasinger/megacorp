@@ -25,4 +25,35 @@ export class Utility {
   onExit() {
     console.log('Utility exit');
   }
+
+  buyProperty() {
+    if (!this.gameState) {
+      throw new Error('Game state not set');
+    }
+
+    console.log('buyProperty');
+
+    this.owner = this.gameState.currentPlayer;
+    this.gameState.currentPlayer.money -= this.rent;
+
+    if (this.gameState.doubleDiceRoll) {
+      return 'TurnStart';
+    }
+
+    return 'TurnEnd';
+  }
+
+  auctionProperty() {
+    if (!this.gameState) {
+      throw new Error('Game state not set');
+    }
+
+    console.log('auctionProperty');
+
+    if (this.gameState.doubleDiceRoll) {
+      return 'TurnStart';
+    }
+
+    return 'TurnEnd';
+  }
 }
