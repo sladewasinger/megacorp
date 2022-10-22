@@ -6,6 +6,7 @@ export class AdvanceToGo {
 
   onDraw(stateMachine, gameState) {
     console.log(`Community Chest: ${this.name}`);
+    gameState.currentPlayer.prevPosition = gameState.currentPlayer.position;
     gameState.currentPlayer.position = 0;
     gameState.currentPlayer.directMovement = true;
     gameState.communityChestMessage = 'Advance to Go';
