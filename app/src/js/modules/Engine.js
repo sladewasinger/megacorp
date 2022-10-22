@@ -11,7 +11,7 @@ export class Engine {
       width: window.innerWidth,
       height: window.innerHeight,
       backgroundColor: 0x000000,
-      resolution: window.devicePixelRatio || 1,
+      resolution: 1, // window.devicePixelRatio || 1,
       view: this.canvas,
     });
 
