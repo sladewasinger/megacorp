@@ -1,10 +1,10 @@
-export class TurnStart {
+export class RollDiceState {
   constructor() {
-    this.name = 'TurnStart';
+    this.name = 'RollDice';
   }
 
   onEnter(stateMachine, gameState) {
-    console.log('TurnStart');
+    console.log(`${this.name} -- enter`);
     this.gameState = gameState;
     this.playerMovementCallbackFn = stateMachine.playerMovementCallbackFn;
 
@@ -12,12 +12,10 @@ export class TurnStart {
       stateMachine.setState('Jail', gameState);
       return;
     }
-
-    stateMachine.setState('RollDice', gameState);
   }
 
   onExit() {
-    console.log('TurnStart exit');
+    console.log(`${this.name} -- exit`);
   }
 
   rollDice(dice1Override, dice2Override) {

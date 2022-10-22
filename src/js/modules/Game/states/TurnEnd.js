@@ -8,7 +8,7 @@ export class TurnEnd {
     this.gameState = gameState;
 
     if (this.gameState.doubleDiceRoll && !this.gameState.currentPlayer.inJail) {
-      stateMachine.setState('TurnStart', gameState);
+      stateMachine.setState('RollDice', gameState);
       return;
     }
   }

@@ -21,7 +21,7 @@ export class Dice {
       renderState.playerMovementInProgress ||
       renderState.auctionInProgress ||
       gameState.currentPlayer.id !== gameState.myId ||
-      (gameState.state.name !== 'TurnStart' && gameState.state.name !== 'JailDecision')
+      (gameState.state.name !== 'RollDice' && gameState.state.name !== 'JailDecision')
     ) {
       this.disable();
       return;

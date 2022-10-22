@@ -14,7 +14,7 @@ export default class GameTests {
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
 
     game.endTurn();
-    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
     Assert.equal(player2, game.gameState.currentPlayer);
   }
 
@@ -32,7 +32,7 @@ export default class GameTests {
     Assert.equal(player1money - cost, players[0].money);
 
     game.endTurn();
-    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
     Assert.equal(players[0], game.gameState.currentPlayer);
     Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === players[0]).length);
 
@@ -54,7 +54,7 @@ export default class GameTests {
     Assert.equal(player1money - cost, players[0].money);
 
     game.endTurn();
-    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
     Assert.equal(players[0], game.gameState.currentPlayer);
     Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === players[0]).length);
 
@@ -76,7 +76,7 @@ export default class GameTests {
     Assert.equal(player1money - cost, players[0].money);
 
     game.endTurn();
-    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
     Assert.equal(players[0], game.gameState.currentPlayer);
     Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === players[0]).length);
 
@@ -100,7 +100,7 @@ export default class GameTests {
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
 
     game.endTurn();
-    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
     Assert.equal(player2, game.gameState.currentPlayer);
 
     const player2Money = player2.money;
@@ -126,7 +126,7 @@ export default class GameTests {
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
 
     game.endTurn();
-    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
     Assert.equal(player2, game.gameState.currentPlayer);
 
     const player2Money = player2.money;

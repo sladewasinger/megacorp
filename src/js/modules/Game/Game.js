@@ -14,6 +14,7 @@ import { GoToJail } from './states/GoToJail.js';
 import { LuxuryTax } from './states/LuxuryTax.js';
 import { Player } from './models/Player.js';
 import { JailDecision } from './states/JailDecision.js';
+import { RollDiceState } from './states/RollDiceState.js';
 
 export class Game {
   constructor(players, gameStateUpdatedCallbackFn, playerMovementCallbackFn) {
@@ -26,6 +27,7 @@ export class Game {
     this.stateMachine = new StateMachine(this.gameStateUpdatedCallbackFn, this.playerMovementCallbackFn);
     this.stateMachine.addState(new TurnStart());
     this.stateMachine.addState(new TurnEnd());
+    this.stateMachine.addState(new RollDiceState());
     this.stateMachine.addState(new JailDecision());
     this.stateMachine.addState(new Go());
     this.stateMachine.addState(
@@ -198,9 +200,9 @@ export class Game {
   }
 
   rollDice(dice1Override, dice2Override) {
-    if (this.stateMachine.currentState.name !== 'TurnStart' &&
+    if (this.stateMachine.currentState.name !== 'RollDice' &&
       this.stateMachine.currentState.name !== 'JailDecision') {
-      throw new Error('Cannot roll dice outside of TurnStart/JailDecision state');
+      throw new Error('Cannot roll dice outside of RollDice/JailDecision state');
     }
 
     const nextState = this.stateMachine.currentState.rollDice(dice1Override, dice2Override);

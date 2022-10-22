@@ -24,7 +24,7 @@ export class Buttons {
       renderState.playerMovementInProgress ||
       renderState.auctionInProgress ||
       gameState.currentPlayer.id !== gameState.myId ||
-      gameState.state.name == 'TurnStart') {
+      gameState.state.name == 'RollDice') {
       this.disable();
       return;
     } else {
