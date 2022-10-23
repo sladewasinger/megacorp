@@ -47,6 +47,6 @@ export class Utility {
 
     console.log('auctionProperty');
 
-    return 'TurnEnd';
+    return 'Auction';
   }
 }

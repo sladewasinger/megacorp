@@ -24,6 +24,7 @@ export class Engine {
           this.rollDice(socket.id, diceRoll1Override, diceRoll2Override, callbackFn));
         socket.on('buyProperty', (callbackFn) => this.buyProperty(socket.id, callbackFn));
         socket.on('auctionProperty', (callbackFn) => this.auctionProperty(socket, callbackFn));
+        socket.on('bid', (bid, callbackFn) => this.bid(socket.id, bid, callbackFn));
         socket.on('endTurn', (callbackFn) => this.endTurn(socket, callbackFn));
         socket.on('Error', (error) => {
           console.log(error);
@@ -251,6 +252,36 @@ export class Engine {
     }
     // this.emitClientGameStateToLobby(lobby);
     callbackFn(null, this.getClientGameState(lobby, user));
+  }
+
+  bid(socketId, bidAmount, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+
+    try {
+      lobby.game.bid(player.id, bidAmount);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
   }
 
   endTurn(socket, callbackFn) {

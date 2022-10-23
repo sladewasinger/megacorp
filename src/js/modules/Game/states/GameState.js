@@ -15,6 +15,8 @@ export class GameState {
     this.communityChestCard = null;
     this.chanceCard = null;
 
+    this.auction = null;
+
     this.tiles = [
       'Go',
       'Mediterranean Avenue',
@@ -57,6 +59,16 @@ export class GameState {
       'Luxury Tax',
       'Boardwalk',
     ];
+  }
+
+  currentProperty(stateMachine) {
+    const tile = this.tiles[this.currentPlayer.position];
+    const tileState = stateMachine.states[this.tiles[this.currentPlayer.position]];
+    if (!tileState) {
+      console.error('No state for tile:', tile);
+    };
+
+    return tileState;
   }
 
   get currentPlayer() {

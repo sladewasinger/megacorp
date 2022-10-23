@@ -34,6 +34,9 @@ export class Buttons {
     if (gameState.state.type == 'property' && !gameState.state.owner) {
       this.disableEndTurnButton();
       this.enableBuyAndAuctionButtons();
+    } else if (gameState.state.name == 'Auction') {
+      this.disableBuyAndAuctionButtons();
+      this.disableEndTurnButton();
     } else {
       this.enableEndTurnButton();
       this.disableBuyAndAuctionButtons();

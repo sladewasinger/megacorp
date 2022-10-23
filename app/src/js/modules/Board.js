@@ -10,6 +10,7 @@ import { CommunityChestTile } from './Tiles/CommunityChestTile.js';
 import { ChanceTile } from './Tiles/ChanceTile.js';
 import { Leaderboard } from './Leaderboard.js';
 import { CommunityChest } from './CommunityChest.js';
+import { BidButtons } from './BidButtons.js';
 const PIXI = window.PIXI;
 
 function sleep(ms) {
@@ -27,12 +28,14 @@ export class Board {
     buyPropertyCallback,
     auctionPropertyCallback,
     endTurnCallback,
+    bidCallback,
   ) {
     this.canvas = canvas;
     this.container = container;
     this.rollDiceCallback = rollDiceCallback;
     this.buyPropertyCallback = buyPropertyCallback;
     this.auctionPropertyCallback = auctionPropertyCallback;
+    this.bidCallback = bidCallback;
     this.endTurnCallback = endTurnCallback;
     this.dice = null;
 
@@ -74,6 +77,7 @@ export class Board {
     // Set controls:
     this.buttons.update(gameState, this.renderState);
     this.dice.update(gameState, this.renderState);
+    this.bidButtons.update(gameState, this.renderState);
 
     // stats:
     this.leaderboard.update(gameState, this.renderState);
@@ -305,6 +309,9 @@ export class Board {
       );
       this.buttons.draw();
       this.buttons.setPosition(200, this.height - 310);
+
+      this.bidButtons = new BidButtons(this.boardContainer, this.bidCallback);
+      this.bidButtons.draw(200, this.height - 460);
 
       // ********************************************* //
       // Leaderboard + CommunityChest + Chance:

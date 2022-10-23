@@ -63,6 +63,6 @@ export class Railroad {
 
     console.log('auctionProperty');
 
-    return 'TurnEnd';
+    return 'Auction';
   }
 }
