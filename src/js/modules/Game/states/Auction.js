@@ -36,6 +36,7 @@ export class Auction {
       playerId,
       bidAmount,
     });
+    player.hasBid = true;
     if (this.gameState.auction.bids.length >= this.gameState.players.filter((p) => p.money > 0).length) {
       return 'EndAuction';
     }
