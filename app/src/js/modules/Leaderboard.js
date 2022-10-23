@@ -8,6 +8,8 @@ export class Leaderboard {
   }
 
   update(gameState, renderState) {
+    this.gameState = gameState;
+    this.renderState = renderState;
     this.setPlayerNames(gameState);
     this.setMoneyText(gameState);
   }
@@ -20,12 +22,14 @@ export class Leaderboard {
       .map((player) => `${player.name}`)
       .join('\n');
 
-    this.currentPlayerOutline.height = 30;
-    this.currentPlayerOutline.width = this.playerNames.width;
+    this.currentPlayerOutline.height = 32;
+    this.currentPlayerOutline.width = this.playerNames.width + 10;
     const currentPlayer = gameState.currentPlayer;
     const currentPlayerIndex = sortedPlayers
       .findIndex((player) => player.id == currentPlayer.id);
-    this.currentPlayerOutline.y = currentPlayerIndex * 24 + this.leaderboardText.height;
+    this.currentPlayerOutline.y = currentPlayerIndex * 24 +
+      this.leaderboardText.height + this.currentPlayerOutline.height / 2;
+    this.currentPlayerOutline.x = this.playerNames.width / 2 + Math.cos(this.renderState.time / 40) * 5;
   }
 
   setMoneyText(gameState) {
@@ -51,12 +55,14 @@ export class Leaderboard {
     this.leaderboardContainer.addChild(this.leaderboardText);
 
     this.currentPlayerOutline = new PIXI.Graphics();
-    this.currentPlayerOutline.lineStyle(2, 0x000000, 1);
-    this.currentPlayerOutline.beginFill(0xffff00, 0.25);
+    // this.currentPlayerOutline.lineStyle(2, 0x000000, 1);
+    this.currentPlayerOutline.beginFill(0xffff00, 0.75);
     this.currentPlayerOutline.drawRect(0, 0, this.width, 30);
     this.currentPlayerOutline.endFill();
     this.currentPlayerOutline.x = 0;
     this.currentPlayerOutline.y = 0;
+    this.currentPlayerOutline.pivot.x = this.currentPlayerOutline.width / 2;
+    this.currentPlayerOutline.pivot.y = this.currentPlayerOutline.height / 2;
     this.leaderboardContainer.addChild(this.currentPlayerOutline);
 
     this.playerNames = new PIXI.Text('WWWWWWWWWWWWWWW', {

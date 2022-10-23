@@ -1,6 +1,7 @@
 export class CommunityChest {
   constructor() {
     this.name = 'Community Chest';
+    this.type = 'Community Chest';
   }
 
   onEnter(stateMachine, gameState) {
