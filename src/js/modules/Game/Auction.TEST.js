@@ -19,6 +19,22 @@ export default class AuctionTests {
     Assert.equal(1, player2.properties.length);
   }
 
+  auctionTieBidTest() {
+    const player1 = new Player('1', 'Player 1');
+    const player2 = new Player('2', 'Player 2');
+
+    const game = new Game([player1, player2]);
+    game.rollDice(1, 2);
+    Assert.equal('Baltic Avenue', game.stateMachine.currentState.name);
+    game.auctionProperty();
+    Assert.equal('Auction', game.stateMachine.currentState.name);
+    game.bid('1', 100);
+    Assert.equal('Auction', game.stateMachine.currentState.name);
+    game.bid('2', 100);
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    Assert.equal(1, player1.properties.length);
+  }
+
   beginAuctionTest_1bankruptPlayer() {
     const player1 = new Player('1', 'Player 1');
     const player2 = new Player('2', 'Player 2');
