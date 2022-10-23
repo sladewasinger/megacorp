@@ -11,6 +11,7 @@ import { ChanceTile } from './Tiles/ChanceTile.js';
 import { Leaderboard } from './Leaderboard.js';
 import { CommunityChest } from './CommunityChest.js';
 import { BidButtons } from './BidButtons.js';
+import { Animations } from './Animations.js';
 const PIXI = window.PIXI;
 
 function sleep(ms) {
@@ -43,7 +44,11 @@ export class Board {
 
     this.renderState = {
       animationInProgress: false,
+      time: 0,
     };
+    setInterval(() => {
+      this.renderState.time++;
+    });
 
     this.container.sortableChildren = true;
     this.boardContainer = new PIXI.Container();
@@ -82,6 +87,9 @@ export class Board {
     // stats:
     this.leaderboard.update(gameState, this.renderState);
     this.communityChestCard.update(gameState, this.renderState);
+
+    // various animations:
+    this.animations.update(gameState, this.renderState);
   }
 
   async drawPlayerMovement(gameState, playerId, positions) {
@@ -111,6 +119,11 @@ export class Board {
         if (!tile) {
           console.error('could not find tile matching position ', position);
           return;
+        }
+        const gameTile = gameState.tiles.find((t, i) => i === position);
+
+        if (positions.indexOf(position) == positions.length - 1 && gameTile.type == 'Community Chest') {
+          this.communityChestCard.setVisible();
         }
 
         const targetPos = {
@@ -320,6 +333,11 @@ export class Board {
 
       this.communityChestCard = new CommunityChest(this.boardContainer);
       this.communityChestCard.draw(this.width - 150 - this.communityChestCard.width, 150 + 10);
+
+      // ********************************************* //
+      // Animations:
+      this.animations = new Animations(this.boardContainer, this.width, this.height);
+      this.animations.draw();
 
       // ********************************************* //
       // Tiles:

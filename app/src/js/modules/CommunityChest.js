@@ -11,6 +11,7 @@ export class CommunityChest {
   update(gameState, renderState) {
     if (gameState.state.name == 'TurnStart' && gameState.prevState?.name == 'TurnEnd') {
       this.setCardText('', '');
+      this.setInvisible();
       return;
     }
     if (gameState.state.name != 'Community Chest') {
@@ -32,6 +33,14 @@ export class CommunityChest {
   setCardText(name, msg) {
     this.cardTitle.text = name;
     this.cardMsg.text = msg;
+  }
+
+  setInvisible() {
+    this.communityChestContainer.visible = false;
+  }
+
+  setVisible() {
+    this.communityChestContainer.visible = true;
   }
 
   draw(x, y) {
@@ -68,5 +77,7 @@ export class CommunityChest {
     this.cardMsg.x = 0;
     this.cardMsg.y = this.cardTitle.y + this.cardTitle.height + 10;
     this.communityChestContainer.addChild(this.cardMsg);
+
+    this.setInvisible();
   }
 }

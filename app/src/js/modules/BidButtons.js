@@ -25,6 +25,9 @@ export class BidButtons {
       return;
     }
 
+    this.leftArrow.x = this.bidButtonOutline.x + this.bidButtonOutline.width + 10 +
+      Math.abs(Math.cos(renderState.time / 25)) * 5;
+
     this.enable();
   }
 
@@ -48,6 +51,8 @@ export class BidButtons {
 
     this.zeroButton.interactive = false;
     this.zeroButton.buttonMode = false;
+
+    this.leftArrow.visible = false;
   }
 
   enable() {
@@ -70,6 +75,8 @@ export class BidButtons {
 
     this.zeroButton.interactive = true;
     this.zeroButton.buttonMode = true;
+
+    this.leftArrow.visible = true;
   }
 
   setBidAmount(amount) {
@@ -212,7 +219,7 @@ export class BidButtons {
     });
     this.buttonsContainer.addChild(this.plus100ButtonText);
 
-    this.bidButton = new PIXI.Graphics();
+    this.bidButton = new PIXI.Container();
 
     this.bidButtonOutline = new PIXI.Graphics();
     this.bidButtonOutline.beginFill(0xffffff);
@@ -251,5 +258,13 @@ export class BidButtons {
     this.currentBidText.x = this.bidButtonOutline.x + this.bidButtonOutline.width - this.currentBidText.width / 2;
     this.currentBidText.y = 75;
     this.buttonsContainer.addChild(this.currentBidText);
+
+    // eslint-disable-next-line new-cap
+    this.leftArrow = new PIXI.Sprite.from('src/assets/left_arrow.png');
+    this.leftArrow.pivot.x = 0;
+    this.leftArrow.pivot.y = 0;
+    this.leftArrow.x = this.bidButtonOutline.x + this.bidButtonOutline.width + 10;
+    this.leftArrow.y = this.bidButtonOutline.y - this.leftArrow.height / 2;
+    this.buttonsContainer.addChild(this.leftArrow);
   }
 }
