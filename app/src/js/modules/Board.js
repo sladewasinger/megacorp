@@ -11,14 +11,14 @@ import { ChanceTile } from './Tiles/ChanceTile.js';
 import { Leaderboard } from './Leaderboard.js';
 import { CommunityChest } from './CommunityChest.js';
 import { BidButtons } from './BidButtons.js';
-import { Animations } from './Animations.js';
+import { TopAnimations } from './TopAnimations.js';
+import { BottomAnimations } from './BottomAnimations.js';
 const PIXI = window.PIXI;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 const calcDistance = (x1, y1, x2, y2) => Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 
 export class Board {
@@ -40,8 +40,6 @@ export class Board {
     this.endTurnCallback = endTurnCallback;
     this.dice = null;
 
-    this.socketId = null;
-
     this.renderState = {
       animationInProgress: false,
       time: 0,
@@ -50,9 +48,10 @@ export class Board {
       this.renderState.time++;
     });
 
-    this.container.sortableChildren = true;
+    // this.container.sortableChildren = true;
     this.boardContainer = new PIXI.Container();
-    this.boardContainer.sortableChildren = true;
+    this.container.addChild(this.boardContainer);
+    // this.boardContainer.sortableChildren = true;
     this.width = 1200;
     this.height = 1200;
     this.tiles = [];
@@ -75,21 +74,23 @@ export class Board {
     if (!this.players) {
       this.drawPlayersInitial(gameState);
       for (const gamePlayer of gameState.players) {
-        this.drawPlayerMoveAnimation(gameState, gamePlayer.id, -1, gamePlayer.position);
+        // this.drawPlayerMoveAnimation(gameState, gamePlayer.id, -1, gamePlayer.position);
+        this.drawPlayerMovement(gameState, gamePlayer.id, [0]);
       }
     }
 
     // Set controls:
     this.buttons.update(gameState, this.renderState);
     this.dice.update(gameState, this.renderState);
-    this.bidButtons.update(gameState, this.renderState);
+    this.bidButtons.update(gameState, this.renderState, this.tiles);
 
     // stats:
     this.leaderboard.update(gameState, this.renderState);
     this.communityChestCard.update(gameState, this.renderState);
 
     // various animations:
-    this.animations.update(gameState, this.renderState);
+    this.bottomAnimations.update(gameState, this.renderState, this.tiles);
+    this.topAnimations.update(gameState, this.renderState, this.tiles);
   }
 
   async drawPlayerMovement(gameState, playerId, positions) {
@@ -111,7 +112,7 @@ export class Board {
       let lastPosition = positions[0] - 1;
       for (const position of positions) {
         if (Math.abs(position - lastPosition) > 1 && !(lastPosition == 39 && position == 0)) {
-          // Big movement - delay
+          // Big movement - delay so people can see it
           await sleep(1000);
         }
         lastPosition = position;
@@ -174,93 +175,13 @@ export class Board {
     this.renderState.playerMovementInProgress = false;
   }
 
-  async drawPlayerMoveAnimation(gameState, playerId, prevPos, pos) {
-    while (this.renderState.animationInProgress) {
-      await sleep(100);
-    }
-
-    this.renderState.animationInProgress = true;
-    this.renderState.lastGameStateProcessed = gameState.id;
-
-    try {
-      const gamePlayer = gameState.players.find((player) => player.id === playerId);
-      const playerGraphics = this.players.find((player) => player.id === playerId);
-
-      // get distance between playerGraphics and tile
-      const tile = this.tiles.find((t, i) => i === gamePlayer.position);
-      const dist = Math.sqrt(
-        Math.pow(playerGraphics.x - tile.tileContainer.x, 2) +
-        Math.pow(playerGraphics.y - tile.tileContainer.y, 2),
-      );
-      console.log('Distance: ', dist);
-      if (dist < 10) {
-        console.log('Player already where he should be');
-        this.renderState.animationInProgress = false;
-        return;
-      }
-
-      let counter0 = 0;
-      while (prevPos != pos && counter0 < 41) {
-        counter0++;
-        prevPos++;
-        if (prevPos >= this.tiles.length) {
-          prevPos = 0;
-        }
-        if (gameState.currentPlayer.inJail) {
-          prevPos = 10;
-        }
-
-        const tile = this.tiles.find((t, i) => i === prevPos);
-        if (!tile) {
-          console.error('could not find tile matching player position');
-          return;
-        }
-
-        const targetPos = {
-          x: tile.tileContainer.x,
-          y: tile.tileContainer.y,
-        };
-
-        let counter = 0;
-        const speed = 5;
-        const damping = 0.2;
-        const clampMinX = -speed;
-        const clampMaxX = speed;
-        const clampMinY = -speed;
-        const clampMaxY = speed;
-        while (Math.abs(playerGraphics.x - targetPos.x) > 1 ||
-          Math.abs(playerGraphics.y - targetPos.y) > 1 && counter < 100
-        ) {
-          counter++;
-          playerGraphics.x += clamp((targetPos.x - playerGraphics.x) * damping, clampMinX, clampMaxX);
-          playerGraphics.y += clamp((targetPos.y - playerGraphics.y) * damping, clampMinY, clampMaxY);
-          await sleep(10);
-        }
-        playerGraphics.x = targetPos.x;
-        playerGraphics.y = targetPos.y;
-
-        const playersOnSameTile = gameState.players.filter((p) => p.position === prevPos);
-        if (playersOnSameTile.length > 1) {
-          const playerIndex = playersOnSameTile.findIndex((p) => p.id === gamePlayer.id);
-          const offset = -25 + playerIndex * 20;
-          playerGraphics.x += offset;
-          playerGraphics.y += offset;
-          await sleep(10);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-    this.renderState.animationInProgress = false;
-  }
-
   drawPlayersInitial(gameState) {
     console.log('drawPlayersInitial');
     this.players = [];
     gameState.players.forEach((player) => {
       const playerContainer = new PIXI.Container();
       playerContainer.id = player.id;
-      playerContainer.zIndex = 1000;
+      // playerContainer.zIndex = 1000;
       playerContainer.x = this.width;
       playerContainer.y = this.height;
 
@@ -269,11 +190,11 @@ export class Board {
       graphics.lineStyle(2, 0x000000, 1);
       graphics.drawCircle(0, 0, 15);
       graphics.endFill();
-      graphics.zIndex = 1001;
+      // graphics.zIndex = 1001;
 
       playerContainer.addChild(graphics);
-      this.boardContainer.addChild(playerContainer);
       this.players.push(playerContainer);
+      this.boardContainer.addChild(playerContainer);
     });
   }
 
@@ -295,6 +216,9 @@ export class Board {
       this.board.endFill();
       this.boardContainer.addChild(this.board);
 
+      this.bottomAnimations = new BottomAnimations(this.boardContainer, this.width, this.height);
+      this.bottomAnimations.draw();
+
       const title = new PIXI.Text('Megacorp', {
         fontFamily: 'Arial',
         fontSize: 48,
@@ -306,6 +230,7 @@ export class Board {
       title.pivot.x = title.width / 2;
       title.x = this.width / 2;
       title.y = this.height / 2 - title.height / 2;
+      title.visible = false;
       this.boardContainer.addChild(title);
 
       // ********************************************* //
@@ -314,8 +239,10 @@ export class Board {
       this.dice.draw();
       this.dice.setPosition(200, this.height - 250);
 
+      const buttonsContainer1 = new PIXI.Container();
+      this.boardContainer.addChild(buttonsContainer1);
       this.buttons = new Buttons(
-        this.boardContainer,
+        buttonsContainer1,
         this.buyPropertyCallback,
         this.auctionPropertyCallback,
         this.endTurnCallback,
@@ -323,21 +250,20 @@ export class Board {
       this.buttons.draw();
       this.buttons.setPosition(200, this.height - 310);
 
-      this.bidButtons = new BidButtons(this.boardContainer, this.bidCallback);
+      const bidButtonsContainer = new PIXI.Container();
+      this.bidButtons = new BidButtons(bidButtonsContainer, this.bidCallback);
       this.bidButtons.draw(200, this.height - 460);
+      this.boardContainer.addChild(bidButtonsContainer);
 
       // ********************************************* //
       // Leaderboard + CommunityChest + Chance:
-      this.leaderboard = new Leaderboard(this.boardContainer);
-      this.leaderboard.draw(150 + 10, 150 + 10);
+      const leaderBoardContainer = new PIXI.Container();
+      this.boardContainer.addChild(leaderBoardContainer);
+      this.leaderboard = new Leaderboard(leaderBoardContainer);
+      this.leaderboard.draw(150 + 100, 150 + 50);
 
       this.communityChestCard = new CommunityChest(this.boardContainer);
       this.communityChestCard.draw(this.width - 150 - this.communityChestCard.width, 150 + 10);
-
-      // ********************************************* //
-      // Animations:
-      this.animations = new Animations(this.boardContainer, this.width, this.height);
-      this.animations.draw();
 
       // ********************************************* //
       // Tiles:
@@ -603,7 +529,12 @@ export class Board {
         -Math.PI / 2,
       );
 
-      this.container.addChild(this.boardContainer);
+      // ********************************************* //
+      // Animations:
+      this.topAnimations = new TopAnimations(this.boardContainer, this.width, this.height);
+      this.topAnimations.draw();
+
+      // ********************************************* //
 
       this.tiles = [
         this.goTile,

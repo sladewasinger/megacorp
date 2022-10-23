@@ -66,8 +66,7 @@ export class RailroadTile {
     title.x = this.width / 2;
     tileContainer.addChild(title);
 
-    // eslint-disable-next-line new-cap
-    const image = new PIXI.Sprite.from('src/assets/railroad.png');
+    const image = PIXI.Sprite.from('src/assets/railroad.png');
     image.width = 69;
     image.height = 50;
     image.x = this.width / 2 - image.width / 2;

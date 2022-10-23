@@ -4,19 +4,20 @@ export class BidButtons {
     this.buttonsContainer = new PIXI.Container();
     this.container.addChild(this.buttonsContainer);
 
-    this.width = 300;
+    this.width = 360;
     this.height = 100;
 
     this.currentBid = 0;
     this.bidCallback = bidCallback;
   }
 
-  update(gameState, renderState) {
+  update(gameState, renderState, tiles) {
     this.currentBidText.text = `Current Bid: ${this.currentBid}`;
 
     const myPlayer = gameState.players.find((player) => player.id === gameState.myId);
 
-    if (renderState.animationInProgress ||
+    if (
+      renderState.animationInProgress ||
       renderState.playerMovementInProgress ||
       gameState.state.name != 'Auction' ||
       myPlayer.hasBid
@@ -25,17 +26,39 @@ export class BidButtons {
       return;
     }
 
+    this.enable();
+
+    if (
+      this.currentBid > myPlayer.money ||
+      this.currentBid === 0
+    ) {
+      this.disableBidButton();
+    } else {
+      this.enableBidButton();
+    }
+
     this.leftArrow.x = this.bidButtonOutline.x + this.bidButtonOutline.width + 10 +
       Math.abs(Math.cos(renderState.time / 25)) * 5;
 
-    this.enable();
+    this.currentBidText.text = `Current Bid: ${this.currentBid}`;
+  }
+
+  disableBidButton() {
+    this.bidButtonContainer.alpha = 0.5;
+    this.bidButtonOutline.interactive = false;
+    this.bidButtonOutline.buttonMode = false;
+  }
+
+  enableBidButton() {
+    this.bidButtonContainer.alpha = 1;
+    this.bidButtonOutline.interactive = true;
+    this.bidButtonOutline.buttonMode = true;
   }
 
   disable() {
-    this.buttonsContainer.alpha = 0.25;
+    this.buttonsContainer.alpha = 0;
 
-    this.bidButtonOutline.interactive = false;
-    this.bidButtonOutline.buttonMode = false;
+    this.disableBidButton();
 
     this.plus100ButtonText.interactive = false;
     this.plus100ButtonText.buttonMode = false;
@@ -52,14 +75,17 @@ export class BidButtons {
     this.zeroButton.interactive = false;
     this.zeroButton.buttonMode = false;
 
-    this.leftArrow.visible = false;
+    this.leftArrow.alpha = 0;
+
+    this.auctionText.alpha = 0;
   }
 
   enable() {
     this.buttonsContainer.alpha = 1;
 
-    this.bidButtonOutline.interactive = true;
-    this.bidButtonOutline.buttonMode = true;
+    // this.bidButtonOutline.interactive = true;
+    // this.bidButtonOutline.buttonMode = true;
+    this.enableBidButton();
 
     this.plus100ButtonText.interactive = true;
     this.plus100ButtonText.buttonMode = true;
@@ -76,16 +102,34 @@ export class BidButtons {
     this.zeroButton.interactive = true;
     this.zeroButton.buttonMode = true;
 
-    this.leftArrow.visible = true;
+    this.leftArrow.alpha = 1;
+
+    this.auctionText.alpha = 1;
   }
 
   setBidAmount(amount) {
     this.currentBid = amount;
   }
 
-  draw(x, y) {
+  async draw(x, y) {
     this.buttonsContainer.x = x;
     this.buttonsContainer.y = y;
+
+    const container = new PIXI.Container();
+
+    this.bidButtonsOutline = new PIXI.Graphics();
+    this.bidButtonsOutline.beginFill(0xffffff);
+    this.bidButtonsOutline.drawRect(0, 0, this.width, this.height);
+    this.bidButtonsOutline.endFill();
+
+    this.auctionText = new PIXI.Text('Place your bet:', {
+      fontFamily: 'Arial',
+      fontSize: 30,
+      fill: 0x000000,
+      align: 'center',
+    });
+    this.auctionText.x = 0;
+    this.auctionText.y = -40;
 
     this.zeroButton = new PIXI.Graphics();
     this.zeroButton.beginFill(0xffffff);
@@ -97,7 +141,6 @@ export class BidButtons {
       this.currentBid = 0;
     });
     this.zeroButton.hitArea = new PIXI.Rectangle(0, 0, 50, 50);
-    this.buttonsContainer.addChild(this.zeroButton);
 
     this.zeroButtonText = new PIXI.Text('0', {
       fontFamily: 'Arial',
@@ -109,15 +152,12 @@ export class BidButtons {
     this.zeroButtonText.pivot.y = this.zeroButtonText.height / 2;
     this.zeroButtonText.x = this.zeroButton.x + this.zeroButton.width / 2;
     this.zeroButtonText.y = this.zeroButton.y + this.zeroButton.height / 2;
-    this.buttonsContainer.addChild(this.zeroButtonText);
-
 
     this.minus10ButtonOutline = new PIXI.Graphics();
     this.minus10ButtonOutline.beginFill(0xffffff);
     this.minus10ButtonOutline.lineStyle(2, 0x000000, 1);
     this.minus10ButtonOutline.drawRect(0, 0, 50, 50);
     this.minus10ButtonOutline.x = 50;
-    this.buttonsContainer.addChild(this.minus10ButtonOutline);
 
     this.minus10ButtonText = new PIXI.Graphics();
     this.minus10ButtonText = new PIXI.Text('-10', {
@@ -139,14 +179,12 @@ export class BidButtons {
         this.currentBid = 0;
       }
     });
-    this.buttonsContainer.addChild(this.minus10ButtonText);
 
     this.plus10ButtonOutline = new PIXI.Graphics();
     this.plus10ButtonOutline.beginFill(0xffffff);
     this.plus10ButtonOutline.lineStyle(2, 0x000000, 1);
     this.plus10ButtonOutline.drawRect(0, 0, 50, 50);
     this.plus10ButtonOutline.x = 100;
-    this.buttonsContainer.addChild(this.plus10ButtonOutline);
 
     this.plus10ButtonText = new PIXI.Text('+10', {
       fontFamily: 'monospace',
@@ -164,14 +202,12 @@ export class BidButtons {
     this.plus10ButtonText.on('pointerdown', () => {
       this.currentBid += 10;
     });
-    this.buttonsContainer.addChild(this.plus10ButtonText);
 
     this.minus100ButtonOutline = new PIXI.Graphics();
     this.minus100ButtonOutline.beginFill(0xffffff);
     this.minus100ButtonOutline.lineStyle(2, 0x000000, 1);
     this.minus100ButtonOutline.drawRect(0, 0, 50, 50);
     this.minus100ButtonOutline.x = 150;
-    this.buttonsContainer.addChild(this.minus100ButtonOutline);
 
     this.minus100ButtonText = new PIXI.Text('-100', {
       fontFamily: 'monospace',
@@ -192,14 +228,12 @@ export class BidButtons {
         this.currentBid = 0;
       }
     });
-    this.buttonsContainer.addChild(this.minus100ButtonText);
 
     this.plus100ButtonOutline = new PIXI.Graphics();
     this.plus100ButtonOutline.beginFill(0xffffff);
     this.plus100ButtonOutline.lineStyle(2, 0x000000, 1);
     this.plus100ButtonOutline.drawRect(0, 0, 50, 50);
     this.plus100ButtonOutline.x = 200;
-    this.buttonsContainer.addChild(this.plus100ButtonOutline);
 
     this.plus100ButtonText = new PIXI.Text('+100', {
       fontFamily: 'monospace',
@@ -217,9 +251,10 @@ export class BidButtons {
     this.plus100ButtonText.on('pointerdown', () => {
       this.currentBid += 100;
     });
-    this.buttonsContainer.addChild(this.plus100ButtonText);
 
-    this.bidButton = new PIXI.Container();
+    this.bidButtonContainer = new PIXI.Container();
+    this.bidButtonContainer.x = 0;
+    this.bidButtonContainer.y = 0;
 
     this.bidButtonOutline = new PIXI.Graphics();
     this.bidButtonOutline.beginFill(0xffffff);
@@ -231,8 +266,8 @@ export class BidButtons {
     this.bidButtonOutline.hitArea = new PIXI.Rectangle(0, 0, 100, 50);
     this.bidButtonOutline.on('pointerdown', () => {
       this.bidCallback(this.currentBid);
+      this.currentBid = 0;
     });
-    this.bidButton.addChild(this.bidButtonOutline);
 
     this.bidButtonText = new PIXI.Text('Bid', {
       fontFamily: 'monospace',
@@ -244,10 +279,9 @@ export class BidButtons {
     this.bidButtonText.pivot.y = this.bidButtonText.height / 2;
     this.bidButtonText.x = this.bidButtonOutline.x + this.bidButtonOutline.width / 2;
     this.bidButtonText.y = this.bidButtonOutline.y + this.bidButtonOutline.height / 2;
-    this.bidButton.addChild(this.bidButtonText);
-    this.buttonsContainer.addChild(this.bidButton);
+    this.bidButtonContainer.addChild(this.bidButtonOutline, this.bidButtonText);
 
-    this.currentBidText = new PIXI.Text(`Current Bid: 000`, {
+    this.currentBidText = new PIXI.Text('Current Bid: 000', {
       fontFamily: 'monospace',
       fontSize: 24,
       fill: 0x000000,
@@ -257,14 +291,30 @@ export class BidButtons {
     this.currentBidText.pivot.y = this.currentBidText.height / 2;
     this.currentBidText.x = this.bidButtonOutline.x + this.bidButtonOutline.width - this.currentBidText.width / 2;
     this.currentBidText.y = 75;
-    this.buttonsContainer.addChild(this.currentBidText);
 
-    // eslint-disable-next-line new-cap
-    this.leftArrow = new PIXI.Sprite.from('src/assets/left_arrow.png');
+    this.leftArrow = PIXI.Sprite.from('src/assets/left_arrow.png');
     this.leftArrow.pivot.x = 0;
     this.leftArrow.pivot.y = 0;
     this.leftArrow.x = this.bidButtonOutline.x + this.bidButtonOutline.width + 10;
     this.leftArrow.y = this.bidButtonOutline.y - this.leftArrow.height / 2;
-    this.buttonsContainer.addChild(this.leftArrow);
+
+    container.addChild(
+      this.bidButtonsOutline,
+      this.bidButtonContainer,
+      this.zeroButton,
+      this.zeroButtonText,
+      this.minus10ButtonOutline,
+      this.minus10ButtonText,
+      this.plus10ButtonOutline,
+      this.plus10ButtonText,
+      this.minus100ButtonOutline,
+      this.minus100ButtonText,
+      this.plus100ButtonOutline,
+      this.plus100ButtonText,
+      this.leftArrow,
+      this.currentBidText,
+    );
+
+    this.buttonsContainer.addChild(container);
   }
 }

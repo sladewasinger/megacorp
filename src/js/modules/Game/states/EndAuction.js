@@ -12,6 +12,7 @@ export class EndAuction {
     const highestBid = this.gameState.auction.highestBid();
     const player = this.gameState.players.find((p) => p.id === highestBid.playerId);
     player.money -= highestBid.bidAmount;
+    this.gameState.auction.highestBidder = player;
 
     const currentProperty = this.gameState.currentProperty(stateMachine);
     currentProperty.owner = player;
