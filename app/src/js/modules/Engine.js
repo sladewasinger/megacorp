@@ -138,7 +138,6 @@ export class Engine {
 
   createBoard() {
     const container = new PIXI.Container();
-    this.app.stage.addChild(container);
     this.board = new Board(
       this.canvas,
       container,
@@ -149,6 +148,7 @@ export class Engine {
       this.bid.bind(this),
     );
     this.board.draw(container);
+    this.app.stage.addChild(container);
   }
 
   rollDice() {

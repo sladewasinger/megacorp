@@ -34,7 +34,7 @@ export class ChanceTile {
     tileContainer.addChild(title);
 
     // eslint-disable-next-line new-cap
-    const image = new PIXI.Sprite.from('src/assets/chance.png');
+    const image = PIXI.Sprite.from('src/assets/chance.png');
     image.width = 279;
     image.height = 558;
     const scale = 0.7 * Math.min(this.width / image.width, this.height / image.height);

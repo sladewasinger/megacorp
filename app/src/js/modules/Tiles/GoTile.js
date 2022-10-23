@@ -23,7 +23,7 @@ export class GoTile {
     tileContainer.addChild(this.tile);
 
     // eslint-disable-next-line new-cap
-    const image = new PIXI.Sprite.from('src/assets/GO.png');
+    const image = PIXI.Sprite.from('src/assets/GO.png');
     image.width = 189;
     image.height = 159;
     const scale = 0.8 * Math.min(this.width / image.width, this.height / image.height);

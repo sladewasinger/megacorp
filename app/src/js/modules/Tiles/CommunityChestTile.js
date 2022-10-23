@@ -34,7 +34,7 @@ export class CommunityChestTile {
     tileContainer.addChild(title);
 
     // eslint-disable-next-line new-cap
-    const image = new PIXI.Sprite.from('src/assets/community_chest.png');
+    const image = PIXI.Sprite.from('src/assets/community_chest.png');
     // scale image to fit within tile
     const scale = 0.75 * Math.min(this.width / image.width, this.height / image.height);
     image.width *= scale;

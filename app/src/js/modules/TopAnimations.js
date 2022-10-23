@@ -1,13 +1,17 @@
-export class Animations {
+export class TopAnimations {
   constructor(container, width, height) {
     this.container = container;
     this.width = width;
     this.height = height;
     this.animationsContainer = new PIXI.Container();
+    this.animationsContainer.x = 0;
+    this.animationsContainer.y = 0;
+    this.animationsContainer.width = width;
+    this.animationsContainer.height = height;
     this.container.addChild(this.animationsContainer);
   }
 
-  update(gameState, renderState) {
+  update(gameState, renderState, tiles) {
     if (
       (
         gameState.state.name == 'TurnStart' &&
@@ -43,6 +47,7 @@ export class Animations {
   }
 
   draw() {
-
+    this.auctionLine = new PIXI.Graphics();
+    this.animationsContainer.addChild(this.auctionLine);
   }
 }

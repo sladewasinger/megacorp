@@ -10,7 +10,10 @@ export class Auction {
 
     if (!this.gameState.auction) {
       this.gameState.auction = {
-        property: this.gameState.currentProperty,
+        property: {
+          name: this.gameState.currentProperty(stateMachine).name,
+          tileId: this.gameState.currentPlayer.position,
+        },
         bids: [],
         highestBid: () => {
           return this.gameState.auction.bids.reduce((prev, current) => {
