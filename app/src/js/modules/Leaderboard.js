@@ -13,9 +13,19 @@ export class Leaderboard {
   }
 
   setPlayerNames(gameState) {
-    this.playerNames.text = gameState.players
-      .sort((a, b) => b.name - a.name)
-      .map((player) => `${player.name}`).join('\n');
+    const sortedPlayers = [...gameState.players];
+    sortedPlayers.sort((a, b) => a.name.localeCompare(b.name));
+
+    this.playerNames.text = sortedPlayers
+      .map((player) => `${player.name}`)
+      .join('\n');
+
+    this.currentPlayerOutline.height = 30;
+    this.currentPlayerOutline.width = this.playerNames.width;
+    const currentPlayer = gameState.currentPlayer;
+    const currentPlayerIndex = sortedPlayers
+      .findIndex((player) => player.id == currentPlayer.id);
+    this.currentPlayerOutline.y = currentPlayerIndex * 24 + this.leaderboardText.height;
   }
 
   setMoneyText(gameState) {
@@ -29,7 +39,7 @@ export class Leaderboard {
     this.leaderboardContainer.x = x;
     this.leaderboardContainer.y = y;
 
-    this.leaderboardText = new PIXI.Text('Leaderboard', {
+    this.leaderboardText = new PIXI.Text('Players:', {
       fontFamily: 'Arial',
       fontSize: 24,
       fontWeight: 'bold',
@@ -40,6 +50,14 @@ export class Leaderboard {
     this.leaderboardText.y = 0;
     this.leaderboardContainer.addChild(this.leaderboardText);
 
+    this.currentPlayerOutline = new PIXI.Graphics();
+    this.currentPlayerOutline.lineStyle(2, 0x000000, 1);
+    this.currentPlayerOutline.beginFill(0xffff00, 0.25);
+    this.currentPlayerOutline.drawRect(0, 0, this.width, 30);
+    this.currentPlayerOutline.endFill();
+    this.currentPlayerOutline.x = 0;
+    this.currentPlayerOutline.y = 0;
+    this.leaderboardContainer.addChild(this.currentPlayerOutline);
 
     this.playerNames = new PIXI.Text('WWWWWWWWWWWWWWW', {
       fontFamily: 'Arial',
