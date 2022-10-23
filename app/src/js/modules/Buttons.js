@@ -44,51 +44,68 @@ export class Buttons {
   }
 
   disable() {
+    const alpha = 0.25;
     this.buyPropertyButton.interactive = false;
     this.buyPropertyButton.buttonMode = false;
-    this.buyPropertyButton.alpha = 0.5;
+    this.buyPropertyButton.alpha = alpha;
+    this.buyPropertyButtonText.alpha = alpha;
+
     this.auctionPropertyButton.interactive = false;
     this.auctionPropertyButton.buttonMode = false;
-    this.auctionPropertyButton.alpha = 0.5;
+    this.auctionPropertyButton.alpha = alpha;
+    this.auctionPropertyButtonText.alpha = alpha;
+
     this.endTurnButton.interactive = false;
     this.endTurnButton.buttonMode = false;
-    this.endTurnButton.alpha = 0.5;
+    this.endTurnButton.alpha = alpha;
+    this.endTurnButtonText.alpha = alpha;
   }
 
   enable() {
     this.buyPropertyButton.interactive = true;
     this.buyPropertyButton.buttonMode = true;
     this.buyPropertyButton.alpha = 1;
+    this.buyPropertyButtonText.alpha = 1;
+
     this.auctionPropertyButton.interactive = true;
     this.auctionPropertyButton.buttonMode = true;
     this.auctionPropertyButton.alpha = 1;
+    this.auctionPropertyButtonText.alpha = 1;
+
     this.endTurnButton.interactive = true;
     this.endTurnButton.buttonMode = true;
     this.endTurnButton.alpha = 1;
+    this.endTurnButtonText.alpha = 1;
   }
 
   enableBuyAndAuctionButtons() {
     this.buyPropertyButton.interactive = true;
     this.buyPropertyButton.buttonMode = true;
     this.buyPropertyButton.alpha = 1;
+    this.buyPropertyButtonText.alpha = 1;
+
     this.auctionPropertyButton.interactive = true;
     this.auctionPropertyButton.buttonMode = true;
     this.auctionPropertyButton.alpha = 1;
+    this.auctionPropertyButtonText.alpha = 1;
   }
 
   disableBuyAndAuctionButtons() {
     this.buyPropertyButton.interactive = false;
     this.buyPropertyButton.buttonMode = false;
-    this.buyPropertyButton.alpha = 0.5;
+    this.buyPropertyButton.alpha = 0.25;
+    this.buyPropertyButtonText.alpha = 0.25;
+
     this.auctionPropertyButton.interactive = false;
     this.auctionPropertyButton.buttonMode = false;
-    this.auctionPropertyButton.alpha = 0.5;
+    this.auctionPropertyButton.alpha = 0.25;
+    this.auctionPropertyButtonText.alpha = 0.25;
   }
 
   disableEndTurnButton() {
     this.endTurnButton.interactive = false;
     this.endTurnButton.buttonMode = false;
-    this.endTurnButton.alpha = 0.5;
+    this.endTurnButton.alpha = 0.25;
   }
 
   enableEndTurnButton() {
