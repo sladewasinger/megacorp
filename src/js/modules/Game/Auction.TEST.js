@@ -16,7 +16,7 @@ export default class AuctionTests {
     Assert.equal('Auction', game.stateMachine.currentState.name);
     game.bid('2', 200);
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
-    Assert.equal('2', game.stateMachine.currentState.gameState.auction.highestBid().playerId);
+    Assert.equal(1, player2.properties.length);
   }
 
   beginAuctionTest_1bankruptPlayer() {
@@ -34,6 +34,6 @@ export default class AuctionTests {
     Assert.equal('Auction', game.stateMachine.currentState.name);
     game.bid('2', 200);
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
-    Assert.equal('2', game.stateMachine.currentState.gameState.auction.highestBid().playerId);
+    Assert.equal(1, player2.properties.length);
   }
 }

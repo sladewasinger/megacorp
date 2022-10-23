@@ -1,7 +1,14 @@
 export class StateMachine {
-  constructor(gameStateUpdatedCallbackFn, playerMovementCallbackFn) {
+  constructor(
+    gameStateUpdatedCallbackFn,
+    playerMovementCallbackFn,
+    landOnTileCallbackFn,
+    boughtPropertyCallbackFn,
+  ) {
     this.gameStateUpdatedCallbackFn = gameStateUpdatedCallbackFn;
     this.playerMovementCallbackFn = playerMovementCallbackFn;
+    this.landOnTileCallbackFn = landOnTileCallbackFn;
+    this.boughtPropertyCallbackFn = boughtPropertyCallbackFn;
     this.states = {};
     this.currentState = null;
     this.previousState = null;

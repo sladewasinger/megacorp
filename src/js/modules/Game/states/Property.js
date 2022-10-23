@@ -30,12 +30,14 @@ export class Property {
   onEnter(stateMachine, gameState) {
     console.log(`${this.name}: Enter`);
     this.gameState = gameState;
+    this.stateMachine = stateMachine;
 
     if (this.owner !== null) {
       if (this.owner !== gameState.currentPlayer) {
         this.gameState.currentPlayer.money -= this.rent;
       }
       stateMachine.setState('TurnEnd', gameState);
+      return;
     }
   }
 
@@ -53,6 +55,8 @@ export class Property {
     this.owner = this.gameState.currentPlayer;
     this.gameState.currentPlayer.money -= this.cost;
     this.gameState.currentPlayer.properties.push(this.name);
+
+    this.stateMachine.boughtPropertyCallbackFn(this.gameState);
 
     return 'TurnEnd';
   }

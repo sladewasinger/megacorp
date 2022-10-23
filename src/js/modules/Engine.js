@@ -47,10 +47,7 @@ export class Engine {
     this.users = this.users.filter((u) => u.id !== user.id);
     this.lobbies.forEach((lobby) => {
       lobby.removeUser(user);
-      lobby.users.forEach((user) => {
-        console.log('lobbyUpdate, sent to ', user.id);
-        this.io.to(user.id).emit('lobbyUpdate', lobby);
-      });
+      this.emitLobbyUpdate(lobby);
     });
     this.lobbies = this.lobbies.filter((lobby) => lobby.users.length > 0);
   }
@@ -115,10 +112,7 @@ export class Engine {
 
     lobby.addUser(user);
 
-    lobby.users.forEach((user) => {
-      console.log('lobbyUpdate, sent to ', user.id);
-      this.io.to(user.id).emit('lobbyUpdate', lobby);
-    });
+    this.emitLobbyUpdate(lobby);
 
     callbackFn(null, lobby);
   }
@@ -138,14 +132,33 @@ export class Engine {
       callbackFn('You are not the owner of this lobby');
       return;
     }
-    lobby.startGame(() => {
-      this.emitClientGameStateToLobby(lobby);
-    }, (player, positions) => {
-      lobby.users.forEach((user) => {
-        console.log('Player moved across positions: ', positions);
-        this.io.to(user.id).emit('playerMovement', player.id, positions);
-      });
-    });
+    lobby.startGame(
+      // Game State Updated:
+      () => {
+        this.emitClientGameStateToLobby(lobby);
+      },
+      // Player Movement:
+      (player, positions) => {
+        lobby.users.forEach((user) => {
+          console.log('Player moved across positions: ', positions);
+          this.io.to(user.id).emit('playerMovement', player.id, positions);
+        });
+      },
+      // Land On Property:
+      (gameState) => {
+        lobby.users.forEach((user) => {
+          console.log('Land on property');
+          this.io.to(user.id).emit('landOnTile', gameState);
+        });
+      },
+      // Bought property:
+      (gameState) => {
+        lobby.users.forEach((user) => {
+          console.log('Bought property');
+          this.io.to(user.id).emit('boughtProperty', gameState);
+        });
+      },
+    );
 
     this.emitClientGameStateToLobby(lobby);
     callbackFn(null, this.getClientGameState(lobby, user));
@@ -179,11 +192,6 @@ export class Engine {
       return;
     }
 
-    // lobby.users.forEach((user) => {
-    //   console.log('gameUpdate, sent to ', user.id);
-    //   // this.io.to(user.id).emit('gameUpdate', this.getClientGameState(lobby, user));
-    //   this.io.to(user.id).emit('diceRoll', player.id, player.prevPosition, player.position);
-    // });
     callbackFn(null, this.getClientGameState(lobby, user));
   }
 
@@ -321,6 +329,16 @@ export class Engine {
     lobby.users.forEach((user) => {
       console.log('gameUpdate, sent to ', user.id);
       this.io.to(user.id).emit('gameUpdate', lobby.game?.getClientGameState(user));
+    });
+  }
+
+  emitLobbyUpdate(lobby) {
+    lobby.users.forEach((user) => {
+      console.log('lobbyUpdate, sent to ', user.id);
+      this.io.to(user.id).emit('lobbyUpdate', {
+        ...lobby,
+        game: undefined,
+      });
     });
   }
 
