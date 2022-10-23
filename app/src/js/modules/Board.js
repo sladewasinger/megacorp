@@ -240,8 +240,10 @@ export class Board {
       this.dice.draw();
       this.dice.setPosition(200, this.height - 250);
 
+      const buttonsContainer1 = new PIXI.Container();
+      this.boardContainer.addChild(buttonsContainer1);
       this.buttons = new Buttons(
-        this.boardContainer,
+        buttonsContainer1,
         this.buyPropertyCallback,
         this.auctionPropertyCallback,
         this.endTurnCallback,
@@ -249,12 +251,16 @@ export class Board {
       this.buttons.draw();
       this.buttons.setPosition(200, this.height - 310);
 
-      this.bidButtons = new BidButtons(this.boardContainer, this.bidCallback);
+      const bidButtonsContainer = new PIXI.Container();
+      this.bidButtons = new BidButtons(bidButtonsContainer, this.bidCallback);
       this.bidButtons.draw(200, this.height - 460);
+      this.boardContainer.addChild(bidButtonsContainer);
 
       // ********************************************* //
       // Leaderboard + CommunityChest + Chance:
-      this.leaderboard = new Leaderboard(this.boardContainer);
+      const leaderBoardContainer = new PIXI.Container();
+      this.boardContainer.addChild(leaderBoardContainer);
+      this.leaderboard = new Leaderboard(leaderBoardContainer);
       this.leaderboard.draw(150 + 50, 150 + 50);
 
       this.communityChestCard = new CommunityChest(this.boardContainer);

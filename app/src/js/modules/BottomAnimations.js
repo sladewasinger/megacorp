@@ -94,17 +94,14 @@ export class BottomAnimations {
   }
 
   draw() {
+    const container = new PIXI.Container();
     this.auctionLineOutline = new PIXI.Graphics();
-    this.animationsContainer.addChild(this.auctionLineOutline);
 
     this.auctionLine = new PIXI.Graphics();
-    this.animationsContainer.addChild(this.auctionLine);
 
     this.auctionLineArrowHead = new PIXI.Graphics();
-    this.animationsContainer.addChild(this.auctionLineArrowHead);
 
     this.auctionLineArrowStart = new PIXI.Graphics();
-    this.animationsContainer.addChild(this.auctionLineArrowStart);
 
     this.auctionText = new PIXI.Text('Auction', {
       fontFamily: 'Arial',
@@ -123,6 +120,12 @@ export class BottomAnimations {
     this.auctionText.x = this.width / 2;
     this.auctionText.y = this.height / 2;
     this.auctionText.visible = false;
-    this.animationsContainer.addChild(this.auctionText);
+
+    container.addChild(this.auctionLineOutline,
+      this.auctionLine,
+      this.auctionLineArrowHead,
+      this.auctionLineArrowStart,
+      this.auctionText);
+    this.animationsContainer.addChild(container);
   }
 }

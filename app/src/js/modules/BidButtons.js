@@ -1,5 +1,3 @@
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export class BidButtons {
   constructor(container, bidCallback) {
     this.container = container;
@@ -79,9 +77,9 @@ export class BidButtons {
     this.zeroButton.interactive = false;
     this.zeroButton.buttonMode = false;
 
-    this.leftArrow.visible = false;
+    this.leftArrow.alpha = 0;
 
-    this.auctionText.visible = false;
+    this.auctionText.alpha = 0;
   }
 
   enable() {
@@ -106,9 +104,9 @@ export class BidButtons {
     this.zeroButton.interactive = true;
     this.zeroButton.buttonMode = true;
 
-    this.leftArrow.visible = true;
+    this.leftArrow.alpha = 1;
 
-    this.auctionText.visible = true;
+    this.auctionText.alpha = 1;
   }
 
   setBidAmount(amount) {
@@ -119,6 +117,8 @@ export class BidButtons {
     this.buttonsContainer.x = x;
     this.buttonsContainer.y = y;
 
+    const container = new PIXI.Container();
+
     this.auctionText = new PIXI.Text('Place your bet:', {
       fontFamily: 'Arial',
       fontSize: 30,
@@ -127,7 +127,6 @@ export class BidButtons {
     });
     this.auctionText.x = 0;
     this.auctionText.y = -40;
-    this.buttonsContainer.addChild(this.auctionText);
 
     this.zeroButton = new PIXI.Graphics();
     this.zeroButton.beginFill(0xffffff);
@@ -139,7 +138,6 @@ export class BidButtons {
       this.currentBid = 0;
     });
     this.zeroButton.hitArea = new PIXI.Rectangle(0, 0, 50, 50);
-    this.buttonsContainer.addChild(this.zeroButton);
 
     this.zeroButtonText = new PIXI.Text('0', {
       fontFamily: 'Arial',
@@ -151,15 +149,12 @@ export class BidButtons {
     this.zeroButtonText.pivot.y = this.zeroButtonText.height / 2;
     this.zeroButtonText.x = this.zeroButton.x + this.zeroButton.width / 2;
     this.zeroButtonText.y = this.zeroButton.y + this.zeroButton.height / 2;
-    this.buttonsContainer.addChild(this.zeroButtonText);
-
 
     this.minus10ButtonOutline = new PIXI.Graphics();
     this.minus10ButtonOutline.beginFill(0xffffff);
     this.minus10ButtonOutline.lineStyle(2, 0x000000, 1);
     this.minus10ButtonOutline.drawRect(0, 0, 50, 50);
     this.minus10ButtonOutline.x = 50;
-    this.buttonsContainer.addChild(this.minus10ButtonOutline);
 
     this.minus10ButtonText = new PIXI.Graphics();
     this.minus10ButtonText = new PIXI.Text('-10', {
@@ -181,14 +176,12 @@ export class BidButtons {
         this.currentBid = 0;
       }
     });
-    this.buttonsContainer.addChild(this.minus10ButtonText);
 
     this.plus10ButtonOutline = new PIXI.Graphics();
     this.plus10ButtonOutline.beginFill(0xffffff);
     this.plus10ButtonOutline.lineStyle(2, 0x000000, 1);
     this.plus10ButtonOutline.drawRect(0, 0, 50, 50);
     this.plus10ButtonOutline.x = 100;
-    this.buttonsContainer.addChild(this.plus10ButtonOutline);
 
     this.plus10ButtonText = new PIXI.Text('+10', {
       fontFamily: 'monospace',
@@ -206,14 +199,12 @@ export class BidButtons {
     this.plus10ButtonText.on('pointerdown', () => {
       this.currentBid += 10;
     });
-    this.buttonsContainer.addChild(this.plus10ButtonText);
 
     this.minus100ButtonOutline = new PIXI.Graphics();
     this.minus100ButtonOutline.beginFill(0xffffff);
     this.minus100ButtonOutline.lineStyle(2, 0x000000, 1);
     this.minus100ButtonOutline.drawRect(0, 0, 50, 50);
     this.minus100ButtonOutline.x = 150;
-    this.buttonsContainer.addChild(this.minus100ButtonOutline);
 
     this.minus100ButtonText = new PIXI.Text('-100', {
       fontFamily: 'monospace',
@@ -234,14 +225,12 @@ export class BidButtons {
         this.currentBid = 0;
       }
     });
-    this.buttonsContainer.addChild(this.minus100ButtonText);
 
     this.plus100ButtonOutline = new PIXI.Graphics();
     this.plus100ButtonOutline.beginFill(0xffffff);
     this.plus100ButtonOutline.lineStyle(2, 0x000000, 1);
     this.plus100ButtonOutline.drawRect(0, 0, 50, 50);
     this.plus100ButtonOutline.x = 200;
-    this.buttonsContainer.addChild(this.plus100ButtonOutline);
 
     this.plus100ButtonText = new PIXI.Text('+100', {
       fontFamily: 'monospace',
@@ -259,7 +248,6 @@ export class BidButtons {
     this.plus100ButtonText.on('pointerdown', () => {
       this.currentBid += 100;
     });
-    this.buttonsContainer.addChild(this.plus100ButtonText);
 
     this.bidButtonContainer = new PIXI.Container();
     this.bidButtonContainer.x = 0;
@@ -289,7 +277,6 @@ export class BidButtons {
     this.bidButtonText.x = this.bidButtonOutline.x + this.bidButtonOutline.width / 2;
     this.bidButtonText.y = this.bidButtonOutline.y + this.bidButtonOutline.height / 2;
     this.bidButtonContainer.addChild(this.bidButtonOutline, this.bidButtonText);
-    this.buttonsContainer.addChild(this.bidButtonContainer);
 
     const currentBidText = new PIXI.Text('Current Bid: 000', {
       fontFamily: 'monospace',
@@ -309,6 +296,22 @@ export class BidButtons {
     this.leftArrow.pivot.y = 0;
     this.leftArrow.x = this.bidButtonOutline.x + this.bidButtonOutline.width + 10;
     this.leftArrow.y = this.bidButtonOutline.y - this.leftArrow.height / 2;
-    this.buttonsContainer.addChild(this.leftArrow);
+
+    container.addChild(
+      this.bidButtonContainer,
+      this.zeroButton,
+      this.zeroButtonText,
+      this.minus10ButtonOutline,
+      this.minus10ButtonText,
+      this.plus10ButtonOutline,
+      this.plus10ButtonText,
+      this.minus100ButtonOutline,
+      this.minus100ButtonText,
+      this.plus100ButtonOutline,
+      this.plus100ButtonText,
+      this.leftArrow,
+    );
+
+    this.buttonsContainer.addChild(container);
   }
 }

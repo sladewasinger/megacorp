@@ -8,6 +8,7 @@ export class TopAnimations {
     this.animationsContainer.y = 0;
     this.animationsContainer.width = width;
     this.animationsContainer.height = height;
+    this.animationsContainer.interactive = true;
     this.container.addChild(this.animationsContainer);
   }
 

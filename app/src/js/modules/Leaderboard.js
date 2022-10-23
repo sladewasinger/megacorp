@@ -43,6 +43,8 @@ export class Leaderboard {
     this.leaderboardContainer.x = x;
     this.leaderboardContainer.y = y;
 
+    const container = new PIXI.Container();
+
     this.leaderboardText = new PIXI.Text('Players:', {
       fontFamily: 'Arial',
       fontSize: 24,
@@ -52,7 +54,6 @@ export class Leaderboard {
     });
     this.leaderboardText.x = 0;
     this.leaderboardText.y = 0;
-    this.leaderboardContainer.addChild(this.leaderboardText);
 
     this.currentPlayerOutline = new PIXI.Graphics();
     // this.currentPlayerOutline.lineStyle(2, 0x000000, 1);
@@ -63,9 +64,8 @@ export class Leaderboard {
     this.currentPlayerOutline.y = 0;
     this.currentPlayerOutline.pivot.x = this.currentPlayerOutline.width / 2;
     this.currentPlayerOutline.pivot.y = this.currentPlayerOutline.height / 2;
-    this.leaderboardContainer.addChild(this.currentPlayerOutline);
 
-    this.playerNames = new PIXI.Text('WWWWWWWWWWWWWWW', {
+    this.playerNames = new PIXI.Text('', {
       fontFamily: 'Arial',
       fontSize: 24,
       fill: 0x000000,
@@ -73,7 +73,6 @@ export class Leaderboard {
     });
     this.playerNames.x = 0;
     this.playerNames.y = this.leaderboardText.height;
-    this.leaderboardContainer.addChild(this.playerNames);
 
     // this.playerNamesBox = new PIXI.Graphics();
     // this.playerNamesBox.lineStyle(2, 0x000000, 1);
@@ -81,7 +80,7 @@ export class Leaderboard {
     // this.playerNamesBox.endFill();
     // this.playerNamesBox.x = this.playerNames.x;
     // this.playerNamesBox.y = this.playerNames.y;
-    // this.leaderboardContainer.addChild(this.playerNamesBox);
+    // container.addChild(this.playerNamesBox);
 
     this.playerMoney = new PIXI.Text('$1500\n$1500\n$1500\n...', {
       fontFamily: 'Arial',
@@ -91,7 +90,14 @@ export class Leaderboard {
     });
     this.playerMoney.x = 10 + this.playerNames.width;
     this.playerMoney.y = this.leaderboardText.height;
-    this.leaderboardContainer.addChild(this.playerMoney);
+
+    container.addChild(
+      this.leaderboardText,
+      this.currentPlayerOutline,
+      this.playerNames,
+      this.playerMoney,
+    );
+    this.leaderboardContainer.addChild(container);
   }
 }
 
