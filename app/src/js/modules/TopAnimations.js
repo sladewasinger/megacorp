@@ -28,9 +28,11 @@ export class TopAnimations {
       gameState.prevState.name == 'Auction'
     ) {
       if (gameState.auction.highestBidder.id == gameState.myId) {
-        this.drawYouWonAuctionText('You won the auction!');
+        this.drawYouWonAuctionText('You won the auction!',
+          gameState.auction.highestBidder.color);
       } else {
-        this.drawYouWonAuctionText(`${gameState.auction.highestBidder.name} won the auction.`);
+        this.drawYouWonAuctionText(`${gameState.auction.highestBidder.name} won the auction.`,
+          gameState.auction.highestBidder.color);
       }
     }
   }
@@ -52,15 +54,18 @@ export class TopAnimations {
     this.fade(yourTurnText, 1);
   }
 
-  drawYouWonAuctionText(text) {
+  drawYouWonAuctionText(text, color) {
     const youWonAuctionText = new PIXI.Text(text, {
       fontFamily: 'Arial',
       fontSize: 80,
       fontWeight: 'bold',
       wordWrap: true,
-      wordWrapWidth: this.width,
-      fill: 0x000000,
+      wordWrapWidth: this.width - 200,
+      fill: color,
       align: 'center',
+      dropShadow: true,
+      dropShadowColor: 0x000000,
+      dropShadowBlur: 10,
     });
     youWonAuctionText.pivot.x = youWonAuctionText.width / 2;
     youWonAuctionText.pivot.y = youWonAuctionText.height / 2;
@@ -68,7 +73,7 @@ export class TopAnimations {
     youWonAuctionText.y = this.height / 2;
     this.animationsContainer.addChild(youWonAuctionText);
 
-    this.fade(youWonAuctionText, 1);
+    this.fade(youWonAuctionText, 2);
   }
 
   fade(graphics, durationSeconds, smoothing = 0.05) {

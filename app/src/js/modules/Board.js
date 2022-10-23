@@ -19,7 +19,6 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 const calcDistance = (x1, y1, x2, y2) => Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 
 export class Board {
@@ -261,15 +260,10 @@ export class Board {
       const leaderBoardContainer = new PIXI.Container();
       this.boardContainer.addChild(leaderBoardContainer);
       this.leaderboard = new Leaderboard(leaderBoardContainer);
-      this.leaderboard.draw(150 + 50, 150 + 50);
+      this.leaderboard.draw(150 + 100, 150 + 50);
 
       this.communityChestCard = new CommunityChest(this.boardContainer);
       this.communityChestCard.draw(this.width - 150 - this.communityChestCard.width, 150 + 10);
-
-      // ********************************************* //
-      // Animations:
-      this.topAnimations = new TopAnimations(this.boardContainer, this.width, this.height);
-      this.topAnimations.draw();
 
       // ********************************************* //
       // Tiles:
@@ -534,6 +528,13 @@ export class Board {
         200 + 100 * 8,
         -Math.PI / 2,
       );
+
+      // ********************************************* //
+      // Animations:
+      this.topAnimations = new TopAnimations(this.boardContainer, this.width, this.height);
+      this.topAnimations.draw();
+
+      // ********************************************* //
 
       this.tiles = [
         this.goTile,
