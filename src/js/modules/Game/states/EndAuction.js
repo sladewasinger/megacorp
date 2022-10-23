@@ -7,6 +7,7 @@ export class EndAuction {
   onEnter(stateMachine, gameState) {
     console.log(`${this.name} -- enter`);
     this.gameState = gameState;
+    this.stateMachine = stateMachine;
     this.auctionCallbackFn = stateMachine.auctionCallbackFn;
 
     const highestBid = this.gameState.auction.highestBid();
@@ -21,6 +22,8 @@ export class EndAuction {
     currentProperty.hotel = false;
 
     player.properties.push(currentProperty.name);
+
+    this.stateMachine.boughtPropertyCallbackFn(this.gameState);
 
     stateMachine.setState('TurnEnd', gameState);
   }

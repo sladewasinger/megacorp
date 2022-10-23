@@ -1,6 +1,7 @@
 export class LuxuryTax {
   constructor() {
     this.name = 'Luxury Tax';
+    this.type = 'tax';
   }
 
   onEnter(stateMachine, gameState) {

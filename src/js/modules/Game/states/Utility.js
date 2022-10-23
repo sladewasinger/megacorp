@@ -13,6 +13,7 @@ export class Utility {
   onEnter(stateMachine, gameState) {
     console.log(this.name);
     this.gameState = gameState;
+    this.stateMachine = stateMachine;
 
     if (this.owner !== null) {
       if (this.owner !== gameState.currentPlayer) {
@@ -36,6 +37,8 @@ export class Utility {
     this.owner = this.gameState.currentPlayer;
     this.gameState.currentPlayer.money -= this.cost;
     this.gameState.currentPlayer.properties.push(this.name);
+
+    this.stateMachine.boughtPropertyCallbackFn(this.gameState);
 
     return 'TurnEnd';
   }

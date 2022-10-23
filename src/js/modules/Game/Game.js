@@ -19,14 +19,23 @@ import { Auction } from './states/Auction.js';
 import { EndAuction } from './states/EndAuction.js';
 
 export class Game {
-  constructor(players, gameStateUpdatedCallbackFn, playerMovementCallbackFn) {
+  constructor(
+    players,
+    gameStateUpdatedCallbackFn,
+    playerMovementCallbackFn,
+    landOnTileCallbackFn,
+    boughtPropertyCallbackFn,
+  ) {
     this.gameStateUpdatedCallbackFn = gameStateUpdatedCallbackFn || (() => { });
     this.playerMovementCallbackFn = playerMovementCallbackFn || (() => { });
+    this.landOnTileCallbackFn = landOnTileCallbackFn || (() => { });
+    this.boughtPropertyCallbackFn = boughtPropertyCallbackFn || (() => { });
 
     this.gameState = new GameState();
     this.gameState.players = players;
 
-    this.stateMachine = new StateMachine(this.gameStateUpdatedCallbackFn, this.playerMovementCallbackFn);
+    this.stateMachine = new StateMachine(this.gameStateUpdatedCallbackFn,
+      this.playerMovementCallbackFn, this.landOnTileCallbackFn, this.boughtPropertyCallbackFn);
     this.stateMachine.addState(new TurnStart());
     this.stateMachine.addState(new TurnEnd());
     this.stateMachine.addState(new RollDiceState());

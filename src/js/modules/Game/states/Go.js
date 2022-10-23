@@ -7,6 +7,9 @@ export class Go {
   onEnter(stateMachine, gameState) {
     console.log('Go');
     this.gameState = gameState;
+
+    this.gameState.currentPlayer.money += 200;
+
     stateMachine.setState('TurnEnd', gameState);
   }
 

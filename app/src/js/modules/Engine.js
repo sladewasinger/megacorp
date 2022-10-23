@@ -47,6 +47,8 @@ export class Engine {
     this.socket.on('diceRoll', (playerId, prevPos, pos) => this.onDiceRoll(playerId, prevPos, pos));
     this.socket.on('playerMovement', (playerId, positions) =>
       this.board.drawPlayerMovement(this.gameState, playerId, positions));
+    this.socket.on('landOnTile', (gameState) => this.landOnTile(gameState));
+    this.socket.on('boughtProperty', (gameState) => this.boughtProperty(gameState));
     this.board.socketId = this.socketId;
 
     this.update();
@@ -192,6 +194,14 @@ export class Engine {
       }
       console.log('Bid placed');
     });
+  }
+
+  landOnTile(gameState) {
+    this.board.leaderboard.setMoneyText(gameState);
+  }
+
+  boughtProperty(gameState) {
+    this.board.leaderboard.setMoneyText(gameState);
   }
 
   endTurn() {

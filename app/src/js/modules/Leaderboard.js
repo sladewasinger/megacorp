@@ -16,7 +16,7 @@ export class Leaderboard {
     }
 
     this.setCurrentPlayerArrow(gameState);
-    this.setMoneyText(gameState);
+    // this.setMoneyText(gameState);
   }
 
   setCurrentPlayerArrow(gameState) {
@@ -37,6 +37,9 @@ export class Leaderboard {
   }
 
   setMoneyText(gameState) {
+    if (!this.players) {
+      return;
+    }
     for (const player of this.players) {
       const gameStatePlayer = gameState.players.find((p) => p.id == player.id);
       if (gameStatePlayer) {

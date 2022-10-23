@@ -46,7 +46,7 @@ export class Board {
     };
     setInterval(() => {
       this.renderState.time++;
-    });
+    }, 10);
 
     // this.container.sortableChildren = true;
     this.boardContainer = new PIXI.Container();
@@ -66,6 +66,7 @@ export class Board {
       console.log('game state is null');
       return;
     }
+    this.gameState = gameState;
 
     this.tiles.forEach((tile, index) => {
       tile.update(index, gameState);
@@ -76,6 +77,18 @@ export class Board {
       for (const gamePlayer of gameState.players) {
         // this.drawPlayerMoveAnimation(gameState, gamePlayer.id, -1, gamePlayer.position);
         this.drawPlayerMovement(gameState, gamePlayer.id, [0]);
+      }
+    }
+
+    if (
+      gameState.state.name === 'RollDice' &&
+      !this.renderState.animationInProgress &&
+      !this.renderState.playerMovementInProgress
+    ) {
+      if (
+        gameState.prevState.type === 'property'
+      ) {
+        this.leaderboard.setMoneyText(gameState);
       }
     }
 
@@ -123,8 +136,15 @@ export class Board {
         }
         const gameTile = gameState.tiles.find((t, i) => i === position);
 
-        if (positions.indexOf(position) == positions.length - 1 && gameTile.type == 'Community Chest') {
-          this.communityChestCard.setVisible();
+        // Land on tile:
+        if (
+          positions.indexOf(position) == positions.length - 1 ||
+          position == 0 // Pass GO
+        ) {
+          if (gameTile.type == 'Community Chest') {
+            this.communityChestCard.setVisible();
+          }
+          this.leaderboard.setMoneyText(this.gameState);
         }
 
         const targetPos = {
