@@ -4,7 +4,7 @@ export class BidButtons {
     this.buttonsContainer = new PIXI.Container();
     this.container.addChild(this.buttonsContainer);
 
-    this.width = 300;
+    this.width = 360;
     this.height = 100;
 
     this.currentBid = 0;
@@ -44,7 +44,7 @@ export class BidButtons {
   }
 
   disableBidButton() {
-    this.bidButtonContainer.alpha = 0.25;
+    this.bidButtonContainer.alpha = 0.5;
     this.bidButtonOutline.interactive = false;
     this.bidButtonOutline.buttonMode = false;
   }
@@ -56,10 +56,8 @@ export class BidButtons {
   }
 
   disable() {
-    this.buttonsContainer.alpha = 0.25;
+    this.buttonsContainer.alpha = 0;
 
-    // this.bidButtonOutline.interactive = false;
-    // this.bidButtonOutline.buttonMode = false;
     this.disableBidButton();
 
     this.plus100ButtonText.interactive = false;
@@ -118,6 +116,11 @@ export class BidButtons {
     this.buttonsContainer.y = y;
 
     const container = new PIXI.Container();
+
+    this.bidButtonsOutline = new PIXI.Graphics();
+    this.bidButtonsOutline.beginFill(0xffffff);
+    this.bidButtonsOutline.drawRect(0, 0, this.width, this.height);
+    this.bidButtonsOutline.endFill();
 
     this.auctionText = new PIXI.Text('Place your bet:', {
       fontFamily: 'Arial',
@@ -278,18 +281,16 @@ export class BidButtons {
     this.bidButtonText.y = this.bidButtonOutline.y + this.bidButtonOutline.height / 2;
     this.bidButtonContainer.addChild(this.bidButtonOutline, this.bidButtonText);
 
-    const currentBidText = new PIXI.Text('Current Bid: 000', {
+    this.currentBidText = new PIXI.Text('Current Bid: 000', {
       fontFamily: 'monospace',
       fontSize: 24,
       fill: 0x000000,
       align: 'center',
     });
-    currentBidText.pivot.x = currentBidText.width / 2;
-    currentBidText.pivot.y = currentBidText.height / 2;
-    currentBidText.x = this.bidButtonOutline.x + this.bidButtonOutline.width - currentBidText.width / 2;
-    currentBidText.y = 75;
-    this.buttonsContainer.addChild(currentBidText);
-    this.currentBidText = currentBidText;
+    this.currentBidText.pivot.x = this.currentBidText.width / 2;
+    this.currentBidText.pivot.y = this.currentBidText.height / 2;
+    this.currentBidText.x = this.bidButtonOutline.x + this.bidButtonOutline.width - this.currentBidText.width / 2;
+    this.currentBidText.y = 75;
 
     this.leftArrow = PIXI.Sprite.from('src/assets/left_arrow.png');
     this.leftArrow.pivot.x = 0;
@@ -298,6 +299,7 @@ export class BidButtons {
     this.leftArrow.y = this.bidButtonOutline.y - this.leftArrow.height / 2;
 
     container.addChild(
+      this.bidButtonsOutline,
       this.bidButtonContainer,
       this.zeroButton,
       this.zeroButtonText,
@@ -310,6 +312,7 @@ export class BidButtons {
       this.plus100ButtonOutline,
       this.plus100ButtonText,
       this.leftArrow,
+      this.currentBidText,
     );
 
     this.buttonsContainer.addChild(container);

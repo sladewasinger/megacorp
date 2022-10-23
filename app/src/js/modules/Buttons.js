@@ -44,7 +44,7 @@ export class Buttons {
   }
 
   disable() {
-    const alpha = 0.25;
+    const alpha = 0;
     this.buyPropertyButton.interactive = false;
     this.buyPropertyButton.buttonMode = false;
     this.buyPropertyButton.alpha = alpha;
@@ -91,27 +91,30 @@ export class Buttons {
   }
 
   disableBuyAndAuctionButtons() {
+    const alpha = 0;
     this.buyPropertyButton.interactive = false;
     this.buyPropertyButton.buttonMode = false;
-    this.buyPropertyButton.alpha = 0.25;
-    this.buyPropertyButtonText.alpha = 0.25;
+    this.buyPropertyButton.alpha = alpha;
+    this.buyPropertyButtonText.alpha = alpha;
 
     this.auctionPropertyButton.interactive = false;
     this.auctionPropertyButton.buttonMode = false;
-    this.auctionPropertyButton.alpha = 0.25;
-    this.auctionPropertyButtonText.alpha = 0.25;
+    this.auctionPropertyButton.alpha = alpha;
+    this.auctionPropertyButtonText.alpha = alpha;
   }
 
   disableEndTurnButton() {
     this.endTurnButton.interactive = false;
     this.endTurnButton.buttonMode = false;
-    this.endTurnButton.alpha = 0.25;
+    this.endTurnButton.alpha = 0;
+    this.endTurnButtonText.alpha = 0;
   }
 
   enableEndTurnButton() {
     this.endTurnButton.interactive = true;
     this.endTurnButton.buttonMode = true;
     this.endTurnButton.alpha = 1;
+    this.endTurnButtonText.alpha = 1;
   }
 
   drawBuyPropertyButton() {

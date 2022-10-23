@@ -113,7 +113,7 @@ export class Board {
       let lastPosition = positions[0] - 1;
       for (const position of positions) {
         if (Math.abs(position - lastPosition) > 1 && !(lastPosition == 39 && position == 0)) {
-          // Big movement - delay
+          // Big movement - delay so people can see it
           await sleep(1000);
         }
         lastPosition = position;

@@ -45,22 +45,30 @@ export class BottomAnimations {
       x: tile.tileContainer.x,
       y: tile.tileContainer.y,
     };
+    const startPos = {
+      x: this.width / 2,
+      y: this.height / 2,
+    };
     if (tileRotation == 0) {
       if (initialEndPos.y < this.height / 2) {
         initialEndPos.y += (tileHeight / 2 + padding);
+        startPos.y -= (this.auctionText.height / 2 + padding);
       } else {
         initialEndPos.y -= (tileHeight / 2 + padding);
+        startPos.y += (this.auctionText.height / 2 + padding);
       }
     } else if (tileRotation == Math.PI / 2) {
       initialEndPos.x += tileHeight / 2 + padding;
+      startPos.x -= (this.auctionText.width / 2 + padding);
     } else if (tileRotation == - Math.PI / 2) {
       initialEndPos.x -= (tileHeight / 2 + padding);
+      startPos.x += (this.auctionText.width / 2 + padding);
     }
 
     const line = {
       start: {
-        x: this.width / 2,
-        y: this.height / 2,
+        x: startPos.x,
+        y: startPos.y,
       },
       end: {
         x: initialEndPos.x,
@@ -110,10 +118,9 @@ export class BottomAnimations {
       fill: 0x000000,
       align: 'center',
       dropShadow: true,
-      dropShadowColor: '#000000',
-      dropShadowBlur: 4,
-      dropShadowAngle: Math.PI / 6,
-      dropShadowDistance: 6,
+      dropShadowColor: '#ffffff',
+      dropShadowBlur: 20,
+      dropShadowDistance: 0,
     });
     this.auctionText.pivot.x = this.auctionText.width / 2;
     this.auctionText.pivot.y = this.auctionText.height / 2;
