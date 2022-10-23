@@ -65,6 +65,7 @@ export class Engine {
       this.gameRunning = true;
     }
 
+    this.board.update(this.gameState);
     // if (
     //   (
     //     gameState.currentPlayer?.directMovement ||
@@ -145,6 +146,7 @@ export class Engine {
       this.buyProperty.bind(this),
       this.auctionProperty.bind(this),
       this.endTurn.bind(this),
+      this.bid.bind(this),
     );
     this.board.draw(container);
   }
@@ -179,6 +181,16 @@ export class Engine {
         return;
       }
       console.log('Property auctioned');
+    });
+  }
+
+  bid(amount) {
+    this.socket.emit('bid', amount, (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Bid placed');
     });
   }
 

@@ -1,16 +1,11 @@
-import { CommunityChestCard } from './CommunityChestCard.js';
-
-export class AdvanceToGo extends CommunityChestCard {
+export class AdvanceToGo {
   constructor() {
-    super();
     this.name = 'Advance to Go';
-    this.type = 'communityChest';
-    this.msg = '';
+    this.type = 'chance';
   }
 
   onDraw(stateMachine, gameState) {
-    super.onDraw(stateMachine, gameState);
-
+    console.log(`Chance: ${this.name}`);
     gameState.currentPlayer.prevPosition = gameState.currentPlayer.position;
     gameState.currentPlayer.position = 0;
     gameState.currentPlayer.directMovement = true;

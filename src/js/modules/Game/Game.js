@@ -14,7 +14,9 @@ import { GoToJail } from './states/GoToJail.js';
 import { LuxuryTax } from './states/LuxuryTax.js';
 import { Player } from './models/Player.js';
 import { JailDecision } from './states/JailDecision.js';
-import chalk from 'chalk';
+import { RollDiceState } from './states/RollDiceState.js';
+import { Auction } from './states/Auction.js';
+import { EndAuction } from './states/EndAuction.js';
 
 export class Game {
   constructor(players, gameStateUpdatedCallbackFn, playerMovementCallbackFn) {
@@ -27,7 +29,10 @@ export class Game {
     this.stateMachine = new StateMachine(this.gameStateUpdatedCallbackFn, this.playerMovementCallbackFn);
     this.stateMachine.addState(new TurnStart());
     this.stateMachine.addState(new TurnEnd());
+    this.stateMachine.addState(new RollDiceState());
     this.stateMachine.addState(new JailDecision());
+    this.stateMachine.addState(new Auction());
+    this.stateMachine.addState(new EndAuction());
     this.stateMachine.addState(new Go());
     this.stateMachine.addState(
       new Property('Mediterranean Avenue', 0x00ff00, 60, [2, 10, 30, 90, 160, 250], 50, 50),
@@ -139,8 +144,16 @@ export class Game {
           mortgaged: tile.mortgaged,
           type: tile.type,
         })),
-      state: this.stateMachine.currentState,
-      prevState: this.stateMachine.previousState,
+      state: {
+        ...this.stateMachine.currentState,
+        stateMachine: undefined,
+        gameState: undefined,
+      },
+      prevState: {
+        ...this.stateMachine.previousState,
+        stateMachine: undefined,
+        gameState: undefined,
+      },
       currentPlayer: this.gameState.currentPlayer,
       myId: user.id,
     };
@@ -184,13 +197,16 @@ export class Game {
       }
     }
 
+    this.gameState.communityChestDeck.shuffle();
+    this.gameState.chanceDeck.shuffle();
+
     this.stateMachine.setState('TurnStart', this.gameState);
   }
 
   rollDice(dice1Override, dice2Override) {
-    if (this.stateMachine.currentState.name !== 'TurnStart' &&
+    if (this.stateMachine.currentState.name !== 'RollDice' &&
       this.stateMachine.currentState.name !== 'JailDecision') {
-      throw new Error('Cannot roll dice outside of TurnStart/JailDecision state');
+      throw new Error('Cannot roll dice outside of RollDice/JailDecision state');
     }
 
     const nextState = this.stateMachine.currentState.rollDice(dice1Override, dice2Override);
@@ -209,10 +225,34 @@ export class Game {
     this.stateMachine.setState(nextState, this.gameState);
   }
 
+  auctionProperty() {
+    if (this.stateMachine.currentState.type !== 'property') {
+      throw new Error('Cannot auction property outside of Property state');
+    }
+    if (this.stateMachine.currentState.owner) {
+      throw new Error('Cannot auction property that is already owned');
+    }
+
+    const nextState = this.stateMachine.currentState.auctionProperty(this.gameState);
+    this.stateMachine.setState(nextState, this.gameState);
+  }
+
+  bid(playerId, bidAmount) {
+    if (this.stateMachine.currentState.name !== 'Auction') {
+      throw new Error('Cannot bid outside of Auction state');
+    }
+    if (this.stateMachine.currentState.auction?.bids.some((bid) => bid.playerId === playerId)) {
+      throw new Error('Cannot bid twice');
+    }
+
+    const nextState = this.stateMachine.currentState.bid(playerId, bidAmount);
+    this.stateMachine.setState(nextState, this.gameState);
+  }
 
   endTurn() {
     if (this.stateMachine.currentState.name !== 'TurnEnd') {
-      throw new Error('Cannot end turn outside of TurnEnd state');
+      throw new Error(`Cannot end turn outside of TurnEnd state! ` +
+        `Current state: '${this.stateMachine.currentState.name}'`);
     }
 
     // Switch to next player

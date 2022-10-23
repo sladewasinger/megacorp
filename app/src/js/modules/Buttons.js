@@ -21,9 +21,10 @@ export class Buttons {
 
   update(gameState, renderState) {
     if (renderState.animationInProgress ||
+      renderState.playerMovementInProgress ||
       renderState.auctionInProgress ||
       gameState.currentPlayer.id !== gameState.myId ||
-      gameState.state.name == 'TurnStart') {
+      gameState.state.name == 'RollDice') {
       this.disable();
       return;
     } else {
@@ -33,6 +34,9 @@ export class Buttons {
     if (gameState.state.type == 'property' && !gameState.state.owner) {
       this.disableEndTurnButton();
       this.enableBuyAndAuctionButtons();
+    } else if (gameState.state.name == 'Auction') {
+      this.disableBuyAndAuctionButtons();
+      this.disableEndTurnButton();
     } else {
       this.enableEndTurnButton();
       this.disableBuyAndAuctionButtons();

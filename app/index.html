@@ -26,7 +26,7 @@
     <div class="container" v-bind:class="{ hidden: gameRunning}">
       <form v-if="!user?.name" v-on:submit="registerName">
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" v-model="name">
+        <input type="text" id="name" name="name" v-model="name" maxlength="15">
         <input type="submit" value="Join">
       </form>
       <form v-if="!!user && user.name && !lobby" v-on:submit="joinLobby">

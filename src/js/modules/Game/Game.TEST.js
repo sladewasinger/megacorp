@@ -1,5 +1,7 @@
 import { Assert } from '../utils/Assert.js';
 import { Game } from './Game.js';
+import { AdvanceToGo } from './models/communityChestCards/AdvanceToGo.js';
+import { BankErrorInYourFavor } from './models/communityChestCards/BankErrorInYourFavor.js';
 import { Player } from './models/Player.js';
 
 export default class GameTests {
@@ -12,7 +14,7 @@ export default class GameTests {
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
 
     game.endTurn();
-    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
     Assert.equal(player2, game.gameState.currentPlayer);
   }
 
@@ -23,12 +25,58 @@ export default class GameTests {
     const game = new Game(players);
     game.rollDice(1, 2); // Land on Baltic Avenue
     Assert.equal('Baltic Avenue', game.stateMachine.currentState.name);
-
+    const cost = game.stateMachine.currentState.cost;
+    const player1money = players[0].money;
     game.buyProperty();
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    Assert.equal(player1money - cost, players[0].money);
 
     game.endTurn();
-    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
+    Assert.equal(players[0], game.gameState.currentPlayer);
+    Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === players[0]).length);
+
+    game.rollDice(1, 39); // Land on same property
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+  }
+
+  buyRailroadTest() {
+    const players = [
+      new Player('1', 'Player 1'),
+    ];
+    const game = new Game(players);
+    game.rollDice(1, 4);
+    Assert.equal('Reading Railroad', game.stateMachine.currentState.name);
+    const cost = game.stateMachine.currentState.cost;
+    const player1money = players[0].money;
+    game.buyProperty();
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    Assert.equal(player1money - cost, players[0].money);
+
+    game.endTurn();
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
+    Assert.equal(players[0], game.gameState.currentPlayer);
+    Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === players[0]).length);
+
+    game.rollDice(1, 39); // Land on same property
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+  }
+
+  buyUtilityTest() {
+    const players = [
+      new Player('1', 'Player 1'),
+    ];
+    const game = new Game(players);
+    game.rollDice(1, 11); // Land on Electric Company
+    Assert.equal('Electric Company', game.stateMachine.currentState.name);
+    const cost = game.stateMachine.currentState.cost;
+    const player1money = players[0].money;
+    game.buyProperty();
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+    Assert.equal(player1money - cost, players[0].money);
+
+    game.endTurn();
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
     Assert.equal(players[0], game.gameState.currentPlayer);
     Assert.equal(1, game.stateMachine.getStates().filter((tile) => tile.owner === players[0]).length);
 
@@ -52,7 +100,7 @@ export default class GameTests {
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
 
     game.endTurn();
-    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
     Assert.equal(player2, game.gameState.currentPlayer);
 
     const player2Money = player2.money;
@@ -62,7 +110,7 @@ export default class GameTests {
     Assert.equal(player2Money - game.stateMachine.states[game.gameState.tiles[3]].rent, player2.money);
   }
 
-  landOnOwnedRailroadTest() {
+  landOnOtherPlayerOwnedRailroadTest() {
     const player1 = new Player('1', 'Player 1');
     const player2 = new Player('2', 'Player 2');
     const players = [
@@ -78,7 +126,7 @@ export default class GameTests {
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
 
     game.endTurn();
-    Assert.equal('TurnStart', game.stateMachine.currentState.name);
+    Assert.equal('RollDice', game.stateMachine.currentState.name);
     Assert.equal(player2, game.gameState.currentPlayer);
 
     const player2Money = player2.money;
@@ -104,9 +152,7 @@ export default class GameTests {
     const player = new Player('1', 'Player 1');
     const game = new Game([player]);
     game.rollDice(5, 5);
-    game.endTurn();
     game.rollDice(5, 5);
-    game.endTurn();
     game.rollDice(5, 5);
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
     Assert.true(game.gameState.currentPlayer.inJail);
@@ -195,18 +241,47 @@ export default class GameTests {
     Assert.false(game.gameState.currentPlayer.inJail);
   }
 
-  communityChestTest() {
+  communityChest_AdvanceToGo_Test() {
     const players = [
       new Player('1', 'Player 1'),
       new Player('2', 'Player 2'),
     ];
     const game = new Game(players);
+    const advanceToGo = new AdvanceToGo();
+    game.gameState.communityChestDeck.cards = [
+      advanceToGo,
+    ];
+
     game.rollDice(-1, 3); // Land on 1st Community Chest
+
     Assert.equal(players[0], game.gameState.currentPlayer);
     Assert.equal('TurnEnd', game.stateMachine.currentState.name);
-    // First card is Advance to Go
-    Assert.equal('Advance to Go', game.gameState.communityChestMessage);
+
+    Assert.equal(advanceToGo.name, game.gameState.communityChestCard.name);
+    Assert.equal(advanceToGo.msg, game.gameState.communityChestCard.msg);
     Assert.equal(0, game.gameState.currentPlayer.position);
+  }
+
+  communityChest_BankErrorInYourFavor_Test() {
+    const players = [
+      new Player('1', 'Player 1'),
+      new Player('2', 'Player 2'),
+    ];
+    const game = new Game(players);
+    const bankError = new BankErrorInYourFavor();
+    game.gameState.communityChestDeck.cards = [
+      bankError,
+    ];
+    const player1money = players[0].money;
+
+    game.rollDice(-1, 3); // Land on 1st Community Chest
+
+    Assert.equal(players[0], game.gameState.currentPlayer);
+    Assert.equal('TurnEnd', game.stateMachine.currentState.name);
+
+    Assert.equal(bankError.name, game.gameState.communityChestCard.name);
+    Assert.equal(bankError.msg, game.gameState.communityChestCard.msg);
+    Assert.equal(player1money + 200, game.gameState.currentPlayer.money);
   }
 
   incomeTaxTest() {

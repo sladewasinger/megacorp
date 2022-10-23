@@ -50,12 +50,8 @@ export class Railroad {
     console.log('buyProperty');
 
     this.owner = this.gameState.currentPlayer;
-    this.gameState.currentPlayer.money -= this.rent;
+    this.gameState.currentPlayer.money -= this.cost;
     this.gameState.currentPlayer.properties.push(this.name);
-
-    if (this.gameState.doubleDiceRoll) {
-      return 'TurnStart';
-    }
 
     return 'TurnEnd';
   }
@@ -67,10 +63,6 @@ export class Railroad {
 
     console.log('auctionProperty');
 
-    if (this.gameState.doubleDiceRoll) {
-      return 'TurnStart';
-    }
-
-    return 'TurnEnd';
+    return 'Auction';
   }
 }

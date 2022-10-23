@@ -18,9 +18,10 @@ export class Dice {
     this.setNumber(gameState.dice1, gameState.dice2);
 
     if (renderState.animationInProgress ||
+      renderState.playerMovementInProgress ||
       renderState.auctionInProgress ||
       gameState.currentPlayer.id !== gameState.myId ||
-      (gameState.state.name !== 'TurnStart' && gameState.state.name !== 'JailDecision')
+      (gameState.state.name !== 'RollDice' && gameState.state.name !== 'JailDecision')
     ) {
       this.disable();
       return;

@@ -8,6 +8,9 @@ import { Dice } from './Dice.js';
 import { Buttons } from './Buttons.js';
 import { CommunityChestTile } from './Tiles/CommunityChestTile.js';
 import { ChanceTile } from './Tiles/ChanceTile.js';
+import { Leaderboard } from './Leaderboard.js';
+import { CommunityChest } from './CommunityChest.js';
+import { BidButtons } from './BidButtons.js';
 const PIXI = window.PIXI;
 
 function sleep(ms) {
@@ -25,12 +28,14 @@ export class Board {
     buyPropertyCallback,
     auctionPropertyCallback,
     endTurnCallback,
+    bidCallback,
   ) {
     this.canvas = canvas;
     this.container = container;
     this.rollDiceCallback = rollDiceCallback;
     this.buyPropertyCallback = buyPropertyCallback;
     this.auctionPropertyCallback = auctionPropertyCallback;
+    this.bidCallback = bidCallback;
     this.endTurnCallback = endTurnCallback;
     this.dice = null;
 
@@ -53,6 +58,11 @@ export class Board {
   }
 
   async update(gameState) {
+    if (!gameState) {
+      console.log('game state is null');
+      return;
+    }
+
     this.tiles.forEach((tile, index) => {
       tile.update(index, gameState);
     });
@@ -67,6 +77,11 @@ export class Board {
     // Set controls:
     this.buttons.update(gameState, this.renderState);
     this.dice.update(gameState, this.renderState);
+    this.bidButtons.update(gameState, this.renderState);
+
+    // stats:
+    this.leaderboard.update(gameState, this.renderState);
+    this.communityChestCard.update(gameState, this.renderState);
   }
 
   async drawPlayerMovement(gameState, playerId, positions) {
@@ -85,7 +100,13 @@ export class Board {
     try {
       const playerGraphics = this.players.find((player) => player.id === playerId);
 
+      let lastPosition = positions[0] - 1;
       for (const position of positions) {
+        if (Math.abs(position - lastPosition) > 1 && !(lastPosition == 39 && position == 0)) {
+          // Big movement - delay
+          await sleep(1000);
+        }
+        lastPosition = position;
         const tile = this.tiles.find((t, i) => i === position);
         if (!tile) {
           console.error('could not find tile matching position ', position);
@@ -98,15 +119,24 @@ export class Board {
         };
 
         let counter = 0;
-        const speed = 10;
-        const damping = 0.25;
+        const maxSpeed = 10;
+        const damping = 0.15;
         while (
           calcDistance(playerGraphics.x, playerGraphics.y, targetPos.x, targetPos.y) > 2 &&
-          counter < 100 // 1 second max of animation (per tile)
+          counter < 200 // 2 second max of animation (per tile)
         ) {
           counter++;
-          playerGraphics.x += clamp((targetPos.x - playerGraphics.x) * damping, -speed, speed);
-          playerGraphics.y += clamp((targetPos.y - playerGraphics.y) * damping, -speed, speed);
+          const vect = {
+            x: targetPos.x - playerGraphics.x,
+            y: targetPos.y - playerGraphics.y,
+          };
+          const dist = calcDistance(0, 0, vect.x, vect.y); // magnitude
+          vect.x /= dist;
+          vect.y /= dist;
+          vect.x *= Math.min(maxSpeed, dist * damping);
+          vect.y *= Math.min(maxSpeed, dist * damping);
+          playerGraphics.x += vect.x;
+          playerGraphics.y += vect.y;
           await sleep(10);
         }
 
@@ -279,6 +309,17 @@ export class Board {
       );
       this.buttons.draw();
       this.buttons.setPosition(200, this.height - 310);
+
+      this.bidButtons = new BidButtons(this.boardContainer, this.bidCallback);
+      this.bidButtons.draw(200, this.height - 460);
+
+      // ********************************************* //
+      // Leaderboard + CommunityChest + Chance:
+      this.leaderboard = new Leaderboard(this.boardContainer);
+      this.leaderboard.draw(150 + 10, 150 + 10);
+
+      this.communityChestCard = new CommunityChest(this.boardContainer);
+      this.communityChestCard.draw(this.width - 150 - this.communityChestCard.width, 150 + 10);
 
       // ********************************************* //
       // Tiles:

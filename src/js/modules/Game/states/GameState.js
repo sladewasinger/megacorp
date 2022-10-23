@@ -12,8 +12,10 @@ export class GameState {
 
     this.communityChestDeck = new CommunityChestDeck();
     this.chanceDeck = new ChanceDeck();
-    this.communityChestMessage = '';
-    this.chanceMessage = '';
+    this.communityChestCard = null;
+    this.chanceCard = null;
+
+    this.auction = null;
 
     this.tiles = [
       'Go',
@@ -57,6 +59,16 @@ export class GameState {
       'Luxury Tax',
       'Boardwalk',
     ];
+  }
+
+  currentProperty(stateMachine) {
+    const tile = this.tiles[this.currentPlayer.position];
+    const tileState = stateMachine.states[this.tiles[this.currentPlayer.position]];
+    if (!tileState) {
+      console.error('No state for tile:', tile);
+    };
+
+    return tileState;
   }
 
   get currentPlayer() {
