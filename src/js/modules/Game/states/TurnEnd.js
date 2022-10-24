@@ -20,5 +20,11 @@ export class TurnEnd {
 
   onExit() {
     console.log('TurnEnd exit');
+
+    if (this.gameState.players.filter((player) => player.money <= 0).length === this.gameState.players.length - 1 &&
+      this.gameState.players.length > 1) {
+      this.gameState.gameOver = true;
+      this.gameState.winner = this.gameState.players.find((player) => player.money > 0);
+    }
   }
 }
