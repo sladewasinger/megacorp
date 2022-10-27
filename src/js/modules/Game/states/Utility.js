@@ -4,10 +4,28 @@ export class Utility {
     this.type = 'property';
 
     this.cost = cost;
-    this.rent = 100;
     this.mortgage = cost / 2;
     this.buybackFee = this.mortgage * 1.1;
     this.owner = null;
+  }
+
+  get rent() {
+    if (!this.gameState || !this.owner) {
+      return 0;
+    }
+
+    const ownedUtilities = this.owner.properties
+      .filter((title) =>
+        title == 'Electric Company' ||
+        title == 'Water Works',
+      ).length;
+    let rentTemp = 0;
+    if (ownedUtilities == 1) {
+      rentTemp = this.gameState.lastRoll * 10;
+    } else if (ownedUtilities == 2) {
+      rentTemp = this.gameState.lastRoll * 20;
+    }
+    return rentTemp;
   }
 
   onEnter(stateMachine, gameState) {
@@ -16,8 +34,9 @@ export class Utility {
     this.stateMachine = stateMachine;
 
     if (this.owner !== null) {
-      if (this.owner !== gameState.currentPlayer) {
+      if (this.owner !== gameState.currentPlayer && !this.mortgaged) {
         this.gameState.currentPlayer.money -= this.rent;
+        this.owner.money += this.rent;
       }
       stateMachine.setState('TurnEnd', gameState);
     }

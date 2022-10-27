@@ -33,6 +33,7 @@ export class Board {
     auctionPropertyCallback,
     endTurnCallback,
     bidCallback,
+    mortgageCallback,
   ) {
     this.canvas = canvas;
     this.container = container;
@@ -46,6 +47,7 @@ export class Board {
     this.renderState = {
       animationInProgress: false,
       time: 0,
+      mortgageCallback: mortgageCallback,
     };
     setInterval(() => {
       this.renderState.time++;

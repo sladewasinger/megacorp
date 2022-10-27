@@ -37,19 +37,28 @@ export class Buttons {
     if (gameState.state.type == 'property' && !gameState.state.owner) {
       this.disableEndTurnButton();
       this.enableBuyAndAuctionButtons();
-      // eslint-disable-next-line brace-style
-    }
-    // } else if (gameState.state.name == 'Auction' || gameState.state.name == 'Bankruptcy') {
-    //   this.disableBuyAndAuctionButtons();
-    //   this.disableEndTurnButton();
-    // }
-    else {
+    } else {
       if (gameState.state.name == 'TurnEnd') {
         this.enableEndTurnButton();
       } else {
         this.disableEndTurnButton();
       }
       this.disableBuyAndAuctionButtons();
+    }
+
+    switch (gameState.state.name) {
+      case 'TurnEnd':
+        this.enableMortgageButton();
+        break;
+      default:
+        this.disableMortgageButton();
+        break;
+    }
+
+    if (renderState.mortgage) {
+      this.disableEndTurnButton();
+    } else {
+      this.enableEndTurnButton();
     }
   }
 
@@ -69,6 +78,8 @@ export class Buttons {
     this.endTurnButton.buttonMode = false;
     this.endTurnButton.alpha = alpha;
     this.endTurnButtonText.alpha = alpha;
+
+    this.disableMortgageButton();
   }
 
   enable() {
@@ -86,6 +97,8 @@ export class Buttons {
     this.endTurnButton.buttonMode = true;
     this.endTurnButton.alpha = 1;
     this.endTurnButtonText.alpha = 1;
+
+    this.enableMortgageButton();
   }
 
   enableBuyAndAuctionButtons() {
@@ -125,6 +138,20 @@ export class Buttons {
     this.endTurnButton.buttonMode = true;
     this.endTurnButton.alpha = 1;
     this.endTurnButtonText.alpha = 1;
+  }
+
+  enableMortgageButton() {
+    this.mortgageButton.interactive = true;
+    this.mortgageButton.buttonMode = true;
+    this.mortgageButton.alpha = 1;
+    this.mortgageButtonText.alpha = 1;
+  }
+
+  disableMortgageButton() {
+    this.mortgageButton.interactive = false;
+    this.mortgageButton.buttonMode = false;
+    this.mortgageButton.alpha = 0;
+    this.mortgageButtonText.alpha = 0;
   }
 
   drawBuyPropertyButton() {
@@ -237,7 +264,6 @@ export class Buttons {
     this.mortgageButton.lineStyle(2, 0x000000, 1);
     this.mortgageButton.drawRect(0, 0, 100, 50);
     this.mortgageButton.endFill();
-
     this.mortgageButton.interactive = true;
     this.mortgageButton.buttonMode = true;
     this.mortgageButton.hitArea = new PIXI.Rectangle(0, 0, 100, 50);

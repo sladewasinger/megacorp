@@ -180,7 +180,7 @@ export class Game {
     }
 
     // Switch to next player
-    nextPlayer = this.gameState.players.shift();
+    const nextPlayer = this.gameState.players.shift();
     this.gameState.players.push(nextPlayer);
 
     if (this.gameState.currentPlayer.money < 0) {
@@ -189,6 +189,25 @@ export class Game {
     }
 
     this.stateMachine.setState('TurnStart', this.gameState);
+  }
+
+  mortgageProperty(player, tileState) {
+    if (!tileState.owner) {
+      throw new Error('Cannot mortgage property that is not owned!');
+    }
+    if (tileState.owner !== player) {
+      throw new Error('Cannot mortgage property that is not owned by you!');
+    }
+    if (tileState.type !== 'property') {
+      throw new Error('This isn\'t a mortgagable property!');
+    }
+    if (tileState.mortgaged) {
+      throw new Error('This property is already mortgaged!');
+    }
+
+    console.log(`Mortgaging property ${tileState.title} for player ${player.name}`);
+    tileState.mortgaged = true;
+    player.money += tileState.mortgage;
   }
 
   addGameStates() {

@@ -148,14 +148,17 @@ export class Engine {
       this.auctionProperty.bind(this),
       this.endTurn.bind(this),
       this.bid.bind(this),
+      this.mortgageProperty.bind(this),
     );
     this.board.draw(container);
     this.app.stage.addChild(container);
   }
 
   rollDice() {
-    const dice1 = Math.floor(Math.random() * 6) + 1;
-    const dice2 = Math.floor(Math.random() * 6) + 1;
+    let dice1 = Math.floor(Math.random() * 6) + 1;
+    let dice2 = Math.floor(Math.random() * 6) + 1;
+    dice1 = 1;
+    dice2 = 2;
     this.socket.emit('rollDice', dice1, dice2, (error, result) => {
       if (error) {
         console.error(error);
@@ -193,6 +196,20 @@ export class Engine {
         return;
       }
       console.log('Bid placed');
+    });
+  }
+
+  mortgageProperty(tile) {
+    console.log('mortgageProperty', tile);
+    const tileId = this.board.tiles.findIndex((t) => t.name == tile.name);
+    this.socket.emit('mortgageProperty', tileId, (error, gameState) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Property mortgaged');
+      this.gameState = gameState;
+      this.board.leaderboard.setMoneyText(gameState);
     });
   }
 

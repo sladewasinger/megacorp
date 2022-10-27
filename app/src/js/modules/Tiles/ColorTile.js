@@ -1,10 +1,8 @@
 const PIXI = window.PIXI;
 
 export class ColorTile {
-  constructor(title, color, price, mortgageCallback) {
-    this.mortgageCallback = mortgageCallback || (() => {
-      console.log('mortgage property');
-    });
+  constructor(title, color, price) {
+    this.name = title;
     this.title = title
       .split(' ')
       .map((word) => {
@@ -24,12 +22,9 @@ export class ColorTile {
     this.height = 150;
   }
 
-  onHover() {
-
-  }
-
   update(index, gameState, renderState) {
     const gameStateTile = gameState.tiles[index];
+    this.renderState = renderState;
     if (!gameStateTile) {
       console.log('no game state tile');
       return;
@@ -56,8 +51,17 @@ House Cost $${gameStateTile.houseCost}
 Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
     }
 
-    if (renderState.mortgage && gameStateTile.owner?.id !== gameState.currentPlayer.id) {
-      this.tileContainer.alpha = 0.25;
+    if (gameStateTile.mortgaged) {
+      this.noSymbolImage.visible = true;
+    } else {
+      this.noSymbolImage.visible = false;
+    }
+
+    if (renderState.mortgage) {
+      if (gameStateTile.owner?.id !== gameState.currentPlayer.id || gameStateTile.mortgaged) {
+        this.tileContainer.alpha = 0.25;
+        this.tileContainer.buttonMode = false;
+      }
     } else {
       this.tileContainer.alpha = 1;
       this.tileContainer.buttonMode = true;
@@ -116,6 +120,32 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
     tileContainer.rotation = rotation;
     container.addChild(tileContainer);
 
+    this.noSymbolImage = PIXI.Sprite.from('src/assets/no_sign.png');
+    const scale = 0.5 * Math.min(this.width / this.noSymbolImage.width, this.height / this.noSymbolImage.height);
+    this.noSymbolImage.width *= scale;
+    this.noSymbolImage.height *= scale;
+    this.noSymbolImage.x = this.width / 2 - this.noSymbolImage.width / 2;
+    this.noSymbolImage.y = this.height / 2 - this.noSymbolImage.height / 2 + 20;
+    tileContainer.addChild(this.noSymbolImage);
+    this.noSymbolImage.visible = false;
+
+    const statusCard = this.drawStatusCard(container);
+    container.addChild(statusCard);
+
+    tileContainer.interactive = true;
+    tileContainer.on('mouseover', () => {
+      statusCard.visible = true;
+    });
+    tileContainer.on('mouseout', () => {
+      statusCard.visible = false;
+    });
+    tileContainer.on('click', () => {
+      this.renderState?.mortgageCallback(this);
+    });
+    tileContainer.buttonMode = false;
+  }
+
+  drawStatusCard(container) {
     const statusCard = new PIXI.Container();
     statusCard.visible = false;
 
@@ -177,24 +207,12 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
         align: 'center',
         wordWrap: true,
         wordWrapWidth: statusCardTile.width,
-      },
+      }
     );
     this.statusCardText.pivot.x = this.statusCardText.width / 2;
     this.statusCardText.x = 15;
     this.statusCardText.y = -this.statusCardText.height / 2 + statusCardTileBar.height / 2;
     statusCard.addChild(this.statusCardText);
-
-    tileContainer.interactive = true;
-    tileContainer.on('mouseover', () => {
-      statusCard.visible = true;
-    });
-    tileContainer.on('mouseout', () => {
-      statusCard.visible = false;
-    });
-    tileContainer.on('click', () => {
-      this.mortgageCallback(this);
-    });
-    tileContainer.buttonMode = false;
-    container.addChild(statusCard);
+    return statusCard;
   }
 }

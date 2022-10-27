@@ -1,5 +1,6 @@
 export class WaterWorksTile {
   constructor() {
+    this.name = 'Water Works';
     this.title = 'Water Works';
     this.width = 100;
     this.height = 150;
@@ -10,6 +11,7 @@ export class WaterWorksTile {
   }
 
   update(index, gameState, renderState) {
+    this.renderState = renderState;
     const gameStateTile = gameState.tiles[index];
     if (!gameStateTile) {
       console.log('no game state tile');
@@ -26,9 +28,13 @@ export class WaterWorksTile {
     }
 
     if (renderState.mortgage) {
-      this.tileContainer.alpha = 0.25;
+      if (gameStateTile.owner?.id !== gameState.currentPlayer.id || gameStateTile.mortgaged) {
+        this.tileContainer.alpha = 0.25;
+        this.tileContainer.buttonMode = false;
+      }
     } else {
       this.tileContainer.alpha = 1;
+      this.tileContainer.buttonMode = true;
     }
   }
 
@@ -138,11 +144,15 @@ export class WaterWorksTile {
     statusCard.addChild(this.statusCardText);
 
     tileContainer.interactive = true;
+    tileContainer.buttonMode = false;
     tileContainer.on('mouseover', () => {
       statusCard.visible = true;
     });
     tileContainer.on('mouseout', () => {
       statusCard.visible = false;
+    });
+    tileContainer.on('click', () => {
+      this.renderState?.mortgageCallback(this);
     });
     container.addChild(statusCard);
   }
