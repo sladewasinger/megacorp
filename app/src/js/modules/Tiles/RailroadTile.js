@@ -4,6 +4,7 @@ export class RailroadTile {
   update(gameState) { }
 
   constructor(title, color, price) {
+    this.name = title;
     this.title = title
       .split(' ')
       .map((word) => {
@@ -23,7 +24,8 @@ export class RailroadTile {
     this.height = 150;
   }
 
-  update(index, gameState) {
+  update(index, gameState, renderState) {
+    this.renderState = renderState;
     const gameStateTile = gameState.tiles[index];
     if (!gameStateTile) {
       console.log('no game state tile');
@@ -37,6 +39,16 @@ export class RailroadTile {
       this.tile.lineStyle(2, 0x000000, 1);
       this.tile.drawRect(0, 0, this.width, this.height);
       this.tile.endFill();
+    }
+
+    if (renderState.mortgage) {
+      if (gameStateTile.owner?.id !== gameState.currentPlayer.id || gameStateTile.mortgaged) {
+        this.tileContainer.alpha = 0.25;
+        this.tileContainer.buttonMode = false;
+      }
+    } else {
+      this.tileContainer.alpha = 1;
+      this.tileContainer.buttonMode = true;
     }
   }
 
@@ -89,6 +101,12 @@ export class RailroadTile {
     tileContainer.x = x;
     tileContainer.y = y;
     tileContainer.rotation = rotation;
+
+    tileContainer.interactive = true;
+    tileContainer.buttonMode = false;
+    tileContainer.on('click', () => {
+      this.renderState?.mortgageCallback(this);
+    });
     container.addChild(tileContainer);
   }
 }

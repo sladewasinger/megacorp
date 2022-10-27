@@ -6,7 +6,13 @@ export class JailTile {
     this.height = 150;
   }
 
-  update(gameState) { }
+  update(index, gameState, renderState) {
+    if (renderState.mortgage) {
+      this.tileContainer.alpha = 0.25;
+    } else {
+      this.tileContainer.alpha = 1;
+    }
+  }
 
   getJailPos() {
     return {

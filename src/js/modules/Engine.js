@@ -26,6 +26,8 @@ export class Engine {
         socket.on('auctionProperty', (callbackFn) => this.auctionProperty(socket, callbackFn));
         socket.on('bid', (bid, callbackFn) => this.bid(socket.id, bid, callbackFn));
         socket.on('endTurn', (callbackFn) => this.endTurn(socket, callbackFn));
+        socket.on('mortgageProperty', (propertyId, callbackFn) =>
+          this.mortgageProperty(socket.id, propertyId, callbackFn));
         socket.on('Error', (error) => {
           console.log(error);
           socket.emit('Error', error);
@@ -323,6 +325,46 @@ export class Engine {
     }
     // this.emitClientGameStateToLobby(lobby);
     callbackFn(null, this.getClientGameState(lobby, user));
+  }
+
+  mortgageProperty(socketId, propertyId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+    const propertyName = lobby.game.gameState.tiles[propertyId];
+    const tileState = lobby.game.stateMachine.states[propertyName];
+    if (!tileState) {
+      callbackFn(`Property ${propertyName} from index ${propertyId} not found!`);
+      return;
+    }
+
+    try {
+      lobby.game.mortgageProperty(player, tileState);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    const gameState = this.getClientGameState(lobby, user);
+    lobby.game.stateMachine.boughtPropertyCallbackFn(gameState);
+    callbackFn(null, gameState);
+    this.emitClientGameStateToLobby(lobby);
   }
 
   emitClientGameStateToLobby(lobby) {

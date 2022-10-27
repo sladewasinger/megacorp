@@ -5,7 +5,13 @@ export class TaxTile {
     this.height = 150;
   }
 
-  update(gameState) { }
+  update(index, gameState, renderState) {
+    if (renderState.mortgage) {
+      this.tileContainer.alpha = 0.25;
+    } else {
+      this.tileContainer.alpha = 1;
+    }
+  }
 
   draw(container, x, y, rotation = 0) {
     const tileContainer = new PIXI.Container();

@@ -14,6 +14,7 @@ export class Property {
     this.owner = null;
     this.houses = 0;
     this.hotel = false;
+    this.mortgaged = false;
   }
 
   get rent() {
@@ -33,8 +34,9 @@ export class Property {
     this.stateMachine = stateMachine;
 
     if (this.owner !== null) {
-      if (this.owner !== gameState.currentPlayer) {
+      if (this.owner !== gameState.currentPlayer && !this.mortgaged) {
         this.gameState.currentPlayer.money -= this.rent;
+        this.owner.money += this.rent;
       }
       stateMachine.setState('TurnEnd', gameState);
       return;

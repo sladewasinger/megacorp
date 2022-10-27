@@ -1,5 +1,6 @@
 export class ElectricCompany {
   constructor() {
+    this.name = 'Electric Company';
     this.title = 'Electric Company';
     this.width = 100;
     this.height = 150;
@@ -9,8 +10,9 @@ export class ElectricCompany {
 
   }
 
-  update(index, gameState) {
+  update(index, gameState, renderState) {
     const gameStateTile = gameState.tiles[index];
+    this.renderState = renderState;
     if (!gameStateTile) {
       console.log('no game state tile');
       return;
@@ -23,6 +25,16 @@ export class ElectricCompany {
       this.tile.lineStyle(2, 0x000000, 1);
       this.tile.drawRect(0, 0, this.width, this.height);
       this.tile.endFill();
+    }
+
+    if (renderState.mortgage) {
+      if (gameStateTile.owner?.id !== gameState.currentPlayer.id || gameStateTile.mortgaged) {
+        this.tileContainer.alpha = 0.25;
+        this.tileContainer.buttonMode = false;
+      }
+    } else {
+      this.tileContainer.alpha = 1;
+      this.tileContainer.buttonMode = true;
     }
   }
 
@@ -132,11 +144,15 @@ export class ElectricCompany {
     statusCard.addChild(this.statusCardText);
 
     tileContainer.interactive = true;
+    tileContainer.buttonMode = false;
     tileContainer.on('mouseover', () => {
       statusCard.visible = true;
     });
     tileContainer.on('mouseout', () => {
       statusCard.visible = false;
+    });
+    tileContainer.on('click', () => {
+      this.renderState?.mortgageCallback(this);
     });
     container.addChild(statusCard);
   }
