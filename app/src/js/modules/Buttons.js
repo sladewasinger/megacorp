@@ -48,6 +48,7 @@ export class Buttons {
 
     switch (gameState.state.name) {
       case 'TurnEnd':
+      case 'Bankruptcy':
         this.enableMortgageButton();
         break;
       default:
