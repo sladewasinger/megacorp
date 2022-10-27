@@ -18,6 +18,7 @@ import { RollDiceState } from './states/RollDiceState.js';
 import { Auction } from './states/Auction.js';
 import { EndAuction } from './states/EndAuction.js';
 import { GameOver } from './states/GameOver.js';
+import { Bankruptcy } from './states/Bankruptcy.js';
 
 export class Game {
   constructor(
@@ -179,16 +180,11 @@ export class Game {
     }
 
     // Switch to next player
-    let count = 0;
-    let nextPlayer;
-    do {
-      nextPlayer = this.gameState.players.shift();
-      this.gameState.players.push(nextPlayer);
-      count++;
-    } while (nextPlayer.money <= 0 && count < this.gameState.players.length);
+    nextPlayer = this.gameState.players.shift();
+    this.gameState.players.push(nextPlayer);
 
-    if (count >= this.gameState.players.length && this.gameState.players.length > 1) {
-      this.stateMachine.setState('GameOver', this.gameState);
+    if (this.gameState.currentPlayer.money < 0) {
+      this.stateMachine.setState('Bankruptcy', this.gameState);
       return;
     }
 
@@ -202,6 +198,7 @@ export class Game {
     this.stateMachine.addState(new JailDecision());
     this.stateMachine.addState(new Auction());
     this.stateMachine.addState(new EndAuction());
+    this.stateMachine.addState(new Bankruptcy());
     this.stateMachine.addState(new GameOver());
     this.stateMachine.addState(new Go());
     this.stateMachine.addState(

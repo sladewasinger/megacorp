@@ -12,6 +12,11 @@ export class TurnEnd {
     }
     this.gameState.auction = null;
 
+    if (this.gameState.currentPlayer.money < 0) {
+      stateMachine.setState('Bankruptcy', gameState);
+      return;
+    }
+
     if (this.gameState.doubleDiceRoll && !this.gameState.currentPlayer.inJail) {
       stateMachine.setState('RollDice', gameState);
       return;
@@ -21,7 +26,7 @@ export class TurnEnd {
   onExit() {
     console.log('TurnEnd exit');
 
-    if (this.gameState.players.filter((player) => player.money <= 0).length === this.gameState.players.length - 1 &&
+    if (this.gameState.players.filter((player) => player.money < 0).length === this.gameState.players.length - 1 &&
       this.gameState.players.length > 1) {
       this.gameState.gameOver = true;
       this.gameState.winner = this.gameState.players.find((player) => player.money > 0);
