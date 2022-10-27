@@ -102,7 +102,7 @@ export class Board {
     this.bidButtons.update(gameState, this.renderState, this.tiles);
 
     // stats:
-    this.leaderboard.update(gameState, this.renderState);
+    this.leaderboard.update(gameState, this.renderState, this.players);
     this.communityChestCard.update(gameState, this.renderState);
 
     // various animations:
@@ -280,12 +280,7 @@ export class Board {
       this.boardContainer.addChild(bidButtonsContainer);
 
       // ********************************************* //
-      // Leaderboard + CommunityChest + Chance:
-      const leaderBoardContainer = new PIXI.Container();
-      this.boardContainer.addChild(leaderBoardContainer);
-      this.leaderboard = new Leaderboard(leaderBoardContainer);
-      this.leaderboard.draw(150 + 100, 150 + 50);
-
+      // CommunityChest + Chance:
       this.communityChestCard = new CommunityChest(this.boardContainer);
       this.communityChestCard.draw(this.width - 150 - this.communityChestCard.width, 150 + 10);
 
@@ -552,6 +547,13 @@ export class Board {
         200 + 100 * 8,
         -Math.PI / 2,
       );
+
+      // ********************************************* //
+      // Leaderboard
+      const leaderBoardContainer = new PIXI.Container();
+      this.boardContainer.addChild(leaderBoardContainer);
+      this.leaderboard = new Leaderboard(leaderBoardContainer);
+      this.leaderboard.draw(150 + 100, 150 + 50);
 
       // ********************************************* //
       // Animations:
