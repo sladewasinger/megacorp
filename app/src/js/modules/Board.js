@@ -125,7 +125,6 @@ export class Board {
 
     try {
       const playerGraphics = this.players.find((player) => player.id === playerId);
-      const gamePlayer = gameState.players.find((player) => player.id === playerId);
       let lastPosition = positions[0] - 1;
       for (const position of positions) {
         if (Math.abs(position - lastPosition) > 1 && !(lastPosition == 39 && position == 0)) {
