@@ -38,28 +38,28 @@ export class Buttons {
       this.disableEndTurnButton();
       this.enableBuyAndAuctionButtons();
     } else {
-      if (gameState.state.name == 'TurnEnd') {
-        this.enableEndTurnButton();
-      } else {
-        this.disableEndTurnButton();
-      }
       this.disableBuyAndAuctionButtons();
     }
 
-    switch (gameState.state.name) {
-      case 'TurnEnd':
-      case 'Bankruptcy':
-        this.enableMortgageButton();
-        break;
-      default:
-        this.disableMortgageButton();
-        break;
+    // End Turn button
+    const turnEndEnabled = gameState.state.name == 'TurnEnd' &&
+      !renderState.animationInProgress &&
+      !renderState.playerMovementInProgress &&
+      !renderState.mortgage;
+
+    if (turnEndEnabled) {
+      this.enableEndTurnButton();
+    } else {
+      this.disableEndTurnButton();
     }
 
-    if (renderState.mortgage) {
-      this.disableEndTurnButton();
+    // Mortgage button
+    const mortgageEnabled = gameState.state.name == 'TurnEnd' ||
+      gameState.state.name == 'Bankruptcy';
+    if (mortgageEnabled) {
+      this.enableMortgageButton();
     } else {
-      this.enableEndTurnButton();
+      this.disableMortgageButton();
     }
   }
 

@@ -157,8 +157,8 @@ export class Engine {
   rollDice() {
     let dice1 = Math.floor(Math.random() * 6) + 1;
     let dice2 = Math.floor(Math.random() * 6) + 1;
-    dice1 = dice1;
-    dice2 = dice2;
+    dice1 = 1;
+    dice2 = 2;
     this.socket.emit('rollDice', dice1, dice2, (error, result) => {
       if (error) {
         console.error(error);

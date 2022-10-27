@@ -208,6 +208,27 @@ export class Game {
     console.log(`Mortgaging property ${tileState.title} for player ${player.name}`);
     tileState.mortgaged = true;
     player.money += tileState.mortgage;
+    this.stateMachine.setState('TurnEnd', this.gameState);
+  }
+
+  declareBankruptcy() {
+    if (this.stateMachine.currentState.name !== 'Bankruptcy') {
+      throw new Error('Cannot declare bankruptcy outside of Bankruptcy state');
+    }
+    // Switch to next player:
+    const ownedProperties = this.gameState.board.filter((tile) => tile.owner === this.gameState.currentPlayer);
+    for (const property of ownedProperties) {
+      property.owner = null;
+      property.mortgaged = false;
+      property.houses = 0;
+      property.hotel = false;
+    }
+    this.gameState.players.shift();
+    if (this.gameState.players.length <= 1) {
+      this.stateMachine.setState('GameOver', this.gameState);
+      return;
+    }
+    this.stateMachine.setState('TurnStart', this.gameState);
   }
 
   addGameStates() {
