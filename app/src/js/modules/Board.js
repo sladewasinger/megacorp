@@ -125,7 +125,7 @@ export class Board {
 
     try {
       const playerGraphics = this.players.find((player) => player.id === playerId);
-
+      const gamePlayer = gameState.players.find((player) => player.id === playerId);
       let lastPosition = positions[0] - 1;
       for (const position of positions) {
         if (Math.abs(position - lastPosition) > 1 && !(lastPosition == 39 && position == 0)) {
@@ -155,6 +155,18 @@ export class Board {
           x: tile.tileContainer.x,
           y: tile.tileContainer.y,
         };
+
+        if (position == 10) {
+          // using this.gameState instead of gameState will get current global state
+          const currentGamePlayer = this.gameState.players.find((player) => player.id === playerId);
+          if (!currentGamePlayer.inJail) {
+            targetPos.x -= 40;
+            targetPos.y += 40;
+          } else {
+            targetPos.x += 10;
+            targetPos.y -= 20;
+          }
+        }
 
         let counter = 0;
         const maxSpeed = 10;

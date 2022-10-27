@@ -133,7 +133,6 @@ export class WaterWorksTile {
 
     tileContainer.interactive = true;
     tileContainer.on('mouseover', () => {
-      console.log('mouseover');
       statusCard.visible = true;
     });
     tileContainer.on('mouseout', () => {
