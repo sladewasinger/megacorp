@@ -16,9 +16,11 @@ export class Auction {
         },
         bids: [],
         highestBid: () => {
-          return this.gameState.auction.bids.reduce((prev, current) => {
-            return (prev.bidAmount > current.bidAmount) ? prev : current;
-          });
+          return this.gameState.auction.bids
+            .sort((a, b) => b.order - a.order)
+            .reduce((prev, current) => {
+              return (prev.bidAmount > current.bidAmount) ? prev : current;
+            });
         },
       };
     }
@@ -38,6 +40,7 @@ export class Auction {
     this.gameState.auction.bids.push({
       playerId,
       bidAmount,
+      order: this.gameState.auction.bids.length,
     });
     player.hasBid = true;
     if (this.gameState.auction.bids.length >= this.gameState.players.filter((p) => p.money > 0).length) {

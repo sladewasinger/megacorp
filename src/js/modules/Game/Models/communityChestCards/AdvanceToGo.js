@@ -18,5 +18,7 @@ export class AdvanceToGo extends CommunityChestCard {
 
     const positions = [gameState.currentPlayer.prevPosition, gameState.currentPlayer.position];
     stateMachine.playerMovementCallbackFn(gameState.currentPlayer, positions);
+
+    return 'Go';
   }
 }

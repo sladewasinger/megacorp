@@ -1,22 +1,6 @@
-const PIXI = window.PIXI;
-
-export class ColorTile {
-  constructor(title, color, price) {
-    this.title = title
-      .split(' ')
-      .map((word) => {
-        let newWord = '';
-        const maxLength = 9;
-        while (word.length > 11) {
-          newWord += word.substr(0, maxLength) + '-\n';
-          word = word.substr(maxLength);
-        }
-        return newWord + word;
-      })
-      .join(' ');
-
-    this.color = color;
-    this.price = price;
+export class ElectricCompany {
+  constructor() {
+    this.title = 'Electric Company';
     this.width = 100;
     this.height = 150;
   }
@@ -40,18 +24,6 @@ export class ColorTile {
       this.tile.drawRect(0, 0, this.width, this.height);
       this.tile.endFill();
     }
-
-    if (gameStateTile.rents) {
-      this.statusCardText.text = `Rent $${gameStateTile.rents[0]}
-With 1 House $${gameStateTile.rents[0]}
-With 2 Houses $${gameStateTile.rents[1]}
-With 3 Houses $${gameStateTile.rents[2]}
-With 4 Houses $${gameStateTile.rents[3]}
-With Hotel $${gameStateTile.rents[4]}
-Mortgage Value $${gameStateTile.mortgage}
-House Cost $${gameStateTile.houseCost}
-Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
-    }
   }
 
   draw(container, x, y, rotation = 0) {
@@ -68,13 +40,6 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
     this.tile.endFill();
     tileContainer.addChild(this.tile);
 
-    const colorBar = new PIXI.Graphics();
-    colorBar.beginFill(this.color);
-    colorBar.lineStyle(2, 0x000000, 1);
-    colorBar.drawRect(0, 0, this.width, 30);
-    colorBar.endFill();
-    tileContainer.addChild(colorBar);
-
     const title = new PIXI.Text(this.title, {
       fontFamily: 'Arial',
       fontSize: 19,
@@ -85,10 +50,20 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
     });
     title.pivot.x = title.width / 2;
     title.x = this.width / 2;
-    title.y = colorBar.height;
+    title.y = 0;
     tileContainer.addChild(title);
 
-    const price = new PIXI.Text(`$${this.price}`, {
+    const image = PIXI.Sprite.from('src/assets/electric_company.png');
+    image.width = 600;
+    image.height = 700;
+    const scale = 0.5 * Math.min(this.width / image.width, this.height / image.height);
+    image.width *= scale;
+    image.height *= scale;
+    image.x = this.width / 2 - image.width / 2;
+    image.y = this.height / 2 - image.height / 2 + 10;
+    tileContainer.addChild(image);
+
+    const price = new PIXI.Text('$150', {
       fontFamily: 'Arial',
       fontSize: 24,
       fill: 0x000000,
@@ -125,15 +100,6 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
     statusCard.x = container._width - this.height - statusCardTile.width / 2 - 10;
     statusCard.y = container._height - this.height - statusCardTile.height / 2 - 10;
 
-    const statusCardTileBar = new PIXI.Graphics();
-    statusCardTileBar.beginFill(this.color);
-    statusCardTileBar.lineStyle(2, 0x000000, 1);
-    statusCardTileBar.drawRect(0, 0, this.width * 2, 60);
-    statusCardTileBar.endFill();
-    statusCardTileBar.x = 0 - statusCardTile.width / 2;
-    statusCardTileBar.y = 0 - statusCardTile.height / 2;
-    statusCard.addChild(statusCardTileBar);
-
     const statusCardTitle = new PIXI.Text(this.title, {
       fontFamily: 'Arial',
       fontSize: 24,
@@ -147,19 +113,10 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
     statusCardTitle.y = 0 - statusCardTile.height / 2 + 10;
     statusCard.addChild(statusCardTitle);
 
-    this.rents = [0, 0, 0, 0, 0, 0];
-    this.houseCost = 0;
-    this.hotelCost = 0;
     this.statusCardText = new PIXI.Text(
-      `Rent $${this.rents[0]}
-      With 1 House $${this.rents[0]}
-      With 2 Houses $${this.rents[1]}
-      With 3 Houses $${this.rents[2]}
-      With 4 Houses $${this.rents[3]}
-      With Hotel $${this.rents[4]}
-      Mortgage Value $${this.price / 2}
-      House Cost $${this.houseCost / 2}
-      Hotel Cost $${this.hotelCost / 2} + 4 houses`,
+      'If one Utility is owned, rent is 10 times amount shown on dice. ' +
+      'If both Utilities are owned, rent is 20 times amount shown on dice.' +
+      '\n\nMortgage Value: $75',
       {
         fontFamily: 'Arial',
         fontSize: 18,
@@ -170,8 +127,8 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
       },
     );
     this.statusCardText.pivot.x = this.statusCardText.width / 2;
-    this.statusCardText.x = 15;
-    this.statusCardText.y = -this.statusCardText.height / 2 + statusCardTileBar.height / 2;
+    this.statusCardText.x = 0;
+    this.statusCardText.y = -this.statusCardText.height / 2;
     statusCard.addChild(this.statusCardText);
 
     tileContainer.interactive = true;

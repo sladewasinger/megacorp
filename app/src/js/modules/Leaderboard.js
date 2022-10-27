@@ -8,7 +8,7 @@ export class Leaderboard {
     this.players = null;
   }
 
-  update(gameState, renderState) {
+  update(gameState, renderState, boardPlayers) {
     this.gameState = gameState;
     this.renderState = renderState;
     if (!this.players) {
@@ -16,7 +16,39 @@ export class Leaderboard {
     }
 
     this.setCurrentPlayerArrow(gameState);
-    // this.setMoneyText(gameState);
+
+    let showingLine = false;
+    for (const player of this.players) {
+      if (player.playerText.mouseHovering) {
+        this.showLineToPlayer(gameState, player, boardPlayers);
+        showingLine = true;
+      }
+    }
+    if (!showingLine) {
+      this.hideLineToPlayer();
+    }
+  }
+
+  showLineToPlayer(gameState, player, boardPlayers) {
+    const lineStart = {
+      x: player.playerText.x + 10,
+      y: player.playerText.y + 20,
+    };
+    const boardPlayer = boardPlayers.find((p) => p.id == player.id);
+    const lineEnd = {
+      x: boardPlayer.position.x - this.leaderboardContainer.x,
+      y: boardPlayer.position.y - this.leaderboardContainer.y,
+    };
+    const line = this.playerPosLine;
+    line.visible = true;
+    line.clear();
+    line.lineStyle(2, 0x000000, 1);
+    line.moveTo(lineStart.x, lineStart.y);
+    line.lineTo(lineEnd.x, lineEnd.y);
+  }
+
+  hideLineToPlayer() {
+    this.playerPosLine.visible = false;
   }
 
   setCurrentPlayerArrow(gameState) {
@@ -65,6 +97,13 @@ export class Leaderboard {
       });
       playerText.x = 0;
       playerText.y = this.leaderboardText.height + index * 30;
+      playerText.interactive = true;
+      playerText.on('mouseover', () => {
+        playerText.mouseHovering = true;
+      });
+      playerText.on('mouseout', () => {
+        playerText.mouseHovering = false;
+      });
       this.leaderboardContainer.addChild(playerText);
 
       const moneyText = new PIXI.Text(`$${player.money}`, {
@@ -143,11 +182,15 @@ export class Leaderboard {
     this.playerMoney.x = 10 + this.playerNames.width;
     this.playerMoney.y = this.leaderboardText.height;
 
+    this.playerPosLine = new PIXI.Graphics();
+    this.playerPosLine.visible = false;
+
     container.addChild(
       this.leaderboardText,
       this.currentPlayerOutline,
       this.playerNames,
       this.playerMoney,
+      this.playerPosLine,
     );
     this.leaderboardContainer.addChild(container);
   }
