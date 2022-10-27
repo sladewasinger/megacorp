@@ -59,6 +59,7 @@ export class Game {
           title: tile.title,
           color: tile.color,
           rent: tile.rent,
+          rents: tile.rents,
           mortgage: tile.mortgage,
           houseCost: tile.houseCost,
           houses: tile.houses,

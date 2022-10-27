@@ -13,6 +13,9 @@ import { CommunityChest } from './CommunityChest.js';
 import { BidButtons } from './BidButtons.js';
 import { TopAnimations } from './TopAnimations.js';
 import { BottomAnimations } from './BottomAnimations.js';
+import { TaxTile } from './Tiles/TaxTile.js';
+import { ElectricCompany } from './Tiles/ElectricCompany.js';
+import { WaterWorksTile } from './Tiles/WaterWorksTile.js';
 const PIXI = window.PIXI;
 
 function sleep(ms) {
@@ -48,15 +51,16 @@ export class Board {
       this.renderState.time++;
     }, 10);
 
-    // this.container.sortableChildren = true;
-    this.boardContainer = new PIXI.Container();
-    this.container.addChild(this.boardContainer);
-    // this.boardContainer.sortableChildren = true;
     this.width = 1200;
     this.height = 1200;
     this.tiles = [];
     this.players = null;
     this.prevGameState = null;
+
+    this.boardContainer = new PIXI.Container();
+    this.boardContainer.width = this.width;
+    this.boardContainer.height = this.height;
+    this.container.addChild(this.boardContainer);
 
     window.addEventListener('resize', this.resize.bind(this));
   }
@@ -315,7 +319,7 @@ export class Board {
         this.height - 75,
       );
 
-      this.incomeTax = new ColorTile('Income Tax', 0x000000, 0);
+      this.incomeTax = new TaxTile('Income Tax');
       this.incomeTax.draw(this.boardContainer, this.width - 100 - 100 * 4, this.height - 75);
 
       this.readingRailroad = new RailroadTile(
@@ -368,7 +372,7 @@ export class Board {
         Math.PI / 2,
       );
 
-      this.electricCompany = new ColorTile('Electric Company', 0x000000, 150);
+      this.electricCompany = new ElectricCompany();
       this.electricCompany.draw(
         this.boardContainer,
         75,
@@ -460,7 +464,7 @@ export class Board {
       this.ventnorAvenue = new ColorTile('Ventnor Avenue', 0xfef200, 260);
       this.ventnorAvenue.draw(this.boardContainer, 200 + 100 * 6, 75, 0);
 
-      this.waterWorks = new ColorTile('Water Works', 0x000000, 150);
+      this.waterWorks = new WaterWorksTile();
       this.waterWorks.draw(this.boardContainer, 200 + 100 * 7, 75, 0);
 
       this.marvinGardens = new ColorTile('Marvin Gardens', 0xfef200, 280);
@@ -533,7 +537,7 @@ export class Board {
         -Math.PI / 2,
       );
 
-      this.luxuryTax = new ColorTile('Luxury Tax', 0x000000, 0);
+      this.luxuryTax = new TaxTile('Luxury Tax', 0x000000, 0);
       this.luxuryTax.draw(
         this.boardContainer,
         this.width - 75,

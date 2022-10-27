@@ -1,6 +1,8 @@
 import { Engine } from './modules/Engine.js';
 const { createApp } = Vue;
 
+const BOARD_TESTING = true;
+
 createApp({
   data() {
     return {
@@ -23,6 +25,12 @@ createApp({
   mounted() {
     this.engine = new Engine();
     this.engine.start();
+
+    if (BOARD_TESTING) {
+      this.engine.registerUser('player 1');
+      this.engine.createLobby();
+      this.engine.startGame();
+    }
   },
   methods: {
     registerName(e) {
