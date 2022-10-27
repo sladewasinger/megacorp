@@ -73,7 +73,7 @@ export class Board {
     this.gameState = gameState;
 
     this.tiles.forEach((tile, index) => {
-      tile.update(index, gameState);
+      tile.update(index, gameState, this.renderState);
     });
 
     if (!this.players) {

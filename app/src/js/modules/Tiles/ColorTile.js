@@ -1,7 +1,10 @@
 const PIXI = window.PIXI;
 
 export class ColorTile {
-  constructor(title, color, price) {
+  constructor(title, color, price, mortgageCallback) {
+    this.mortgageCallback = mortgageCallback || (() => {
+      console.log('mortgage property');
+    });
     this.title = title
       .split(' ')
       .map((word) => {
@@ -25,7 +28,7 @@ export class ColorTile {
 
   }
 
-  update(index, gameState) {
+  update(index, gameState, renderState) {
     const gameStateTile = gameState.tiles[index];
     if (!gameStateTile) {
       console.log('no game state tile');
@@ -51,6 +54,13 @@ With Hotel $${gameStateTile.rents[4]}
 Mortgage Value $${gameStateTile.mortgage}
 House Cost $${gameStateTile.houseCost}
 Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
+    }
+
+    if (renderState.mortgage && gameStateTile.owner?.id !== gameState.currentPlayer.id) {
+      this.tileContainer.alpha = 0.25;
+    } else {
+      this.tileContainer.alpha = 1;
+      this.tileContainer.buttonMode = true;
     }
   }
 
@@ -181,6 +191,10 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
     tileContainer.on('mouseout', () => {
       statusCard.visible = false;
     });
+    tileContainer.on('click', () => {
+      this.mortgageCallback(this);
+    });
+    tileContainer.buttonMode = false;
     container.addChild(statusCard);
   }
 }

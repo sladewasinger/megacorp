@@ -12,6 +12,7 @@ export class Buttons {
     this.drawBuyPropertyButton();
     this.drawAuctionPropertyButton();
     this.drawEndTurnButton();
+    this.drawMortgageButton();
   }
 
   setPosition(x, y) {
@@ -20,6 +21,7 @@ export class Buttons {
   }
 
   update(gameState, renderState) {
+    this.renderState = renderState;
     if (renderState.animationInProgress ||
       renderState.playerMovementInProgress ||
       renderState.auctionInProgress ||
@@ -35,11 +37,18 @@ export class Buttons {
     if (gameState.state.type == 'property' && !gameState.state.owner) {
       this.disableEndTurnButton();
       this.enableBuyAndAuctionButtons();
-    } else if (gameState.state.name == 'Auction') {
-      this.disableBuyAndAuctionButtons();
-      this.disableEndTurnButton();
-    } else {
-      this.enableEndTurnButton();
+      // eslint-disable-next-line brace-style
+    }
+    // } else if (gameState.state.name == 'Auction' || gameState.state.name == 'Bankruptcy') {
+    //   this.disableBuyAndAuctionButtons();
+    //   this.disableEndTurnButton();
+    // }
+    else {
+      if (gameState.state.name == 'TurnEnd') {
+        this.enableEndTurnButton();
+      } else {
+        this.disableEndTurnButton();
+      }
       this.disableBuyAndAuctionButtons();
     }
   }
@@ -215,5 +224,38 @@ export class Buttons {
     this.endTurnButtonText.x = this.endTurnButton.x + this.endTurnButton.width / 2;
     this.endTurnButtonText.y = this.endTurnButton.y + this.endTurnButton.height / 2;
     container.addChild(this.endTurnButtonText);
+  }
+
+  drawMortgageButton() {
+    const container = new PIXI.Container();
+    container.x = 300;
+    container.y = 0;
+    this.buttonsContainer.addChild(container);
+
+    this.mortgageButton = new PIXI.Graphics();
+    this.mortgageButton.beginFill(0xffff00);
+    this.mortgageButton.lineStyle(2, 0x000000, 1);
+    this.mortgageButton.drawRect(0, 0, 100, 50);
+    this.mortgageButton.endFill();
+
+    this.mortgageButton.interactive = true;
+    this.mortgageButton.buttonMode = true;
+    this.mortgageButton.hitArea = new PIXI.Rectangle(0, 0, 100, 50);
+    this.mortgageButton.on('pointerdown', () => {
+      this.renderState.mortgage = !this.renderState.mortgage;
+    });
+    container.addChild(this.mortgageButton);
+
+    this.mortgageButtonText = new PIXI.Text('Mortgage', {
+      fontFamily: 'Arial',
+      fontSize: 24,
+      fill: 0x000000,
+      align: 'center',
+    });
+    this.mortgageButtonText.pivot.x = this.mortgageButtonText.width / 2;
+    this.mortgageButtonText.pivot.y = this.mortgageButtonText.height / 2;
+    this.mortgageButtonText.x = this.mortgageButton.x + this.mortgageButton.width / 2;
+    this.mortgageButtonText.y = this.mortgageButton.y + this.mortgageButton.height / 2;
+    container.addChild(this.mortgageButtonText);
   }
 }

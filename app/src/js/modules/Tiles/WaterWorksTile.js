@@ -9,7 +9,7 @@ export class WaterWorksTile {
 
   }
 
-  update(index, gameState) {
+  update(index, gameState, renderState) {
     const gameStateTile = gameState.tiles[index];
     if (!gameStateTile) {
       console.log('no game state tile');
@@ -23,6 +23,12 @@ export class WaterWorksTile {
       this.tile.lineStyle(2, 0x000000, 1);
       this.tile.drawRect(0, 0, this.width, this.height);
       this.tile.endFill();
+    }
+
+    if (renderState.mortgage) {
+      this.tileContainer.alpha = 0.25;
+    } else {
+      this.tileContainer.alpha = 1;
     }
   }
 
