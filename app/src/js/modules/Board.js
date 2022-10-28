@@ -37,6 +37,7 @@ export class Board {
     unmortgageCallback,
     buyHouseCallback,
     sellHouseCallback,
+    declareBankruptcyCallback,
   ) {
     this.canvas = canvas;
     this.container = container;
@@ -54,6 +55,7 @@ export class Board {
       unmortgageCallback: unmortgageCallback,
       buyHouseCallback: buyHouseCallback,
       sellHouseCallback: sellHouseCallback,
+      declareBankruptcyCallback: declareBankruptcyCallback,
     };
     setInterval(() => {
       this.renderState.time++;
