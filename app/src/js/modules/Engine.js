@@ -152,6 +152,7 @@ export class Engine {
       this.unmortgageProperty.bind(this),
       this.buyHouse.bind(this),
       this.sellHouse.bind(this),
+      this.declareBankruptcy.bind(this),
     );
     this.board.draw(container);
     this.app.stage.addChild(container);
@@ -255,6 +256,16 @@ export class Engine {
       console.log('House sold');
       this.gameState = gameState;
       this.board.leaderboard.setMoneyText(gameState);
+    });
+  }
+
+  declareBankruptcy() {
+    this.socket.emit('declareBankruptcy', (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Bankruptcy declared');
     });
   }
 

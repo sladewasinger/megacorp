@@ -181,8 +181,18 @@ export class Game {
     }
 
     // Switch to next player
-    const nextPlayer = this.gameState.players.shift();
-    this.gameState.players.push(nextPlayer);
+    let currentPlayer;
+    let count = 0;
+    do {
+      currentPlayer = this.gameState.players.shift();
+      this.gameState.players.push(currentPlayer);
+      count++;
+    } while (this.gameState.currentPlayer.money < 0 && count < this.gameState.players.length);
+
+    if (count >= this.gameState.players.length) {
+      this.gameState.winner = this.gameState.currentPlayer;
+      this.stateMachine.setState('GameOver', this.gameState);
+    }
 
     if (this.gameState.currentPlayer.money < 0) {
       this.stateMachine.setState('Bankruptcy', this.gameState);
@@ -301,19 +311,36 @@ export class Game {
     if (this.stateMachine.currentState.name !== 'Bankruptcy') {
       throw new Error('Cannot declare bankruptcy outside of Bankruptcy state');
     }
-    // Switch to next player:
-    const ownedProperties = this.gameState.board.filter((tile) => tile.owner === this.gameState.currentPlayer);
+
+    console.log(`Player ${this.gameState.currentPlayer.name} declares bankruptcy!`);
+    const ownedProperties = this.stateMachine.getStates()
+      .filter((x) => x.type == 'property')
+      .filter((tile) => tile.owner?.id === this.gameState.currentPlayer.id);
     for (const property of ownedProperties) {
       property.owner = null;
       property.mortgaged = false;
       property.houses = 0;
       property.hotel = false;
     }
-    this.gameState.players.shift();
-    if (this.gameState.players.length <= 1) {
+
+    // Switch to next player:
+    let currentPlayer;
+    let count = 0;
+    do {
+      currentPlayer = this.gameState.players.shift();
+      currentPlayer.bankrupt = true;
+      this.gameState.players.push(currentPlayer);
+      count++;
+    } while (this.gameState.currentPlayer.money < 0 && count < this.gameState.players.length);
+
+    if (count >= this.gameState.players.length - 1) {
+      this.gameState.gameOver = true;
+      this.gameState.winner = this.gameState.players.find((player) => player.money > 0);
+
       this.stateMachine.setState('GameOver', this.gameState);
       return;
     }
+
     this.stateMachine.setState('TurnStart', this.gameState);
   }
 

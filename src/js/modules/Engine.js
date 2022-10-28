@@ -34,6 +34,7 @@ export class Engine {
           this.buyHouse(socket.id, propertyId, callbackFn));
         socket.on('sellHouse', (propertyId, callbackFn) =>
           this.sellHouse(socket.id, propertyId, callbackFn));
+        socket.on('declareBankruptcy', (callbackFn) => this.declareBankruptcy(socket.id, callbackFn));
         socket.on('Error', (error) => {
           console.log(error);
           socket.emit('Error', error);
@@ -489,6 +490,39 @@ export class Engine {
     }
     const gameState = this.getClientGameState(lobby, user);
     lobby.game.stateMachine.boughtPropertyCallbackFn(gameState);
+    callbackFn(null, gameState);
+    this.emitClientGameStateToLobby(lobby);
+  }
+
+  declareBankruptcy(socketId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+
+    try {
+      lobby.game.declareBankruptcy(player);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    const gameState = this.getClientGameState(lobby, user);
     callbackFn(null, gameState);
     this.emitClientGameStateToLobby(lobby);
   }

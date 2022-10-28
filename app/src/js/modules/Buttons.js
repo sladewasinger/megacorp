@@ -49,7 +49,11 @@ export class Buttons {
         this.renderState.propertyActionInProgress = !this.renderState.propertyActionInProgress;
         this.renderState.propertyAction = 'mortgage';
       });
-    this.drawDeclareBankruptcyButton();
+    this.bankruptcyButton = new Button(this.buttonsContainer, 400, 0, 100, 50, 'Declare Bankruptcy',
+      0xff0000, 0x000000,
+      () => {
+        this.renderState.declareBankruptcyCallback();
+      });
     this.sellHouseButton = new Button(this.buttonsContainer, 300, 50, 100, 50, 'Sell House', 0xff0000, 0xffffff, () => {
       this.renderState.propertyActionInProgress = !this.renderState.propertyActionInProgress;
       this.renderState.propertyAction = 'sellHouse';
@@ -336,14 +340,6 @@ export class Buttons {
     this.endTurnButtonText.x = this.endTurnButton.x + this.endTurnButton.width / 2;
     this.endTurnButtonText.y = this.endTurnButton.y + this.endTurnButton.height / 2;
     container.addChild(this.endTurnButtonText);
-  }
-
-  drawDeclareBankruptcyButton() {
-    this.bankruptcyButton = new Button(this.buttonsContainer, 400, 0, 100, 50, 'Declare Bankruptcy',
-      0xff0000, 0x000000,
-      () => {
-        this.renderState.declareBankruptcy();
-      });
   }
 }
 
