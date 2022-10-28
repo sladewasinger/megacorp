@@ -71,7 +71,10 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
             this.tileContainer.buttonMode = true;
           }
         } else if (renderState.propertyAction == 'unmortgage') {
-          if (gameStateTile.mortgaged) {
+          if (
+            gameStateTile.mortgaged &&
+            gameStateTile.owner?.money >= Math.floor(gameStateTile.mortgage * 1.1)
+          ) {
             this.tileContainer.alpha = 1;
             this.tileContainer.buttonMode = true;
           } else {

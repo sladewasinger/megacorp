@@ -225,13 +225,13 @@ export class Game {
     if (!tileState.mortgaged) {
       throw new Error('This property is not mortgaged!');
     }
-    if (player.money < tileState.mortgage * 1.1) {
+    if (player.money < Math.floor(tileState.mortgage * 1.1)) {
       throw new Error('You don\'t have enough money to unmortgage this property!');
     }
 
     console.log(`Unmortgaging property ${tileState.title} for player ${player.name}`);
     tileState.mortgaged = false;
-    player.money -= (tileState.mortgage * 1.1);
+    player.money -= Math.floor(tileState.mortgage * 1.1);
     this.stateMachine.setState('TurnEnd', this.gameState);
   }
 
