@@ -13,6 +13,10 @@ body {
   overflow: hidden;
 }
 
+[v-cloak] {
+  display: none;
+}
+
 #app {
   padding: 0;
 }

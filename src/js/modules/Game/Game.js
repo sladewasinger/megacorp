@@ -122,6 +122,10 @@ export class Game {
       }
     }
 
+    for (let i = 0; i < this.gameState.players.length; i++) {
+      this.gameState.players[i].turnOrder = i;
+    }
+
     // this.gameState.communityChestDeck.shuffle();
     // this.gameState.chanceDeck.shuffle();
 
@@ -189,7 +193,7 @@ export class Game {
       count++;
     } while (this.gameState.currentPlayer.money < 0 && count < this.gameState.players.length);
 
-    if (count >= this.gameState.players.length) {
+    if (count >= this.gameState.players.length && this.gameState.players.length > 1) {
       this.gameState.winner = this.gameState.currentPlayer;
       this.stateMachine.setState('GameOver', this.gameState);
     }

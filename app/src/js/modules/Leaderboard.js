@@ -53,7 +53,7 @@ export class Leaderboard {
 
   setCurrentPlayerArrow(gameState) {
     const sortedPlayers = [...gameState.players];
-    sortedPlayers.sort((a, b) => a.name.localeCompare(b.name));
+    sortedPlayers.sort((a, b) => a.turnOrder - b.turnOrder);
 
 
     // this.playerNames.text = sortedPlayers
@@ -63,9 +63,9 @@ export class Leaderboard {
     const currentPlayer = gameState.currentPlayer;
     const currentPlayerIndex = sortedPlayers
       .findIndex((player) => player.id == currentPlayer.id);
-    this.currentPlayerOutline.y = 10 + currentPlayerIndex * 30 +
+    this.currentPlayerIndicator.y = 10 + currentPlayerIndex * 30 +
       this.leaderboardText.height;
-    this.currentPlayerOutline.x = 0 + Math.cos(this.renderState.time / 40) * 5;
+    this.currentPlayerIndicator.x = 0 + Math.cos(this.renderState.time / 30) * 5;
   }
 
   setMoneyText(gameState) {
@@ -84,7 +84,7 @@ export class Leaderboard {
   drawPlayersInitial(gameState) {
     this.players = [];
     let index = 0;
-    for (const player of gameState.players.sort((a, b) => a.name.localeCompare(b.name))) {
+    for (const player of gameState.players.sort((a, b) => a.turnOrder - b.turnOrder)) {
       const playerText = new PIXI.Text(player.name, {
         fontFamily: 'Arial',
         fontSize: 30,
@@ -144,17 +144,17 @@ export class Leaderboard {
     this.leaderboardText.x = 0;
     this.leaderboardText.y = 0;
 
-    this.currentPlayerOutline = PIXI.Sprite.from('src/assets/left_arrow.png');
-    this.currentPlayerOutline.scale.x = -0.5;
-    this.currentPlayerOutline.scale.y = 0.5;
+    this.currentPlayerIndicator = PIXI.Sprite.from('src/assets/left_arrow.png');
+    this.currentPlayerIndicator.scale.x = -0.5;
+    this.currentPlayerIndicator.scale.y = 0.5;
     // this.currentPlayerOutline.lineStyle(2, 0x000000, 1);
     // this.currentPlayerOutline.beginFill(0xffff00, 0.75);
     // this.currentPlayerOutline.drawRect(0, 0, this.width, 30);
     // this.currentPlayerOutline.endFill();
-    this.currentPlayerOutline.x = 0;
-    this.currentPlayerOutline.y = 0;
-    this.currentPlayerOutline.pivot.x = this.currentPlayerOutline.width / 2;
-    this.currentPlayerOutline.pivot.y = this.currentPlayerOutline.height / 2;
+    this.currentPlayerIndicator.x = 0;
+    this.currentPlayerIndicator.y = 0;
+    this.currentPlayerIndicator.pivot.x = this.currentPlayerIndicator.width / 2;
+    this.currentPlayerIndicator.pivot.y = this.currentPlayerIndicator.height / 2;
 
     this.playerNames = new PIXI.Text('', {
       fontFamily: 'Arial',
@@ -187,7 +187,7 @@ export class Leaderboard {
 
     container.addChild(
       this.leaderboardText,
-      this.currentPlayerOutline,
+      this.currentPlayerIndicator,
       this.playerNames,
       this.playerMoney,
       this.playerPosLine,

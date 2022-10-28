@@ -6,6 +6,7 @@ const BOARD_TESTING = false;
 createApp({
   data() {
     return {
+      loaded: false,
       name: '',
       engine: null,
       lobbyId: null,
@@ -31,6 +32,12 @@ createApp({
     auctionInProgress() {
       return this.engine?.gameState?.state.name == 'Auction';
     },
+    myPlayer() {
+      return this.players.find((p) => p.id === this.user.id);
+    },
+    hasBid() {
+      return this.myPlayer?.hasBid;
+    },
   },
   mounted() {
     this.engine = new Engine();
@@ -41,6 +48,8 @@ createApp({
       this.engine.createLobby();
       this.engine.startGame();
     }
+
+    this.loaded = true;
   },
   methods: {
     registerName(e) {

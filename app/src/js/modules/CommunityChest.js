@@ -47,6 +47,12 @@ export class CommunityChest {
     this.communityChestContainer.x = x;
     this.communityChestContainer.y = y;
 
+    this.communityChestBackground = new PIXI.Graphics();
+    this.communityChestBackground.beginFill(0xffffff);
+    this.communityChestBackground.drawRect(0, 0, this.width, this.height);
+    this.communityChestBackground.endFill();
+    this.communityChestContainer.addChild(this.communityChestBackground);
+
     this.communityChestText = new PIXI.Text('Community Chest', {
       fontFamily: 'Arial',
       fontSize: 24,
