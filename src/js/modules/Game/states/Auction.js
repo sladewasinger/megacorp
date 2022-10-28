@@ -43,7 +43,7 @@ export class Auction {
       order: this.gameState.auction.bids.length,
     });
     player.hasBid = true;
-    if (this.gameState.auction.bids.length >= this.gameState.players.filter((p) => p.money > 0).length) {
+    if (this.gameState.auction.bids.length >= this.gameState.players.filter((p) => p.money >= 0).length) {
       return 'EndAuction';
     }
     return 'Auction';
