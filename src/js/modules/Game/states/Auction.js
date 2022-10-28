@@ -32,7 +32,7 @@ export class Auction {
 
   bid(playerId, bidAmount) {
     const player = this.gameState.players.find((p) => p.id === playerId);
-    if (player.money < bidAmount || bidAmount <= 0) {
+    if (player.money < bidAmount || bidAmount < 0) {
       throw new Error('Not enough money');
     }
 

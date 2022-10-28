@@ -2,6 +2,7 @@ export class Utility {
   constructor(name, cost) {
     this.name = name;
     this.type = 'property';
+    this.subtype = 'utility';
 
     this.cost = cost;
     this.mortgage = cost / 2;

@@ -34,6 +34,9 @@ export class Board {
     endTurnCallback,
     bidCallback,
     mortgageCallback,
+    unmortgageCallback,
+    buyHouseCallback,
+    sellHouseCallback,
   ) {
     this.canvas = canvas;
     this.container = container;
@@ -48,6 +51,9 @@ export class Board {
       animationInProgress: false,
       time: 0,
       mortgageCallback: mortgageCallback,
+      unmortgageCallback: unmortgageCallback,
+      buyHouseCallback: buyHouseCallback,
+      sellHouseCallback: sellHouseCallback,
     };
     setInterval(() => {
       this.renderState.time++;

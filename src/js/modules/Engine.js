@@ -28,6 +28,12 @@ export class Engine {
         socket.on('endTurn', (callbackFn) => this.endTurn(socket, callbackFn));
         socket.on('mortgageProperty', (propertyId, callbackFn) =>
           this.mortgageProperty(socket.id, propertyId, callbackFn));
+        socket.on('unmortgageProperty', (propertyId, callbackFn) =>
+          this.unmortgageProperty(socket.id, propertyId, callbackFn));
+        socket.on('buyHouse', (propertyId, callbackFn) =>
+          this.buyHouse(socket.id, propertyId, callbackFn));
+        socket.on('sellHouse', (propertyId, callbackFn) =>
+          this.sellHouse(socket.id, propertyId, callbackFn));
         socket.on('Error', (error) => {
           console.log(error);
           socket.emit('Error', error);
@@ -352,6 +358,126 @@ export class Engine {
 
     try {
       lobby.game.mortgageProperty(player, tileState);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    const gameState = this.getClientGameState(lobby, user);
+    lobby.game.stateMachine.boughtPropertyCallbackFn(gameState);
+    callbackFn(null, gameState);
+    this.emitClientGameStateToLobby(lobby);
+  }
+
+  unmortgageProperty(socketId, propertyId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+    const propertyName = lobby.game.gameState.tiles[propertyId];
+    const tileState = lobby.game.stateMachine.states[propertyName];
+    if (!tileState) {
+      callbackFn(`Property ${propertyName} from index ${propertyId} not found!`);
+      return;
+    }
+
+    try {
+      lobby.game.unmortgageProperty(player, tileState);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    const gameState = this.getClientGameState(lobby, user);
+    lobby.game.stateMachine.boughtPropertyCallbackFn(gameState);
+    callbackFn(null, gameState);
+    this.emitClientGameStateToLobby(lobby);
+  }
+
+  buyHouse(socketId, propertyId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+    const propertyName = lobby.game.gameState.tiles[propertyId];
+    const tileState = lobby.game.stateMachine.states[propertyName];
+    if (!tileState) {
+      callbackFn(`Property ${propertyName} from index ${propertyId} not found!`);
+      return;
+    }
+
+    try {
+      lobby.game.buyHouse(player, tileState);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    const gameState = this.getClientGameState(lobby, user);
+    lobby.game.stateMachine.boughtPropertyCallbackFn(gameState);
+    callbackFn(null, gameState);
+    this.emitClientGameStateToLobby(lobby);
+  }
+
+  sellHouse(socketId, propertyId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+    const propertyName = lobby.game.gameState.tiles[propertyId];
+    const tileState = lobby.game.stateMachine.states[propertyName];
+    if (!tileState) {
+      callbackFn(`Property ${propertyName} from index ${propertyId} not found!`);
+      return;
+    }
+
+    try {
+      lobby.game.sellHouse(player, tileState);
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {

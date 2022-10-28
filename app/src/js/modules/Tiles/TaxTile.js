@@ -6,7 +6,7 @@ export class TaxTile {
   }
 
   update(index, gameState, renderState) {
-    if (renderState.mortgage) {
+    if (renderState.propertyActionInProgress) {
       this.tileContainer.alpha = 0.25;
     } else {
       this.tileContainer.alpha = 1;

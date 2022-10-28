@@ -149,6 +149,9 @@ export class Engine {
       this.endTurn.bind(this),
       this.bid.bind(this),
       this.mortgageProperty.bind(this),
+      this.unmortgageProperty.bind(this),
+      this.buyHouse.bind(this),
+      this.sellHouse.bind(this),
     );
     this.board.draw(container);
     this.app.stage.addChild(container);
@@ -208,6 +211,48 @@ export class Engine {
         return;
       }
       console.log('Property mortgaged');
+      this.gameState = gameState;
+      this.board.leaderboard.setMoneyText(gameState);
+    });
+  }
+
+  unmortgageProperty(tile) {
+    console.log('unmortgageProperty', tile);
+    const tileId = this.board.tiles.findIndex((t) => t.name == tile.name);
+    this.socket.emit('unmortgageProperty', tileId, (error, gameState) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Property unmortgaged');
+      this.gameState = gameState;
+      this.board.leaderboard.setMoneyText(gameState);
+    });
+  }
+
+  buyHouse(tile) {
+    console.log('buyHouse', tile);
+    const tileId = this.board.tiles.findIndex((t) => t.name == tile.name);
+    this.socket.emit('buyHouse', tileId, (error, gameState) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('House bought');
+      this.gameState = gameState;
+      this.board.leaderboard.setMoneyText(gameState);
+    });
+  }
+
+  sellHouse(tile) {
+    console.log('sellHouse', tile);
+    const tileId = this.board.tiles.findIndex((t) => t.name == tile.name);
+    this.socket.emit('sellHouse', tileId, (error, gameState) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('House sold');
       this.gameState = gameState;
       this.board.leaderboard.setMoneyText(gameState);
     });

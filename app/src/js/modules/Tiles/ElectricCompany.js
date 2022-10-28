@@ -27,14 +27,38 @@ export class ElectricCompany {
       this.tile.endFill();
     }
 
-    if (renderState.mortgage) {
-      if (gameStateTile.owner?.id !== gameState.currentPlayer.id || gameStateTile.mortgaged) {
+    if (gameStateTile.mortgaged) {
+      this.noSymbolImage.visible = true;
+    } else {
+      this.noSymbolImage.visible = false;
+    }
+
+    if (renderState.propertyActionInProgress) {
+      if (gameStateTile.owner?.id !== gameState.currentPlayer.id) {
         this.tileContainer.alpha = 0.25;
         this.tileContainer.buttonMode = false;
+      } else {
+        if (renderState.propertyAction == 'mortgage') {
+          if (gameStateTile.mortgaged) {
+            this.tileContainer.alpha = 0.25;
+            this.tileContainer.buttonMode = false;
+          } else {
+            this.tileContainer.alpha = 1;
+            this.tileContainer.buttonMode = true;
+          }
+        } else if (renderState.propertyAction == 'unmortgage') {
+          if (gameStateTile.mortgaged) {
+            this.tileContainer.alpha = 1;
+            this.tileContainer.buttonMode = true;
+          } else {
+            this.tileContainer.alpha = 0.25;
+            this.tileContainer.buttonMode = false;
+          }
+        }
       }
     } else {
       this.tileContainer.alpha = 1;
-      this.tileContainer.buttonMode = true;
+      this.tileContainer.buttonMode = false;
     }
   }
 
@@ -87,6 +111,16 @@ export class ElectricCompany {
     price.x = this.width / 2;
     price.y = this.height - 30;
     tileContainer.addChild(price);
+
+    this.noSymbolImage = PIXI.Sprite.from('src/assets/no_sign.png');
+    const noSymbolScale = 0.5 *
+      Math.min(this.width / this.noSymbolImage.width, this.height / this.noSymbolImage.height);
+    this.noSymbolImage.width *= noSymbolScale;
+    this.noSymbolImage.height *= noSymbolScale;
+    this.noSymbolImage.x = this.width / 2 - this.noSymbolImage.width / 2;
+    this.noSymbolImage.y = this.height / 2 - this.noSymbolImage.height / 2 + 20;
+    tileContainer.addChild(this.noSymbolImage);
+    this.noSymbolImage.visible = false;
 
     tileContainer.x = x;
     tileContainer.y = y;
@@ -152,7 +186,24 @@ export class ElectricCompany {
       statusCard.visible = false;
     });
     tileContainer.on('click', () => {
-      this.renderState?.mortgageCallback(this);
+      if (this.renderState.propertyActionInProgress) {
+        switch (this.renderState.propertyAction) {
+          case 'mortgage':
+            this.renderState?.mortgageCallback(this);
+            break;
+          case 'unmortgage':
+            this.renderState?.unmortgageCallback(this);
+            break;
+          case 'buyHouse':
+            this.renderState?.buyHouseCallback(this);
+            break;
+          case 'sellHouse':
+            this.renderState?.sellHouseCallback(this);
+            break;
+          default:
+            break;
+        }
+      }
     });
     container.addChild(statusCard);
   }

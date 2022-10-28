@@ -30,7 +30,7 @@ export class BidButtons {
 
     if (
       this.currentBid > myPlayer.money ||
-      this.currentBid === 0
+      this.currentBid < 0
     ) {
       this.disableBidButton();
     } else {
