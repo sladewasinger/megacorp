@@ -49,7 +49,7 @@
       <div class="header">Blind Auction in Progress</div>
       <div class="content">
         <form v-on:submit="bid">
-          <input type="number" v-model="bidAmount">
+          <input type="number" v-model="bidAmount" min="0">
           <input type="submit" value="Bid">
           <img src="src/assets/left_arrow.png" alt="left arrow" class="wobble-horizontal img-small">
         </form>
