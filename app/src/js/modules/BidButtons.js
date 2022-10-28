@@ -22,7 +22,7 @@ export class BidButtons {
       renderState.animationInProgress ||
       renderState.playerMovementInProgress ||
       gameState.state.name != 'Auction' ||
-      myPlayer.hasBid
+      myPlayer.hasBid || true
     ) {
       this.disable();
       return;

@@ -45,6 +45,18 @@
       </div>
     </div>
     <canvas id="canvas" width="500" height="500" :class="{ hidden: !gameRunning }"></canvas>
+    <div id="auction-box" class="draggable" :class="{ hidden: !auctionInProgress }">
+      <div class="header">Blind Auction in Progress</div>
+      <div class="content">
+        <form v-on:submit="bid">
+          <input type="number" v-model="bidAmount">
+          <input type="submit" value="Bid">
+        </form>
+        <div v-for="player in players" :key="player.id">
+          {{ player.name }}
+        </div>
+      </div>
+    </div>
   </div>
   <script type="module" src="src/js/index.js"></script>
 </body>
