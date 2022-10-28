@@ -8,6 +8,7 @@ export class BidButtons {
     this.height = 100;
 
     this.currentBid = 0;
+    this.maxBid = 1500;
     this.bidCallback = bidCallback;
   }
 
@@ -15,6 +16,7 @@ export class BidButtons {
     this.currentBidText.text = `Current Bid: ${this.currentBid}`;
 
     const myPlayer = gameState.players.find((player) => player.id === gameState.myId);
+    this.maxBid = myPlayer.money;
 
     if (
       renderState.animationInProgress ||
@@ -30,7 +32,7 @@ export class BidButtons {
 
     if (
       this.currentBid > myPlayer.money ||
-      this.currentBid === 0
+      this.currentBid < 0
     ) {
       this.disableBidButton();
     } else {
@@ -201,6 +203,9 @@ export class BidButtons {
     this.plus10ButtonText.hitArea = new PIXI.Rectangle(0, 0, 50, 50);
     this.plus10ButtonText.on('pointerdown', () => {
       this.currentBid += 10;
+      if (this.currentBid > this.maxBid) {
+        this.currentBid = this.maxBid;
+      }
     });
 
     this.minus100ButtonOutline = new PIXI.Graphics();
@@ -250,6 +255,9 @@ export class BidButtons {
     this.plus100ButtonText.hitArea = new PIXI.Rectangle(0, 0, 50, 50);
     this.plus100ButtonText.on('pointerdown', () => {
       this.currentBid += 100;
+      if (this.currentBid > this.maxBid) {
+        this.currentBid = this.maxBid;
+      }
     });
 
     this.bidButtonContainer = new PIXI.Container();

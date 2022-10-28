@@ -10,6 +10,13 @@
       "name": "Tests",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}\\tests.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Game",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}\\index.js"
     }
   ]
 }

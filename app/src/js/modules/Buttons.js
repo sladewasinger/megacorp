@@ -1,3 +1,30 @@
+/**
+ * @description
+ * Takes an Array<V>, and a grouping function,
+ * and returns a Map of the array grouped by the grouping function.
+ *
+ * @param list An array of type V.
+ * @param keyGetter A Function that takes the the Array type V as an input, and returns a value of type K.
+ *                  K is generally intended to be a property key of V.
+ *
+ * @returns Map of the array grouped by the grouping function.
+ */
+// export function groupBy<K, V>(list: Array<V>, keyGetter: (input: V) => K): Map<K, Array<V>> {
+//    const map = new Map<K, Array<V>>();
+function groupBy(list, keyGetter) {
+  const map = new Map();
+  list.forEach((item) => {
+    const key = keyGetter(item);
+    const collection = map.get(key);
+    if (!collection) {
+      map.set(key, [item]);
+    } else {
+      collection.push(item);
+    }
+  });
+  return map;
+}
+
 export class Buttons {
   constructor(container, buyPropertyCallback, auctionPropertyCallback, endTurnCallback) {
     this.container = container;
@@ -12,7 +39,25 @@ export class Buttons {
     this.drawBuyPropertyButton();
     this.drawAuctionPropertyButton();
     this.drawEndTurnButton();
-    this.drawMortgageButton();
+    this.unmortgageButton = new Button(this.buttonsContainer, 300, -50, 100, 50, 'Buy Back', 0xffff00, 0x000000,
+      () => {
+        this.renderState.propertyActionInProgress = !this.renderState.propertyActionInProgress;
+        this.renderState.propertyAction = 'unmortgage';
+      });
+    this.mortgageButton = new Button(this.buttonsContainer, 300, 0, 100, 50, 'Mortgage', 0xffff00, 0x000000,
+      () => {
+        this.renderState.propertyActionInProgress = !this.renderState.propertyActionInProgress;
+        this.renderState.propertyAction = 'mortgage';
+      });
+    this.drawDeclareBankruptcyButton();
+    this.sellHouseButton = new Button(this.buttonsContainer, 300, 50, 100, 50, 'Sell House', 0xff0000, 0xffffff, () => {
+      this.renderState.propertyActionInProgress = !this.renderState.propertyActionInProgress;
+      this.renderState.propertyAction = 'sellHouse';
+    });
+    this.buyHouseButton = new Button(this.buttonsContainer, 300, 100, 100, 50, 'Buy House', 0x00ff00, 0x000000, () => {
+      this.renderState.propertyActionInProgress = !this.renderState.propertyActionInProgress;
+      this.renderState.propertyAction = 'buyHouse';
+    });
   }
 
   setPosition(x, y) {
@@ -34,31 +79,77 @@ export class Buttons {
       this.enable();
     }
 
+    // buy and auction buttons
     if (gameState.state.type == 'property' && !gameState.state.owner) {
-      this.disableEndTurnButton();
       this.enableBuyAndAuctionButtons();
     } else {
-      if (gameState.state.name == 'TurnEnd') {
-        this.enableEndTurnButton();
-      } else {
-        this.disableEndTurnButton();
-      }
       this.disableBuyAndAuctionButtons();
     }
 
-    switch (gameState.state.name) {
-      case 'TurnEnd':
-        this.enableMortgageButton();
-        break;
-      default:
-        this.disableMortgageButton();
-        break;
+    // End Turn button
+    const turnEndEnabled = gameState.state.name == 'TurnEnd' &&
+      !renderState.animationInProgress &&
+      !renderState.playerMovementInProgress &&
+      !renderState.propertyActionInProgress;
+    if (turnEndEnabled) {
+      this.enableEndTurnButton();
+    } else {
+      this.disableEndTurnButton();
     }
 
-    if (renderState.mortgage) {
-      this.disableEndTurnButton();
+    // Unmortgage button
+    const unmortgageEnabled = (gameState.state.name == 'TurnEnd' || gameState.state.name == 'Bankruptcy') &&
+      (!renderState.propertyActionInProgress || renderState.propertyAction == 'unmortgage');
+    if (unmortgageEnabled) {
+      this.unmortgageButton.enable();
     } else {
-      this.enableEndTurnButton();
+      this.unmortgageButton.disable();
+    }
+
+    // Mortgage button
+    const mortgageEnabled = (gameState.state.name == 'TurnEnd' ||
+      gameState.state.name == 'Bankruptcy') &&
+      (!renderState.propertyActionInProgress || renderState.propertyAction == 'mortgage');
+    if (mortgageEnabled) {
+      this.mortgageButton.enable();
+    } else {
+      this.mortgageButton.disable();
+    }
+
+    // Declare Bankruptcy button
+    const bankruptcyEnabled = gameState.state.name == 'Bankruptcy';
+    if (bankruptcyEnabled) {
+      this.bankruptcyButton.enable();
+    } else {
+      this.bankruptcyButton.disable();
+    }
+
+    // Buy House button
+    const colorTileGroups = groupBy(gameState.tiles.filter((t) => t.type == 'property'), (t) => t.color);
+    let ownsAtLeastOneColorGroup = true; // false;
+    for (const [, tiles] of colorTileGroups) {
+      const ownsAllTiles = tiles.every((t) => t.owner?.id == gameState.myId);
+      if (ownsAllTiles) {
+        ownsAtLeastOneColorGroup = true;
+        break;
+      }
+    }
+    const buyHouseEnabled = (gameState.state.name == 'TurnEnd' &&
+      ownsAtLeastOneColorGroup) &&
+      (!renderState.propertyActionInProgress || renderState.propertyAction == 'buyHouse');
+    if (buyHouseEnabled) {
+      this.buyHouseButton.enable();
+    } else {
+      this.buyHouseButton.disable();
+    }
+
+    // Sell House button
+    const sellHouseEnabled = (gameState.state.name == 'TurnEnd' || gameState.state.name == 'Bankruptcy') &&
+      (!renderState.propertyActionInProgress || renderState.propertyAction == 'sellHouse');
+    if (sellHouseEnabled) {
+      this.sellHouseButton.enable();
+    } else {
+      this.sellHouseButton.disable();
     }
   }
 
@@ -79,7 +170,11 @@ export class Buttons {
     this.endTurnButton.alpha = alpha;
     this.endTurnButtonText.alpha = alpha;
 
-    this.disableMortgageButton();
+    this.unmortgageButton.disable();
+    this.mortgageButton.disable();
+    this.bankruptcyButton.disable();
+    this.sellHouseButton.disable();
+    this.buyHouseButton.disable();
   }
 
   enable() {
@@ -98,7 +193,11 @@ export class Buttons {
     this.endTurnButton.alpha = 1;
     this.endTurnButtonText.alpha = 1;
 
-    this.enableMortgageButton();
+    this.unmortgageButton.enable();
+    this.mortgageButton.enable();
+    this.bankruptcyButton.enable();
+    this.sellHouseButton.enable();
+    this.buyHouseButton.enable();
   }
 
   enableBuyAndAuctionButtons() {
@@ -138,20 +237,6 @@ export class Buttons {
     this.endTurnButton.buttonMode = true;
     this.endTurnButton.alpha = 1;
     this.endTurnButtonText.alpha = 1;
-  }
-
-  enableMortgageButton() {
-    this.mortgageButton.interactive = true;
-    this.mortgageButton.buttonMode = true;
-    this.mortgageButton.alpha = 1;
-    this.mortgageButtonText.alpha = 1;
-  }
-
-  disableMortgageButton() {
-    this.mortgageButton.interactive = false;
-    this.mortgageButton.buttonMode = false;
-    this.mortgageButton.alpha = 0;
-    this.mortgageButtonText.alpha = 0;
   }
 
   drawBuyPropertyButton() {
@@ -253,35 +338,80 @@ export class Buttons {
     container.addChild(this.endTurnButtonText);
   }
 
-  drawMortgageButton() {
-    const container = new PIXI.Container();
-    container.x = 300;
-    container.y = 0;
-    this.buttonsContainer.addChild(container);
+  drawDeclareBankruptcyButton() {
+    this.bankruptcyButton = new Button(this.buttonsContainer, 400, 0, 100, 50, 'Declare Bankruptcy',
+      0xff0000, 0x000000,
+      () => {
+        this.renderState.declareBankruptcy();
+      });
+  }
+}
 
-    this.mortgageButton = new PIXI.Graphics();
-    this.mortgageButton.beginFill(0xffff00);
-    this.mortgageButton.lineStyle(2, 0x000000, 1);
-    this.mortgageButton.drawRect(0, 0, 100, 50);
-    this.mortgageButton.endFill();
-    this.mortgageButton.interactive = true;
-    this.mortgageButton.buttonMode = true;
-    this.mortgageButton.hitArea = new PIXI.Rectangle(0, 0, 100, 50);
-    this.mortgageButton.on('pointerdown', () => {
-      this.renderState.mortgage = !this.renderState.mortgage;
+export class Button {
+  constructor(container,
+    x,
+    y,
+    width,
+    height,
+    text,
+    backgroundColor,
+    textColor,
+    callback) {
+    this.container = container;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.text = text;
+    this.callback = callback || (() => { });
+
+    const button = new PIXI.Container();
+    button.x = this.x;
+    button.y = this.y;
+    button.interactive = true;
+    button.buttonMode = true;
+    button.hitArea = new PIXI.Rectangle(0, 0, this.width, this.height);
+    button.on('pointerdown', () => {
+      this.callback();
     });
-    container.addChild(this.mortgageButton);
+    this.container.addChild(button);
+    this.button = button;
 
-    this.mortgageButtonText = new PIXI.Text('Mortgage', {
+    this.buttonBox = new PIXI.Graphics();
+    this.buttonBox.beginFill(backgroundColor);
+    this.buttonBox.lineStyle(2, 0x000000, 1);
+    this.buttonBox.drawRect(0, 0, this.width, this.height);
+    this.buttonBox.endFill();
+    button.addChild(this.buttonBox);
+
+    const fontSize = this.text.length > 10 ? 19 : 24;
+    this.buttonText = new PIXI.Text(this.text, {
       fontFamily: 'Arial',
-      fontSize: 24,
-      fill: 0x000000,
+      fontSize: fontSize,
+      fill: textColor,
       align: 'center',
+      wordWrap: true,
+      wordWrapWidth: this.width,
     });
-    this.mortgageButtonText.pivot.x = this.mortgageButtonText.width / 2;
-    this.mortgageButtonText.pivot.y = this.mortgageButtonText.height / 2;
-    this.mortgageButtonText.x = this.mortgageButton.x + this.mortgageButton.width / 2;
-    this.mortgageButtonText.y = this.mortgageButton.y + this.mortgageButton.height / 2;
-    container.addChild(this.mortgageButtonText);
+    this.buttonText.pivot.x = this.buttonText.width / 2;
+    this.buttonText.pivot.y = this.buttonText.height / 2;
+    this.buttonText.x = this.buttonBox.x + this.buttonBox.width / 2;
+    this.buttonText.y = this.buttonBox.y + this.buttonBox.height / 2;
+    button.addChild(this.buttonText);
+  }
+
+  update(gameState, renderState) {
+    this.gameState = gameState;
+    this.renderState = renderState;
+  }
+
+  disable() {
+    this.button.visible = false;
+    this.button.interactive = false;
+  }
+
+  enable() {
+    this.button.visible = true;
+    this.button.interactive = true;
   }
 }

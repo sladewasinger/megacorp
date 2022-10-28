@@ -57,14 +57,65 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
       this.noSymbolImage.visible = false;
     }
 
-    if (renderState.mortgage) {
-      if (gameStateTile.owner?.id !== gameState.currentPlayer.id || gameStateTile.mortgaged) {
+    if (renderState.propertyActionInProgress) {
+      if (gameStateTile.owner?.id !== gameState.currentPlayer.id) {
         this.tileContainer.alpha = 0.25;
         this.tileContainer.buttonMode = false;
+      } else {
+        if (renderState.propertyAction == 'mortgage') {
+          if (gameStateTile.mortgaged) {
+            this.tileContainer.alpha = 0.25;
+            this.tileContainer.buttonMode = false;
+          } else {
+            this.tileContainer.alpha = 1;
+            this.tileContainer.buttonMode = true;
+          }
+        } else if (renderState.propertyAction == 'unmortgage') {
+          if (
+            gameStateTile.mortgaged &&
+            gameStateTile.owner?.money >= Math.floor(gameStateTile.mortgage * 1.1)
+          ) {
+            this.tileContainer.alpha = 1;
+            this.tileContainer.buttonMode = true;
+          } else {
+            this.tileContainer.alpha = 0.25;
+            this.tileContainer.buttonMode = false;
+          }
+        } else if (renderState.propertyAction == 'buyHouse') {
+          if (gameStateTile.houses <= 4 && !gameStateTile.hotel) {
+            this.tileContainer.alpha = 1;
+            this.tileContainer.buttonMode = true;
+          } else {
+            this.tileContainer.alpha = 0.25;
+            this.tileContainer.buttonMode = false;
+          }
+        } else if (renderState.propertyAction == 'sellHouse') {
+          if (gameStateTile.houses > 0) {
+            this.tileContainer.alpha = 1;
+            this.tileContainer.buttonMode = true;
+          } else {
+            this.tileContainer.alpha = 0.25;
+            this.tileContainer.buttonMode = false;
+          }
+        }
       }
     } else {
       this.tileContainer.alpha = 1;
-      this.tileContainer.buttonMode = true;
+      this.tileContainer.buttonMode = false;
+    }
+
+    // Houses
+    for (let i = 0; i < this.houses.length; i++) {
+      this.houses[i].visible = false;
+    }
+    for (let i = 0; i < Math.min(gameStateTile.houses, 4); i++) {
+      this.houses[i].visible = true;
+    }
+
+    if (gameStateTile.hotel) {
+      this.hotel.visible = true;
+    } else {
+      this.hotel.visible = false;
     }
   }
 
@@ -88,6 +139,30 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
     colorBar.drawRect(0, 0, this.width, 30);
     colorBar.endFill();
     tileContainer.addChild(colorBar);
+
+    this.houses = [];
+    for (let i = 0; i < 4; i++) {
+      const house = new PIXI.Graphics();
+      house.beginFill(0x00ff00);
+      house.lineStyle(2, 0x000000, 1);
+      house.drawRect(0, 0, 10, 10);
+      house.endFill();
+      house.x = 10 + i * 15;
+      house.y = 10;
+      house.visible = true;
+      this.houses.push(house);
+      tileContainer.addChild(house);
+    }
+
+    this.hotel = new PIXI.Graphics();
+    this.hotel.beginFill(0xaa0000);
+    this.hotel.lineStyle(2, 0x000000, 1);
+    this.hotel.drawRect(0, 0, 17, 17);
+    this.hotel.endFill();
+    this.hotel.x = 10 + 4 * 15;
+    this.hotel.y = 7;
+    this.hotel.visible = true;
+    tileContainer.addChild(this.hotel);
 
     const title = new PIXI.Text(this.title, {
       fontFamily: 'Arial',
@@ -140,7 +215,24 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
       statusCard.visible = false;
     });
     tileContainer.on('click', () => {
-      this.renderState?.mortgageCallback(this);
+      if (this.renderState.propertyActionInProgress) {
+        switch (this.renderState.propertyAction) {
+          case 'mortgage':
+            this.renderState?.mortgageCallback(this);
+            break;
+          case 'unmortgage':
+            this.renderState?.unmortgageCallback(this);
+            break;
+          case 'buyHouse':
+            this.renderState?.buyHouseCallback(this);
+            break;
+          case 'sellHouse':
+            this.renderState?.sellHouseCallback(this);
+            break;
+          default:
+            break;
+        }
+      }
     });
     tileContainer.buttonMode = false;
   }
@@ -207,7 +299,7 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
         align: 'center',
         wordWrap: true,
         wordWrapWidth: statusCardTile.width,
-      }
+      },
     );
     this.statusCardText.pivot.x = this.statusCardText.width / 2;
     this.statusCardText.x = 15;

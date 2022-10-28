@@ -2,6 +2,7 @@ export class Property {
   constructor(name, color, cost, rents, houseCost, hotelCost) {
     this.name = name;
     this.type = 'property';
+    this.subtype = 'color';
 
     this.title = name;
     this.color = color;
