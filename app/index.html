@@ -51,10 +51,9 @@
         <form v-on:submit="bid">
           <input type="number" v-model="bidAmount">
           <input type="submit" value="Bid">
+          <img src="src/assets/left_arrow.png" alt="left arrow" class="wobble-horizontal img-small">
         </form>
-        <div v-for="player in players" :key="player.id">
-          {{ player.name }}
-        </div>
+
       </div>
     </div>
   </div>
