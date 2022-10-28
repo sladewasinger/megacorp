@@ -1,7 +1,7 @@
 import { Engine } from './modules/Engine.js';
 const { createApp } = Vue;
 
-const BOARD_TESTING = true;
+const BOARD_TESTING = false;
 
 createApp({
   data() {
