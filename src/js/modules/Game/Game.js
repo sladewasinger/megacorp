@@ -19,6 +19,7 @@ import { Auction } from './states/Auction.js';
 import { EndAuction } from './states/EndAuction.js';
 import { GameOver } from './states/GameOver.js';
 import { Bankruptcy } from './states/Bankruptcy.js';
+import { randomUUID } from 'crypto';
 
 export class Game {
   constructor(
@@ -57,6 +58,7 @@ export class Game {
       tiles: this.gameState.tiles
         .map((tile) => this.stateMachine.states[tile])
         .map((tile) => ({
+          name: tile.name,
           title: tile.title,
           color: tile.color,
           rent: tile.rent,
@@ -373,6 +375,141 @@ export class Game {
     }
 
     this.stateMachine.setState('TurnStart', this.gameState);
+  }
+
+  createTrade(player, trade) {
+    const otherPlayer = this.gameState.players.find((x) => x.id === trade.targetPlayerId);
+    if (!otherPlayer) {
+      throw new Error('Target player not found!');
+    }
+    if (player.id === otherPlayer.id) {
+      throw new Error('You can\'t trade with yourself!');
+    }
+    if (trade.offer.money < 0 || trade.request.money < 0) {
+      throw new Error('You can\'t trade negative money!');
+    }
+    if (trade.offer.money > player.money) {
+      throw new Error('You don\'t have enough money to offer!');
+    }
+    if (trade.request.money > otherPlayer.money) {
+      throw new Error('Target player doesn\'t have enough money for your request!');
+    }
+    for (const offerTile of trade.offer.properties) {
+      if (!player.properties.includes(offerTile)) {
+        throw new Error('You don\'t own this property!');
+      }
+    }
+    for (const requestTile of trade.request.properties) {
+      if (!otherPlayer.properties.includes(requestTile)) {
+        throw new Error('Target player doesn\'t own this property!');
+      }
+    }
+
+    console.log(`Player ${player.name} creates trade with player ${otherPlayer.name}`);
+    this.gameState.trades = this.gameState.trades || [];
+    const newTrade = {
+      id: randomUUID(),
+      name: `${player.name}`,
+      targetPlayerId: trade.targetPlayerId,
+      authorPlayerId: player.id,
+      offer: {
+        money: trade.offer.money,
+        properties: this.stateMachine.getStates()
+          .filter((x) => x.type == 'property')
+          .filter((tile) => trade.offer.properties.includes(tile.name))
+          .map((tile) => ({
+            name: tile.name,
+            color: tile.color,
+            title: tile.title,
+          })),
+      },
+      request: {
+        money: trade.request.money,
+        properties: this.stateMachine.getStates()
+          .filter((x) => x.type == 'property')
+          .filter((tile) => trade.request.properties.includes(tile.name))
+          .map((tile) => ({
+            name: tile.name,
+            color: tile.color,
+            title: tile.title,
+          })),
+      },
+    };
+    this.gameState.trades.push(newTrade);
+
+    this.gameStateUpdatedCallbackFn(this.gameState);
+  }
+
+  acceptTrade(targetPlayerId, tradeId) {
+    const trade = this.gameState.trades.find((x) => x.id == tradeId);
+    if (!trade) {
+      throw new Error('Trade not found!');
+    }
+    const targetPlayer = this.gameState.players.find((x) => x.id === targetPlayerId);
+    if (!targetPlayer) {
+      throw new Error('Target player not found!');
+    }
+    const authorPlayer = this.gameState.players.find((x) => x.id === trade.authorPlayerId);
+    if (!authorPlayer) {
+      throw new Error('Trade author not found!');
+    }
+    if (targetPlayer.id === authorPlayer.id) {
+      throw new Error('You can\'t trade with yourself!');
+    }
+    if (trade.request.money > targetPlayer.money) {
+      throw new Error('You don\'t have enough money for the request!');
+    }
+    if (trade.offer.money > authorPlayer.money) {
+      throw new Error('Target player doesn\'t have enough money for the offer!');
+    }
+    for (const requestTile of trade.request.properties) {
+      if (!targetPlayer.properties.includes(requestTile.name)) {
+        throw new Error('You don\'t own this property!');
+      }
+    }
+    for (const offerTile of trade.offer.properties) {
+      if (!authorPlayer.properties.includes(offerTile.name)) {
+        throw new Error('Target player doesn\'t own this property!');
+      }
+    }
+
+    console.log(`Player ${targetPlayer.name} accepts trade with player ${authorPlayer.name}`);
+    targetPlayer.money -= +trade.request.money;
+    targetPlayer.money += +trade.offer.money;
+    authorPlayer.money -= +trade.offer.money;
+    authorPlayer.money += +trade.request.money;
+    for (const requestTile of trade.request.properties) {
+      const tile = this.stateMachine.getStates().find((x) => x.name === requestTile.name);
+      tile.owner = authorPlayer;
+      authorPlayer.properties.push(tile.name);
+      targetPlayer.properties = authorPlayer.properties.filter((x) => x !== tile.name);
+    }
+    for (const offerTile of trade.offer.properties) {
+      const tile = this.stateMachine.getStates().find((x) => x.name === offerTile.name);
+      tile.owner = targetPlayer;
+      targetPlayer.properties.push(tile.name);
+      authorPlayer.properties = targetPlayer.properties.filter((x) => x !== tile.name);
+    }
+    this.gameState.trades = this.gameState.trades.filter((x) => x.id !== tradeId);
+    this.gameStateUpdatedCallbackFn(this.gameState);
+    this.boughtPropertyCallbackFn(this.gameState);
+  }
+
+  rejectTrade(tradeId) {
+    const trade = this.gameState.trades.find((x) => x.id === tradeId);
+    if (!trade) {
+      throw new Error('Trade not found!');
+    }
+
+    console.log(`Trade ${tradeId} rejected`);
+    this.gameState.trades = this.gameState.trades.filter((x) => x.id !== tradeId);
+    this.gameStateUpdatedCallbackFn(this.gameState);
+  }
+
+  cancelMyTrades(player) {
+    console.log(`Player ${player.name} cancels all his trades`);
+    this.gameState.trades = this.gameState.trades.filter((x) => x.authorPlayerId !== player.id);
+    this.gameStateUpdatedCallbackFn(this.gameState);
   }
 
   addGameStates() {

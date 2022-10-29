@@ -190,6 +190,14 @@ export class Buttons {
     } else {
       this.sellHouseButton.disable();
     }
+
+    // Trade button
+    const tradeEnabled = gameState.state.name == 'TurnEnd' && !renderState.propertyActionInProgress;
+    if (tradeEnabled) {
+      this.tradeButton.enable();
+    } else {
+      this.tradeButton.disable();
+    }
   }
 
   disable() {
@@ -214,6 +222,7 @@ export class Buttons {
     this.bankruptcyButton.disable();
     this.sellHouseButton.disable();
     this.buyHouseButton.disable();
+    this.tradeButton.disable();
   }
 
   enable() {
@@ -237,6 +246,7 @@ export class Buttons {
     this.bankruptcyButton.enable();
     this.sellHouseButton.enable();
     this.buyHouseButton.enable();
+    this.tradeButton.enable();
   }
 
   enableBuyAndAuctionButtons() {

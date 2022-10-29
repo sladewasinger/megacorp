@@ -1,7 +1,7 @@
 import { Engine } from './modules/Engine.js';
 const { createApp } = Vue;
 
-const BOARD_TESTING = true;
+const BOARD_TESTING = false;
 
 createApp({
   data() {
@@ -13,32 +13,18 @@ createApp({
       bidAmount: 0,
       selectedTrade: null,
       tradeDialogOpen: false,
-      trades: [{
-        id: 1,
-        name: 'Bubba',
+      tradeRequest: {
+        targetPlayerId: null,
+        authorPlayerId: null,
         offer: {
-          properties: [
-            {
-              id: 1,
-              name: 'Mediterranean Avenue',
-              price: 60,
-              color: 'brown',
-            },
-          ],
-          money: 100,
-        },
-        request: {
-          properties: [
-            {
-              id: 2,
-              name: 'Baltic Avenue',
-              price: 60,
-              color: 'blue',
-            },
-          ],
+          properties: [],
           money: 0,
         },
-      }],
+        request: {
+          properties: [],
+          money: 0,
+        },
+      },
     };
   },
   computed: {
@@ -65,6 +51,33 @@ createApp({
     },
     hasBid() {
       return this.myPlayer?.hasBid;
+    },
+    myProperties() {
+      return this.engine?.gameState?.tiles.filter((t) => t.owner?.id === this.myPlayer?.id) || [];
+    },
+    otherPlayerOwnedProperties() {
+      return this.engine?.gameState?.tiles
+        .filter((t) => !!t.owner)
+        .filter((t) => t.owner?.id !== this.myPlayer?.id) || [];
+    },
+    allPlayersButMe() {
+      return this.players.filter((p) => p.id !== this.myPlayer?.id);
+    },
+    trades() {
+      return this.engine?.gameState?.trades || [];
+    },
+    tradeTargetOwnedProperties() {
+      const targetPlayer = this.players.find((p) => p.id === this.tradeRequest?.targetPlayerId);
+      if (!targetPlayer) {
+        return [];
+      }
+      return this.engine?.gameState?.tiles.filter((t) => t.owner?.id === targetPlayer.id) || [];
+    },
+    alreadyOfferedTrade() {
+      return this.trades.find((t) => t.authorPlayerId === this.myPlayer?.id);
+    },
+    myTrades() {
+      return this.trades.filter((t) => t.authorPlayerId === this.myPlayer?.id);
     },
   },
   mounted() {
@@ -103,6 +116,35 @@ createApp({
       e.preventDefault();
       this.engine.bid(this.bidAmount);
     },
+    createTrade() {
+      this.tradeRequest.authorPlayerId = this.myPlayer.id;
+      this.engine.createTrade(this.tradeRequest);
+    },
+    acceptTrade() {
+      this.engine.acceptTrade(this.selectedTrade?.id);
+      this.selectedTrade = null;
+    },
+    rejectTrade() {
+      this.engine.rejectTrade(this.selectedTrade?.id);
+      this.selectedTrade = null;
+    },
+    cancelAllMyTrades() {
+      this.engine.cancelMyTrades();
+    },
+    tradeRequestNameChanged(e) {
+      console.log('resetting trade request');
+      this.tradeRequet = {
+        targetPlayerId: this.tradeRequest.targetPlayerId,
+        offer: {
+          properties: [],
+          money: 0,
+        },
+        request: {
+          properties: [],
+          money: 0,
+        },
+      };
+    },
   },
 }).mount('#app');
 
@@ -134,11 +176,9 @@ function makeDraggable(elements) {
       document.onmouseup = closeDragElement;
       document.onmousemove = elementDrag;
 
-      console.log(elmnt);
       elmnt.style.zIndex = (Math.max(elements.map((x) => +x.style.zIndex)) || 0) + 1;
       for (const element of elements.filter((x) => x !== elmnt)) {
         element.style.zIndex = Math.max(0, (+element.style.zIndex || 0) - 1);
-        console.log(elmnt.style.zIndex);
       }
     }
 

@@ -108,26 +108,29 @@ body {
   border-radius: 5px;
 }
 
-#trade-box .accept-button {
+.accept-button {
   height: 30px;
-  background-color: green;
+  background-color: #006d00;
   border-radius: 5px;
   font-weight: bold;
 }
 
-#trade-box .reject-button {
+.reject-button {
   height: 30px;
-  background-color: red;
+  background-color: #aa0000;
   border-radius: 5px;
   font-weight: bold;
 }
 
-#trade-box .square {
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  border: 1px solid #000;
-  background-color: #fff;
+.button:hover {
+  cursor: pointer;
+  filter: brightness(1.5);
+  box-shadow: #000 2px 2px 7px;
+  font-weight: 800;
+}
+
+.button:disabled {
+  cursor: default;
 }
 
 /* *********************************** */
@@ -155,9 +158,7 @@ body {
   padding: 5px;
   text-align: center;
   cursor: move;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  min-height: 40px;
 }
 
 #create-trade-box .content {
@@ -169,16 +170,27 @@ body {
 
 .x-button {
   display: block;
-  float: right;
+  position: absolute;
+  right: 5px;
+  top: 5px;
   cursor: pointer;
   font-family: monospace;
   font-size: 16px;
   transform: scale(2, 1);
   border: 1px solid #000;
-  margin: 5px
+  margin-right: 10px;
+  padding: 4px;
 }
 
 /* ----------------------------------------- */
+
+.square {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 1px solid #000;
+  background-color: #fff;
+}
 
 .flex-row {
   display: flex;

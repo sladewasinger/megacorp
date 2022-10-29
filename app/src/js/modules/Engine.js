@@ -290,6 +290,46 @@ export class Engine {
     });
   }
 
+  createTrade(tradeRequest) {
+    this.socket.emit('createTrade', tradeRequest, (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Trade created');
+    });
+  }
+
+  acceptTrade(tradeId) {
+    this.socket.emit('acceptTrade', tradeId, (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Trade accepted');
+    });
+  }
+
+  rejectTrade(tradeId) {
+    this.socket.emit('rejectTrade', tradeId, (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Trade rejected');
+    });
+  }
+
+  cancelMyTrades() {
+    this.socket.emit('cancelMyTrades', (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('My trades cancelled');
+    });
+  }
+
   resize() {
     this.app.renderer.resize(window.innerWidth, window.innerHeight);
   }
