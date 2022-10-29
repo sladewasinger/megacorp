@@ -101,13 +101,36 @@ export class Game {
       return +(`0x${f(0)}${f(8)}${f(4)}`);
     };
 
+    const colors = [
+      0xe6194B, // red
+      0x3cb44b, // green
+      0xffe119, // yellow
+      0x4363d8, // blue
+      0xf58231, // orange
+      0x911eb4, // purple
+      0x42d4f4, // cyan
+      0xf032e6, // magenta
+      0xbfef45, // lime
+      0xfabeb4, // pink
+      0x469990, // teal
+      0xdcbeff, // lavender
+      0x9A6324, // brown
+      0x800000, // maroon
+      0xaaffc3, // mint
+      0x808000, // olive
+      0xffd8b1, // beige
+      0x000075, // navy
+      0xa9a9a9, // grey
+      0xfffac8, // cream
+    ];
+
     let index = 0;
     for (const player of this.gameState.players) {
       index++;
       player.money = 1500;
       player.prevPosition = -1;
       player.position = 0;
-      player.color = hslToHex(selectColor(index));
+      player.color = colors[index]; // hslToHex(selectColor(index));
       console.log(player.color);
     }
 

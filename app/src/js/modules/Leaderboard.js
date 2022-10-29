@@ -15,7 +15,7 @@ export class Leaderboard {
       this.drawPlayersInitial(gameState);
     }
 
-    this.setCurrentPlayerArrow(gameState);
+    this.setCurrentPlayerArrow(gameState, boardPlayers);
 
     let showingLine = false;
     for (const player of this.players) {
@@ -51,21 +51,38 @@ export class Leaderboard {
     this.playerPosLine.visible = false;
   }
 
-  setCurrentPlayerArrow(gameState) {
+  setCurrentPlayerArrow(gameState, boardPlayers) {
     const sortedPlayers = [...gameState.players];
     sortedPlayers.sort((a, b) => a.turnOrder - b.turnOrder);
-
-
-    // this.playerNames.text = sortedPlayers
-    //   .map((player) => `${player.name}`)
-    //   .join('\n');
 
     const currentPlayer = gameState.currentPlayer;
     const currentPlayerIndex = sortedPlayers
       .findIndex((player) => player.id == currentPlayer.id);
-    this.currentPlayerIndicator.y = 10 + currentPlayerIndex * 30 +
+    this.currentPlayerIndicator.y = 5 + currentPlayerIndex * 30 +
       this.leaderboardText.height;
-    this.currentPlayerIndicator.x = 0 + Math.cos(this.renderState.time / 30) * 5;
+    this.currentPlayerIndicator.x = -35 + Math.cos(this.renderState.time / 30) * 5;
+
+    const playerBoardToken = boardPlayers.find((p) => p.id == currentPlayer.id);
+    if (playerBoardToken) {
+      const rotation = Math.PI / 2;
+      const offset = {
+        x: 39,
+        y: -50 + Math.cos(this.renderState.time / 30) * 10,
+      };
+      // if (currentPlayer.position >= 0 && currentPlayer.position <= 10) {
+      //   rotation = Math.PI / 2;
+      // } else if (currentPlayer.position > 10 && currentPlayer.position < 20) {
+      //   rotation = Math.PI;
+      // } else if (currentPlayer.position > 30 && currentPlayer.position < 40) {
+      //   rotation = - Math.PI / 2;
+      // }
+      this.currentPlayerIndicator2.rotation = rotation;
+
+      this.currentPlayerIndicator2.x = playerBoardToken.position.x - this.leaderboardContainer.x -
+        playerBoardToken.width / 2 + offset.x;
+      this.currentPlayerIndicator2.y = playerBoardToken.position.y - this.leaderboardContainer.y -
+        playerBoardToken.height / 2 + offset.y;
+    }
   }
 
   setMoneyText(gameState) {
@@ -144,17 +161,20 @@ export class Leaderboard {
     this.leaderboardText.x = 0;
     this.leaderboardText.y = 0;
 
-    this.currentPlayerIndicator = PIXI.Sprite.from('src/assets/left_arrow.png');
-    this.currentPlayerIndicator.scale.x = -0.5;
-    this.currentPlayerIndicator.scale.y = 0.5;
-    // this.currentPlayerOutline.lineStyle(2, 0x000000, 1);
-    // this.currentPlayerOutline.beginFill(0xffff00, 0.75);
-    // this.currentPlayerOutline.drawRect(0, 0, this.width, 30);
-    // this.currentPlayerOutline.endFill();
+    this.currentPlayerIndicator = PIXI.Sprite.from('src/assets/right_arrows.png');
+    this.currentPlayerIndicator.scale.x = 0.25;
+    this.currentPlayerIndicator.scale.y = 0.25;
     this.currentPlayerIndicator.x = 0;
     this.currentPlayerIndicator.y = 0;
     this.currentPlayerIndicator.pivot.x = this.currentPlayerIndicator.width / 2;
     this.currentPlayerIndicator.pivot.y = this.currentPlayerIndicator.height / 2;
+
+    this.currentPlayerIndicator2 = PIXI.Sprite.from('src/assets/right_arrows.png');
+    this.currentPlayerIndicator2.scale.x = 0.4;
+    this.currentPlayerIndicator2.scale.y = 0.4;
+    this.currentPlayerIndicator2.pivot.x = this.currentPlayerIndicator2.width / 2;
+    this.currentPlayerIndicator2.pivot.y = this.currentPlayerIndicator2.height / 2;
+    this.currentPlayerIndicator2.alpha = 0.7;
 
     this.playerNames = new PIXI.Text('', {
       fontFamily: 'Arial',
@@ -188,6 +208,7 @@ export class Leaderboard {
     container.addChild(
       this.leaderboardText,
       this.currentPlayerIndicator,
+      this.currentPlayerIndicator2,
       this.playerNames,
       this.playerMoney,
       this.playerPosLine,

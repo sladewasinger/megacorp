@@ -2,7 +2,7 @@ export class CommunityChest {
   constructor(container) {
     this.container = container;
     this.width = 300;
-    this.height = 300;
+    this.height = 150;
     this.communityChestContainer = new PIXI.Container();
     this.container.addChild(this.communityChestContainer);
     this.lastCommunityChestCard = null;

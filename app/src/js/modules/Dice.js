@@ -148,7 +148,7 @@ export class Dice {
     this.leftArrow = PIXI.Sprite.from('src/assets/left_arrow.png');
     this.leftArrow.pivot.x = 0;
     this.leftArrow.pivot.y = 0;
-    this.leftArrow.x = this.diceNumber2.x + this.diceNumber2.width + 50;
+    this.leftArrow.x = this.diceNumber2.x + this.diceNumber2.width + 30;
     this.leftArrow.y = this.diceNumber2.y - this.diceNumber2.height / 2;
     this.diceContainer.addChild(this.leftArrow);
 
