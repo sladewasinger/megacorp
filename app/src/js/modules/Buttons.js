@@ -59,7 +59,7 @@ export class Buttons {
           this.renderState.propertyAction = 'mortgage';
         }
       });
-    this.bankruptcyButton = new Button(this.buttonsContainer, 300, 0, 100, 50, 'Declare Bankruptcy',
+    this.bankruptcyButton = new Button(this.buttonsContainer, 200, -50, 100, 50, 'Declare Bankruptcy',
       0xff0000, 0x000000,
       () => {
         this.renderState.declareBankruptcyCallback();
