@@ -58,6 +58,51 @@
 
         </div>
       </div>
+      <div id="trade-box" class="draggable">
+        <div class="header">Trades</div>
+        <div class="content">
+          <div class="flex-column">
+            <select v-model="selectedTrade" class="trade-select">
+              <option v-for="trade in trades" :key="trade.id" :value="trade">
+                From: {{ trade.name }}
+              </option>
+            </select>
+            <div class="flex-row space-between" v-if="selectedTrade">
+              <div>
+                <h2>You Get:</h2>
+                <ul>
+                  <li v-for="prop in selectedTrade.offer.properties" :key="prop">
+                    <span class="square" :style="{ backgroundColor: prop.color}"></span>
+                    {{ prop.name }}
+                  </li>
+                  <li>
+                    <b>Money: ${{ selectedTrade.request.money }}</b>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h2>You Give:</h2>
+                <ul>
+                  <li v-for="prop in selectedTrade.request.properties" :key="prop">
+                    <span class="square" :style="{ backgroundColor: prop.color}"></span>
+                    {{ prop.name }}
+                  </li>
+                  <li>
+                    <b>Money: ${{ selectedTrade.request.money }}</b>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <input type="button" value="Accept Trade" class="accept-button " @click="trade">
+            <input type="button" value="Reject Trade" class="reject-button" @click="trade">
+          </div>
+        </div>
+      </div>
+      <div id="create-trade-box" class="draggable">
+        <div class="header">Trades</div>
+        <div class="content">
+        </div>
+      </div>
     </div>
   </div>
   <script type="module" src="src/js/index.js"></script>

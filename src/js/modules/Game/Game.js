@@ -126,11 +126,15 @@ export class Game {
 
     let index = 0;
     for (const player of this.gameState.players) {
-      index++;
       player.money = 1500;
       player.prevPosition = -1;
       player.position = 0;
-      player.color = colors[index]; // hslToHex(selectColor(index));
+      if (index >= colors.length) {
+        player.color = hslToHex(selectColor(index)); // infinite colors
+      } else {
+        player.color = colors[index]; // limited colors for better contrast
+      }
+      index++;
       console.log(player.color);
     }
 

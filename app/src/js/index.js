@@ -11,6 +11,33 @@ createApp({
       engine: null,
       lobbyId: null,
       bidAmount: 0,
+      selectedTrade: null,
+      trades: [{
+        id: 1,
+        name: 'Bubba',
+        offer: {
+          properties: [
+            {
+              id: 1,
+              name: 'Mediterranean Avenue',
+              price: 60,
+              color: 'brown',
+            },
+          ],
+          money: 100,
+        },
+        request: {
+          properties: [
+            {
+              id: 2,
+              name: 'Baltic Avenue',
+              price: 60,
+              color: 'blue',
+            },
+          ],
+          money: 0,
+        },
+      }],
     };
   },
   computed: {
@@ -74,22 +101,22 @@ createApp({
 }).mount('#app');
 
 
-console.log('here');
-// Make the DIV element draggable:
-dragElement(document.getElementById('auction-box'));
+makeDraggable(document.getElementById('auction-box'));
+makeDraggable(document.getElementById('trade-box'));
+makeDraggable(document.getElementById('create-trade-box'));
 
-function dragElement(elmnt) {
-  let pos1 = 0; let pos2 = 0; let pos3 = 0; let pos4 = 0;
+function makeDraggable(elmnt) {
+  let x1 = 0; let y1 = 0; let x2 = 0; let y = 0;
 
+  // Must contain a .header element:
   document.querySelector(`#${elmnt.id} .header`).onmousedown = dragMouseDown;
-
 
   function dragMouseDown(e) {
     e = e || window.event;
     // e.preventDefault();
     // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
+    x2 = e.clientX;
+    y = e.clientY;
     document.onmouseup = closeDragElement;
     // call a function whenever the cursor moves:
     document.onmousemove = elementDrag;
@@ -99,13 +126,13 @@ function dragElement(elmnt) {
     e = e || window.event;
     e.preventDefault();
     // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
+    x1 = x2 - e.clientX;
+    y1 = y - e.clientY;
+    x2 = e.clientX;
+    y = e.clientY;
     // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + 'px';
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + 'px';
+    elmnt.style.top = (elmnt.offsetTop - y1) + 'px';
+    elmnt.style.left = (elmnt.offsetLeft - x1) + 'px';
   }
 
   function closeDragElement() {
