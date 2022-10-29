@@ -3,9 +3,10 @@ const PIXI = window.PIXI;
 const io = window.io;
 
 export class Engine {
-  constructor() {
+  constructor(vueData) {
     this.canvas = document.getElementById('canvas');
     this.reset();
+    this.vueData = vueData;
 
     this.app = new PIXI.Application({
       width: window.innerWidth,
@@ -26,6 +27,7 @@ export class Engine {
     this.lobby = null;
     this.gameRunning = false;
     this.gameState = null;
+    this.tradeDialogOpen = false;
   }
 
   start() {
@@ -153,6 +155,7 @@ export class Engine {
       this.buyHouse.bind(this),
       this.sellHouse.bind(this),
       this.declareBankruptcy.bind(this),
+      this.vueData.openTradeDialogCallback,
     );
     this.board.draw(container);
     this.app.stage.addChild(container);

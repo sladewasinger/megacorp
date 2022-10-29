@@ -82,6 +82,10 @@ export class Buttons {
         this.renderState.propertyAction = 'buyHouse';
       }
     });
+    this.tradeButton = new Button(this.buttonsContainer, 500, 100, 100, 50, 'Trade', 0x00ff00, 0x000000, () => {
+      console.log('Trade button pressed.');
+      this.renderState?.openTradeDialogCallback();
+    });
   }
 
   setPosition(x, y) {

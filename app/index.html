@@ -98,8 +98,11 @@
           </div>
         </div>
       </div>
-      <div id="create-trade-box" class="draggable">
-        <div class="header">Create Trade</div>
+      <div id="create-trade-box" class="draggable" :class="{ hidden: tradeDialogOpen === false }">
+        <div class="header">
+          Create Trade
+          <div class="x-button" @click="tradeDialogOpen = false">X</div>
+        </div>
         <div class="content">
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { Engine } from './modules/Engine.js';
 const { createApp } = Vue;
 
-const BOARD_TESTING = false;
+const BOARD_TESTING = true;
 
 createApp({
   data() {
@@ -12,6 +12,7 @@ createApp({
       lobbyId: null,
       bidAmount: 0,
       selectedTrade: null,
+      tradeDialogOpen: false,
       trades: [{
         id: 1,
         name: 'Bubba',
@@ -67,7 +68,12 @@ createApp({
     },
   },
   mounted() {
-    this.engine = new Engine();
+    this.engine = new Engine({
+      openTradeDialogCallback: () => {
+        console.log('trade dialog opened');
+        this.tradeDialogOpen = true;
+      },
+    });
     this.engine.start();
 
     if (BOARD_TESTING) {
@@ -101,43 +107,55 @@ createApp({
 }).mount('#app');
 
 
-makeDraggable(document.getElementById('auction-box'));
-makeDraggable(document.getElementById('trade-box'));
-makeDraggable(document.getElementById('create-trade-box'));
+makeDraggable([
+  document.getElementById('auction-box'),
+  document.getElementById('trade-box'),
+  document.getElementById('create-trade-box'),
+]);
 
-function makeDraggable(elmnt) {
-  let x1 = 0; let y1 = 0; let x2 = 0; let y = 0;
-
-  // Must contain a .header element:
-  document.querySelector(`#${elmnt.id} .header`).onmousedown = dragMouseDown;
-
-  function dragMouseDown(e) {
-    e = e || window.event;
-    // e.preventDefault();
-    // get the mouse cursor position at startup:
-    x2 = e.clientX;
-    y = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
+function makeDraggable(elements) {
+  if (!elements || elements.length === 0) {
+    return;
   }
+  for (let i = 0; i < elements.length; i++) {
+    const elmnt = elements[i];
+    elmnt._zIndex = (+elmnt.style.zIndex || 0);
+    console.log(elmnt._zIndex);
+    let endX = 0; let endY = 0; let startX = 0; let startY = 0;
 
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    x1 = x2 - e.clientX;
-    y1 = y - e.clientY;
-    x2 = e.clientX;
-    y = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - y1) + 'px';
-    elmnt.style.left = (elmnt.offsetLeft - x1) + 'px';
-  }
+    // Must contain a .header element:
+    document.querySelector(`#${elmnt.id} .header`).onmousedown = dragMouseDown;
 
-  function closeDragElement() {
-    // stop moving when mouse button is released:
-    document.onmouseup = null;
-    document.onmousemove = null;
+    function dragMouseDown(e) {
+      e = e || window.event;
+      // e.preventDefault();
+      startX = e.clientX;
+      startY = e.clientY;
+      document.onmouseup = closeDragElement;
+      document.onmousemove = elementDrag;
+
+      console.log(elmnt);
+      elmnt.style.zIndex = (Math.max(elements.map((x) => +x.style.zIndex)) || 0) + 1;
+      for (const element of elements.filter((x) => x !== elmnt)) {
+        element.style.zIndex = Math.max(0, (+element.style.zIndex || 0) - 1);
+        console.log(elmnt.style.zIndex);
+      }
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      endX = startX - e.clientX;
+      endY = startY - e.clientY;
+      startX = e.clientX;
+      startY = e.clientY;
+      elmnt.style.top = (elmnt.offsetTop - endY) + 'px';
+      elmnt.style.left = (elmnt.offsetLeft - endX) + 'px';
+    }
+
+    function closeDragElement() {
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
   }
 }
