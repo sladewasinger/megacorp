@@ -106,10 +106,13 @@ export class Leaderboard {
         fontFamily: 'Arial',
         fontSize: 30,
         fill: player.color,
-        dropShadow: true,
-        dropShadowColor: 0x000000,
-        dropShadowBlur: 4,
-        dropShadowDistance: 2,
+        stroke: 0x000000,
+        strokeThickness: 4,
+        letterSpacing: 2,
+        // dropShadow: true,
+        // dropShadowColor: 0x000000,
+        // dropShadowBlur: 4,
+        // dropShadowDistance: 2,
         align: 'left',
       });
       playerText.x = 0;

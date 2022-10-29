@@ -236,7 +236,7 @@ export class Board {
 
       const graphics = new PIXI.Graphics();
       graphics.beginFill(player.color);
-      graphics.lineStyle(2, 0x000000, 1);
+      graphics.lineStyle(4, 0x000000, 1);
       graphics.drawCircle(0, 0, 15);
       graphics.endFill();
       // graphics.zIndex = 1001;

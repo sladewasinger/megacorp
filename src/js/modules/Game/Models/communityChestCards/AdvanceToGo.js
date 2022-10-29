@@ -5,7 +5,7 @@ export class AdvanceToGo extends CommunityChestCard {
     super();
     this.name = 'Advance to Go';
     this.type = 'communityChest';
-    this.msg = '';
+    this.msg = 'Collect $200';
   }
 
   onDraw(stateMachine, gameState) {
@@ -14,7 +14,6 @@ export class AdvanceToGo extends CommunityChestCard {
     gameState.currentPlayer.prevPosition = gameState.currentPlayer.position;
     gameState.currentPlayer.position = 0;
     gameState.currentPlayer.directMovement = true;
-    gameState.communityChestMessage = 'Advance to Go';
 
     const positions = [gameState.currentPlayer.prevPosition, gameState.currentPlayer.position];
     stateMachine.playerMovementCallbackFn(gameState.currentPlayer, positions);
