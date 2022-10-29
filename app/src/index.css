@@ -75,8 +75,9 @@ body {
   color: #000;
   border: 2px solid #000;
   border-radius: 5px;
-  top: 250px;
-  right: 400px;
+  top: 450px;
+  right: 50px;
+  left: auto;
   width: 450px;
   height: 350px;
   box-shadow: rgb(0 0 0) 10px 10px 15px;
@@ -136,7 +137,7 @@ body {
   color: #000;
   border: 2px solid #000;
   border-radius: 5px;
-  top: 250px;
+  top: 50px;
   right: 50px;
   width: 450px;
   height: 350px;
