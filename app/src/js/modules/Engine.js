@@ -156,6 +156,7 @@ export class Engine {
       this.sellHouse.bind(this),
       this.declareBankruptcy.bind(this),
       this.vueData.openTradeDialogCallback,
+      this.vueData.openViewTradesDialogCallback,
     );
     this.board.draw(container);
     this.app.stage.addChild(container);

@@ -57,13 +57,17 @@
           </form>
         </div>
       </div>
-      <div id="trade-box" class="draggable" style="left: calc(100vw - 500px); top: 450px">
-        <div class="header">Trades ({{ trades.length }})</div>
+      <div id="trade-box" class="draggable" :class="{ hidden: viewTradesDialogOpen === false }"
+        style="left: calc(100vw - 500px); top: 450px">
+        <div class="header">
+          Trades ({{ allTradesButMine.length }})
+          <div class="x-button" @click="viewTradesDialogOpen = false">X</div>
+        </div>
         <div class="content">
           <div class="flex-column">
             <select v-model="selectedTrade" class="trade-select">
               <option value="null" :key="null" selected disabled>Select Trade</optoin>
-              <option v-for="trade in trades" :key="trade.id" :value="trade">
+              <option v-for="trade in allTradesButMine" :key="trade.id" :value="trade">
                 From: {{ trade.name }}
               </option>
             </select>
@@ -102,11 +106,11 @@
           </div>
         </div>
       </div>
-      <div id="create-trade-box" class="draggable" :class="{ hidden: tradeDialogOpen === false }"
+      <div id="create-trade-box" class="draggable" :class="{ hidden: createTradeDialogOpen === false }"
         style="left: calc(100vw - 500px); top: 50px">
         <div class="header">
           Create Trade
-          <div class="x-button" @click="tradeDialogOpen = false">X</div>
+          <div class="x-button" @click="createTradeDialogOpen = false">X</div>
         </div>
         <div class="content">
           <div class="flex-column">

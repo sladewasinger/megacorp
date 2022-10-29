@@ -12,7 +12,8 @@ createApp({
       lobbyId: null,
       bidAmount: 0,
       selectedTrade: null,
-      tradeDialogOpen: false,
+      createTradeDialogOpen: false,
+      viewTradesDialogOpen: false,
       tradeRequest: {
         targetPlayerId: null,
         authorPlayerId: null,
@@ -79,12 +80,17 @@ createApp({
     myTrades() {
       return this.trades.filter((t) => t.authorPlayerId === this.myPlayer?.id);
     },
+    allTradesButMine() {
+      return this.trades.filter((t) => t.authorPlayerId !== this.myPlayer?.id);
+    },
   },
   mounted() {
     this.engine = new Engine({
       openTradeDialogCallback: () => {
-        console.log('trade dialog opened');
-        this.tradeDialogOpen = true;
+        this.createTradeDialogOpen = true;
+      },
+      openViewTradesDialogCallback: () => {
+        this.viewTradesDialogOpen = true;
       },
     });
     this.engine.start();
@@ -119,6 +125,18 @@ createApp({
     createTrade() {
       this.tradeRequest.authorPlayerId = this.myPlayer.id;
       this.engine.createTrade(this.tradeRequest);
+      this.tradeRequest = {
+        targetPlayerId: null,
+        authorPlayerId: this.myPlayer.id,
+        offer: {
+          properties: [],
+          money: 0,
+        },
+        request: {
+          properties: [],
+          money: 0,
+        },
+      };
     },
     acceptTrade() {
       this.engine.acceptTrade(this.selectedTrade?.id);

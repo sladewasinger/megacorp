@@ -94,6 +94,7 @@ body {
   padding: 5px;
   text-align: center;
   cursor: move;
+  min-height: 40px;
 }
 
 #trade-box .content {

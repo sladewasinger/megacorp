@@ -82,10 +82,15 @@ export class Buttons {
         this.renderState.propertyAction = 'buyHouse';
       }
     });
-    this.tradeButton = new Button(this.buttonsContainer, 500, 100, 100, 50, 'Trade', 0x00ff00, 0x000000, () => {
+    this.tradeButton = new Button(this.buttonsContainer, 500, 100, 100, 50, 'Create Trade', 0x00ff00, 0x000000, () => {
       console.log('Trade button pressed.');
       this.renderState?.openTradeDialogCallback();
     });
+    this.viewTradesButton = new Button(this.buttonsContainer,
+      500, 50, 100, 50, 'Trades (0)', 0x00ff00, 0x000000, () => {
+        console.log('View Trades button pressed.');
+        this.renderState?.openViewTradesDialogCallback();
+      });
   }
 
   setPosition(x, y) {
@@ -94,7 +99,13 @@ export class Buttons {
   }
 
   update(gameState, renderState) {
+    this.gameState = gameState;
     this.renderState = renderState;
+    this.renderState.tradesOfferedToMe = () => {
+      return this.gameState?.trades?.filter((trade) => {
+        return trade.targetPlayerId === this.gameState?.myId;
+      }) || [];
+    };
     const myPlayer = gameState.players.find((player) => player.id === gameState.myId);
     if (renderState.animationInProgress ||
       renderState.playerMovementInProgress ||
@@ -198,6 +209,9 @@ export class Buttons {
     } else {
       this.tradeButton.disable();
     }
+
+    // View Trades Button
+    this.viewTradesButton.buttonText.text = `Trades (${renderState.tradesOfferedToMe().length})`;
   }
 
   disable() {
@@ -223,6 +237,7 @@ export class Buttons {
     this.sellHouseButton.disable();
     this.buyHouseButton.disable();
     this.tradeButton.disable();
+    this.viewTradesButton.buttonText.text = `Trades (${this.renderState?.tradesOfferedToMe().length})`;
   }
 
   enable() {

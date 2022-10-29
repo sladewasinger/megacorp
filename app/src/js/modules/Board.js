@@ -40,6 +40,7 @@ export class Board {
     sellHouseCallback,
     declareBankruptcyCallback,
     openTradeDialogCallback,
+    openViewTradesDialogCallback,
   ) {
     this.canvas = canvas;
     this.container = container;
@@ -59,6 +60,7 @@ export class Board {
       sellHouseCallback: sellHouseCallback,
       declareBankruptcyCallback: declareBankruptcyCallback,
       openTradeDialogCallback: openTradeDialogCallback,
+      openViewTradesDialogCallback: openViewTradesDialogCallback,
     };
     setInterval(() => {
       this.renderState.time++;
