@@ -47,14 +47,21 @@ With 3 Houses $${gameStateTile.rents[2]}
 With 4 Houses $${gameStateTile.rents[3]}
 With Hotel $${gameStateTile.rents[4]}
 Mortgage Value $${gameStateTile.mortgage}
+Buyback Cost $${Math.floor(gameStateTile.mortgage * 1.1)}
 House Cost $${gameStateTile.houseCost}
-Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
+Hotel Cost $${gameStateTile.houseCost}`;
     }
 
     if (gameStateTile.mortgaged) {
       this.noSymbolImage.visible = true;
+      this.priceText.style.fontSize = 18;
+      this.priceText.text = 'Mortgaged';
+      this.priceText.pivot.x = this.priceText.width / 2;
     } else {
       this.noSymbolImage.visible = false;
+      this.priceText.style.fontSize = 24;
+      this.priceText.text = `$${this.price}`;
+      this.priceText.pivot.x = this.priceText.width / 2;
     }
 
     if (renderState.propertyActionInProgress) {
@@ -188,6 +195,7 @@ Hotel Cost $${gameStateTile.houseCost} + 4 houses`;
     price.pivot.x = price.width / 2;
     price.x = this.width / 2;
     price.y = this.height - 30;
+    this.priceText = price;
     tileContainer.addChild(price);
 
     tileContainer.x = x;

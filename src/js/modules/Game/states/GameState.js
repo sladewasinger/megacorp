@@ -9,6 +9,7 @@ export class GameState {
     this.dice2 = 0;
     this.doubleDiceRollCount = 0;
     this.players = [];
+    this.trades = [];
 
     this.communityChestDeck = new CommunityChestDeck();
     this.chanceDeck = new ChanceDeck();

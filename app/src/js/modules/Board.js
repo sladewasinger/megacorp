@@ -16,6 +16,7 @@ import { BottomAnimations } from './BottomAnimations.js';
 import { TaxTile } from './Tiles/TaxTile.js';
 import { ElectricCompany } from './Tiles/ElectricCompany.js';
 import { WaterWorksTile } from './Tiles/WaterWorksTile.js';
+import { Chance } from './Chance.js';
 const PIXI = window.PIXI;
 
 function sleep(ms) {
@@ -38,6 +39,8 @@ export class Board {
     buyHouseCallback,
     sellHouseCallback,
     declareBankruptcyCallback,
+    openTradeDialogCallback,
+    openViewTradesDialogCallback,
   ) {
     this.canvas = canvas;
     this.container = container;
@@ -56,6 +59,8 @@ export class Board {
       buyHouseCallback: buyHouseCallback,
       sellHouseCallback: sellHouseCallback,
       declareBankruptcyCallback: declareBankruptcyCallback,
+      openTradeDialogCallback: openTradeDialogCallback,
+      openViewTradesDialogCallback: openViewTradesDialogCallback,
     };
     setInterval(() => {
       this.renderState.time++;
@@ -114,6 +119,7 @@ export class Board {
     // stats:
     this.leaderboard.update(gameState, this.renderState, this.players);
     this.communityChestCard.update(gameState, this.renderState);
+    this.chanceCard.update(gameState, this.renderState);
 
     // various animations:
     this.bottomAnimations.update(gameState, this.renderState, this.tiles);
@@ -156,6 +162,8 @@ export class Board {
         ) {
           if (gameTile.type == 'Community Chest') {
             this.communityChestCard.setVisible();
+          } else if (gameTile.type == 'Chance') {
+            this.chanceCard.setVisible();
           }
           this.leaderboard.setMoneyText(this.gameState);
         }
@@ -232,7 +240,7 @@ export class Board {
 
       const graphics = new PIXI.Graphics();
       graphics.beginFill(player.color);
-      graphics.lineStyle(2, 0x000000, 1);
+      graphics.lineStyle(4, 0x000000, 1);
       graphics.drawCircle(0, 0, 15);
       graphics.endFill();
       // graphics.zIndex = 1001;
@@ -304,6 +312,9 @@ export class Board {
       // CommunityChest + Chance:
       this.communityChestCard = new CommunityChest(this.boardContainer);
       this.communityChestCard.draw(this.width - 150 - this.communityChestCard.width, 150 + 10);
+
+      this.chanceCard = new Chance(this.boardContainer);
+      this.chanceCard.draw(this.width - 150 - this.chanceCard.width, 150 + 150 + 10);
 
       // ********************************************* //
       // Tiles:

@@ -3,9 +3,10 @@ const PIXI = window.PIXI;
 const io = window.io;
 
 export class Engine {
-  constructor() {
+  constructor(vueData) {
     this.canvas = document.getElementById('canvas');
     this.reset();
+    this.vueData = vueData;
 
     this.app = new PIXI.Application({
       width: window.innerWidth,
@@ -26,6 +27,7 @@ export class Engine {
     this.lobby = null;
     this.gameRunning = false;
     this.gameState = null;
+    this.tradeDialogOpen = false;
   }
 
   start() {
@@ -153,6 +155,8 @@ export class Engine {
       this.buyHouse.bind(this),
       this.sellHouse.bind(this),
       this.declareBankruptcy.bind(this),
+      this.vueData.openTradeDialogCallback,
+      this.vueData.openViewTradesDialogCallback,
     );
     this.board.draw(container);
     this.app.stage.addChild(container);
@@ -284,6 +288,46 @@ export class Engine {
         return;
       }
       console.log('Turn ended');
+    });
+  }
+
+  createTrade(tradeRequest) {
+    this.socket.emit('createTrade', tradeRequest, (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Trade created');
+    });
+  }
+
+  acceptTrade(tradeId) {
+    this.socket.emit('acceptTrade', tradeId, (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Trade accepted');
+    });
+  }
+
+  rejectTrade(tradeId) {
+    this.socket.emit('rejectTrade', tradeId, (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('Trade rejected');
+    });
+  }
+
+  cancelMyTrades() {
+    this.socket.emit('cancelMyTrades', (error, result) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log('My trades cancelled');
     });
   }
 

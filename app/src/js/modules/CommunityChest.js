@@ -2,7 +2,7 @@ export class CommunityChest {
   constructor(container) {
     this.container = container;
     this.width = 300;
-    this.height = 300;
+    this.height = 150;
     this.communityChestContainer = new PIXI.Container();
     this.container.addChild(this.communityChestContainer);
     this.lastCommunityChestCard = null;
@@ -46,6 +46,12 @@ export class CommunityChest {
   draw(x, y) {
     this.communityChestContainer.x = x;
     this.communityChestContainer.y = y;
+
+    this.communityChestBackground = new PIXI.Graphics();
+    this.communityChestBackground.beginFill(0xffffff);
+    this.communityChestBackground.drawRect(0, 0, this.width, this.height);
+    this.communityChestBackground.endFill();
+    this.communityChestContainer.addChild(this.communityChestBackground);
 
     this.communityChestText = new PIXI.Text('Community Chest', {
       fontFamily: 'Arial',

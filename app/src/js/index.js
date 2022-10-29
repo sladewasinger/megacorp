@@ -6,10 +6,26 @@ const BOARD_TESTING = false;
 createApp({
   data() {
     return {
+      loaded: false,
       name: '',
       engine: null,
       lobbyId: null,
       bidAmount: 0,
+      selectedTrade: null,
+      createTradeDialogOpen: false,
+      viewTradesDialogOpen: false,
+      tradeRequest: {
+        targetPlayerId: null,
+        authorPlayerId: null,
+        offer: {
+          properties: [],
+          money: 0,
+        },
+        request: {
+          properties: [],
+          money: 0,
+        },
+      },
     };
   },
   computed: {
@@ -31,9 +47,52 @@ createApp({
     auctionInProgress() {
       return this.engine?.gameState?.state.name == 'Auction';
     },
+    myPlayer() {
+      return this.players.find((p) => p.id === this.user.id);
+    },
+    hasBid() {
+      return this.myPlayer?.hasBid;
+    },
+    myProperties() {
+      return this.engine?.gameState?.tiles.filter((t) => t.owner?.id === this.myPlayer?.id) || [];
+    },
+    otherPlayerOwnedProperties() {
+      return this.engine?.gameState?.tiles
+        .filter((t) => !!t.owner)
+        .filter((t) => t.owner?.id !== this.myPlayer?.id) || [];
+    },
+    allPlayersButMe() {
+      return this.players.filter((p) => p.id !== this.myPlayer?.id);
+    },
+    trades() {
+      return this.engine?.gameState?.trades || [];
+    },
+    tradeTargetOwnedProperties() {
+      const targetPlayer = this.players.find((p) => p.id === this.tradeRequest?.targetPlayerId);
+      if (!targetPlayer) {
+        return [];
+      }
+      return this.engine?.gameState?.tiles.filter((t) => t.owner?.id === targetPlayer.id) || [];
+    },
+    alreadyOfferedTrade() {
+      return this.trades.find((t) => t.authorPlayerId === this.myPlayer?.id);
+    },
+    myTrades() {
+      return this.trades.filter((t) => t.authorPlayerId === this.myPlayer?.id);
+    },
+    allTradesButMine() {
+      return this.trades.filter((t) => t.authorPlayerId !== this.myPlayer?.id);
+    },
   },
   mounted() {
-    this.engine = new Engine();
+    this.engine = new Engine({
+      openTradeDialogCallback: () => {
+        this.createTradeDialogOpen = true;
+      },
+      openViewTradesDialogCallback: () => {
+        this.viewTradesDialogOpen = true;
+      },
+    });
     this.engine.start();
 
     if (BOARD_TESTING) {
@@ -41,6 +100,8 @@ createApp({
       this.engine.createLobby();
       this.engine.startGame();
     }
+
+    this.loaded = true;
   },
   methods: {
     registerName(e) {
@@ -61,47 +122,98 @@ createApp({
       e.preventDefault();
       this.engine.bid(this.bidAmount);
     },
+    createTrade() {
+      this.tradeRequest.authorPlayerId = this.myPlayer.id;
+      this.engine.createTrade(this.tradeRequest);
+      this.tradeRequest = {
+        targetPlayerId: null,
+        authorPlayerId: this.myPlayer.id,
+        offer: {
+          properties: [],
+          money: 0,
+        },
+        request: {
+          properties: [],
+          money: 0,
+        },
+      };
+    },
+    acceptTrade() {
+      this.engine.acceptTrade(this.selectedTrade?.id);
+      this.selectedTrade = null;
+    },
+    rejectTrade() {
+      this.engine.rejectTrade(this.selectedTrade?.id);
+      this.selectedTrade = null;
+    },
+    cancelAllMyTrades() {
+      this.engine.cancelMyTrades();
+    },
+    tradeRequestNameChanged(e) {
+      console.log('resetting trade request');
+      this.tradeRequet = {
+        targetPlayerId: this.tradeRequest.targetPlayerId,
+        offer: {
+          properties: [],
+          money: 0,
+        },
+        request: {
+          properties: [],
+          money: 0,
+        },
+      };
+    },
   },
 }).mount('#app');
 
 
-console.log('here');
-// Make the DIV element draggable:
-dragElement(document.getElementById('auction-box'));
+makeDraggable([
+  document.getElementById('auction-box'),
+  document.getElementById('trade-box'),
+  document.getElementById('create-trade-box'),
+]);
 
-function dragElement(elmnt) {
-  let pos1 = 0; let pos2 = 0; let pos3 = 0; let pos4 = 0;
-
-  document.querySelector(`#${elmnt.id} .header`).onmousedown = dragMouseDown;
-
-
-  function dragMouseDown(e) {
-    e = e || window.event;
-    // e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
+function makeDraggable(elements) {
+  if (!elements || elements.length === 0) {
+    return;
   }
+  for (let i = 0; i < elements.length; i++) {
+    const elmnt = elements[i];
+    elmnt._zIndex = (+elmnt.style.zIndex || 0);
+    console.log(elmnt._zIndex);
+    let endX = 0; let endY = 0; let startX = 0; let startY = 0;
 
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + 'px';
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + 'px';
-  }
+    // Must contain a .header element:
+    document.querySelector(`#${elmnt.id} .header`).onmousedown = dragMouseDown;
 
-  function closeDragElement() {
-    // stop moving when mouse button is released:
-    document.onmouseup = null;
-    document.onmousemove = null;
+    function dragMouseDown(e) {
+      e = e || window.event;
+      // e.preventDefault();
+      startX = e.clientX;
+      startY = e.clientY;
+      document.onmouseup = closeDragElement;
+      document.onmousemove = elementDrag;
+
+      elmnt.style.zIndex = (Math.max(elements.map((x) => +x.style.zIndex)) || 0) + 1;
+      for (const element of elements.filter((x) => x !== elmnt)) {
+        element.style.zIndex = Math.max(0, (+element.style.zIndex || 0) - 1);
+      }
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+      endX = startX - e.clientX;
+      endY = startY - e.clientY;
+      startX = e.clientX;
+      startY = e.clientY;
+      elmnt.style.top = (elmnt.offsetTop - endY) + 'px';
+      elmnt.style.left = (elmnt.offsetLeft - endX) + 'px';
+    }
+
+    function closeDragElement() {
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
   }
 }

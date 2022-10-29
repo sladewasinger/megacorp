@@ -1,6 +1,7 @@
 export class Utility {
   constructor(name, cost) {
     this.name = name;
+    this.title = name;
     this.type = 'property';
     this.subtype = 'utility';
 

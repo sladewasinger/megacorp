@@ -132,12 +132,67 @@ export class RailroadTile {
     tileContainer.addChild(this.noSymbolImage);
     this.noSymbolImage.visible = false;
 
+    const statusCard = new PIXI.Container();
+    statusCard.visible = false;
+
+    const statusCardTile = new PIXI.Graphics();
+    statusCardTile.beginFill(0xffffff);
+    statusCardTile.lineStyle(2, 0x000000, 1);
+    statusCardTile.drawRect(0, 0, this.width * 2, this.height * 2);
+    statusCardTile.endFill();
+    statusCardTile.with = this.width * 2;
+    statusCardTile.height = this.height * 2;
+    statusCardTile.pivot = new PIXI.Point(statusCardTile.width / 2, statusCardTile.height / 2);
+    statusCardTile.x = 0;
+    statusCardTile.y = 0;
+    statusCardTile.hitArea = new PIXI.Rectangle(0, 0, statusCardTile.width, statusCardTile.height);
+    statusCard.addChild(statusCardTile);
+
+    statusCard.x = container._width - this.height - statusCardTile.width / 2 - 10;
+    statusCard.y = container._height - this.height - statusCardTile.height / 2 - 10;
+
+    const statusCardTitle = new PIXI.Text(this.title, {
+      fontFamily: 'Arial',
+      fontSize: 24,
+      fill: 0x000000,
+      align: 'center',
+      wordWrap: true,
+      wordWrapWidth: this.width * 2,
+    });
+    statusCardTitle.pivot.x = statusCardTitle.width / 2;
+    statusCardTitle.x = 0;
+    statusCardTitle.y = 0 - statusCardTile.height / 2 + 10;
+    statusCard.addChild(statusCardTitle);
+
+    this.statusCardText = new PIXI.Text(
+      'Rent: $50\n\nWith 2 Railroads: $100\nWith 3 Railroads: $200\nWith 4 Railroads: $400',
+      {
+        fontFamily: 'Arial',
+        fontSize: 18,
+        fill: 0x000000,
+        align: 'center',
+        wordWrap: true,
+        wordWrapWidth: statusCardTile.width,
+      },
+    );
+    this.statusCardText.pivot.x = this.statusCardText.width / 2;
+    this.statusCardText.x = 0;
+    this.statusCardText.y = -this.statusCardText.height / 2;
+    statusCard.addChild(this.statusCardText);
+    container.addChild(statusCard);
+
     tileContainer.x = x;
     tileContainer.y = y;
     tileContainer.rotation = rotation;
 
     tileContainer.interactive = true;
     tileContainer.buttonMode = false;
+    tileContainer.on('mouseover', () => {
+      statusCard.visible = true;
+    });
+    tileContainer.on('mouseout', () => {
+      statusCard.visible = false;
+    });
     tileContainer.on('click', () => {
       if (this.renderState.propertyActionInProgress) {
         switch (this.renderState.propertyAction) {

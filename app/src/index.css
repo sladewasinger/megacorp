@@ -13,6 +13,10 @@ body {
   overflow: hidden;
 }
 
+[v-cloak] {
+  display: none;
+}
+
 #app {
   padding: 0;
 }
@@ -60,6 +64,150 @@ body {
 #auction-box form {
   display: flex;
   flex-direction: row;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+/* *********************************** */
+/* Trade Box */
+#trade-box {
+  background-color: #fff;
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 5px;
+  top: 450px;
+  right: 50px;
+  left: auto;
+  width: 450px;
+  height: 350px;
+  box-shadow: rgb(0 0 0) 10px 10px 15px;
+  resize: both;
+  overflow: auto;
+}
+
+#trade-box .header {
+  background-color: rgb(253, 207, 0);
+  color: rgb(0, 0, 0);
+  border: 1px solid #000;
+  font-weight: bold;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  padding: 5px;
+  text-align: center;
+  cursor: move;
+  min-height: 40px;
+}
+
+#trade-box .content {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#trade-box .trade-select {
+  height: 30px;
+  border-radius: 5px;
+}
+
+.accept-button {
+  height: 30px;
+  background-color: #006d00;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.reject-button {
+  height: 30px;
+  background-color: #aa0000;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.button:hover {
+  cursor: pointer;
+  filter: brightness(1.5);
+  box-shadow: #000 2px 2px 7px;
+  font-weight: 800;
+}
+
+.button:disabled {
+  cursor: default;
+}
+
+/* *********************************** */
+/* Create Trade Box */
+#create-trade-box {
+  background-color: #fff;
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 5px;
+  top: 50px;
+  right: 50px;
+  width: 450px;
+  height: 350px;
+  box-shadow: rgb(0 0 0) 10px 10px 15px;
+  resize: both;
+  overflow: auto;
+}
+
+#create-trade-box .header {
+  background-color: rgb(253, 207, 0);
+  color: rgb(0, 0, 0);
+  border: 1px solid #000;
+  font-weight: bold;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  padding: 5px;
+  text-align: center;
+  cursor: move;
+  min-height: 40px;
+}
+
+#create-trade-box .content {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.x-button {
+  display: block;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 16px;
+  transform: scale(2, 1);
+  border: 1px solid #000;
+  margin-right: 10px;
+  padding: 4px;
+}
+
+/* ----------------------------------------- */
+
+.square {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 1px solid #000;
+  background-color: #fff;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: 5px;
 }
 
 .wobble-horizontal {

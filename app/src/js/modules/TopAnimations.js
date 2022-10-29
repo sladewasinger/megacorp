@@ -16,12 +16,17 @@ export class TopAnimations {
   update(gameState, renderState, tiles) {
     if (
       (
-        gameState.state.name == 'TurnStart' &&
-        (gameState.prevState.name == 'TurnEnd' || !gameState.prevState) &&
+        gameState.state.name == 'RollDice' &&
+        // gameState.state.name == 'TurnStart' &&
+        // (gameState.prevState.name == 'TurnEnd' || !gameState.prevState) &&
         gameState.currentPlayer.id == gameState.myId
       )
     ) {
       this.drawYourTurnText();
+    }
+
+    if (gameState.prevState.name == 'RollDice' && gameState.currentPlayer.id == gameState.myId) {
+      this.clearYourTurnText();
     }
 
     if (
@@ -29,11 +34,11 @@ export class TopAnimations {
       gameState.prevState.name == 'Auction'
     ) {
       if (gameState.auction.highestBidder.id == gameState.myId) {
-        this.drawYouWonAuctionText('You won the auction!',
+        this.drawWonAuctionText('You won the auction!',
           gameState.auction.highestBidder.color);
       } else {
-        this.drawYouWonAuctionText(`${gameState.auction.highestBidder.name} won the auction.`,
-          gameState.auction.highestBidder.color);
+        this.drawWonAuctionText(`${gameState.auction.highestBidder.name} won the auction ` +
+          `for $${gameState.auction.highestBid}.`, gameState.auction.highestBidder.color);
       }
     }
 
@@ -48,23 +53,31 @@ export class TopAnimations {
   }
 
   drawYourTurnText() {
-    const yourTurnText = new PIXI.Text('Your Turn', {
-      fontFamily: 'Arial',
-      fontSize: 200,
-      fontWeight: 'bold',
-      fill: 0x000000,
-      align: 'center',
-    });
-    yourTurnText.pivot.x = yourTurnText.width / 2;
-    yourTurnText.pivot.y = yourTurnText.height / 2;
-    yourTurnText.x = this.width / 2;
-    yourTurnText.y = this.height / 2;
-    this.animationsContainer.addChild(yourTurnText);
-
-    this.fade(yourTurnText, 1);
+    if (!this.yourTurnText) {
+      const yourTurnText = new PIXI.Text('Your Turn', {
+        fontFamily: 'Arial',
+        fontSize: 200,
+        fontWeight: 'bold',
+        fill: 0x000000,
+        align: 'center',
+      });
+      yourTurnText.pivot.x = yourTurnText.width / 2;
+      yourTurnText.pivot.y = yourTurnText.height / 2;
+      yourTurnText.x = this.width / 2;
+      yourTurnText.y = this.height / 2;
+      this.yourTurnText = yourTurnText;
+      this.animationsContainer.addChild(yourTurnText);
+    }
   }
 
-  drawYouWonAuctionText(text, color) {
+  clearYourTurnText() {
+    if (this.yourTurnText) {
+      this.fade(this.yourTurnText, 1);
+      this.yourTurnText = null;
+    }
+  }
+
+  drawWonAuctionText(text, color) {
     const youWonAuctionText = new PIXI.Text(text, {
       fontFamily: 'Arial',
       fontSize: 80,

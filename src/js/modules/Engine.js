@@ -35,6 +35,10 @@ export class Engine {
         socket.on('sellHouse', (propertyId, callbackFn) =>
           this.sellHouse(socket.id, propertyId, callbackFn));
         socket.on('declareBankruptcy', (callbackFn) => this.declareBankruptcy(socket.id, callbackFn));
+        socket.on('createTrade', (trade, callbackFn) => this.createTrade(socket.id, trade, callbackFn));
+        socket.on('acceptTrade', (tradeId, callbackFn) => this.acceptTrade(socket.id, tradeId, callbackFn));
+        socket.on('rejectTrade', (tradeId, callbackFn) => this.rejectTrade(socket.id, tradeId, callbackFn));
+        socket.on('cancelMyTrades', (callbackFn) => this.cancelMyTrades(socket.id, callbackFn));
         socket.on('Error', (error) => {
           console.log(error);
           socket.emit('Error', error);
@@ -513,6 +517,158 @@ export class Engine {
 
     try {
       lobby.game.declareBankruptcy(player);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    const gameState = this.getClientGameState(lobby, user);
+    callbackFn(null, gameState);
+    this.emitClientGameStateToLobby(lobby);
+  }
+
+  createTrade(socketId, trade, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+
+    console.log('Engine: createTrade', trade);
+
+    try {
+      lobby.game.createTrade(player, trade);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    const gameState = this.getClientGameState(lobby, user);
+    callbackFn(null, gameState);
+    this.emitClientGameStateToLobby(lobby);
+  }
+
+  acceptTrade(socketId, tradeId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+    const trade = lobby.game.gameState.trades.find((trade) => trade.id === tradeId);
+    if (!trade) {
+      callbackFn('Trade not found');
+      return;
+    }
+    if (player.id !== trade.targetPlayerId) {
+      callbackFn('You are not the target of this trade');
+      return;
+    }
+
+    try {
+      lobby.game.acceptTrade(player.id, trade.id);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    const gameState = this.getClientGameState(lobby, user);
+    callbackFn(null, gameState);
+    this.emitClientGameStateToLobby(lobby);
+  }
+
+  rejectTrade(socketId, tradeId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+    const trade = lobby.game.gameState.trades.find((trade) => trade.id === tradeId);
+    if (!trade) {
+      callbackFn('Trade not found');
+      return;
+    }
+    if (player.id !== trade.targetPlayerId) {
+      callbackFn('You are not the target of this trade');
+      return;
+    }
+
+    try {
+      lobby.game.rejectTrade(trade.id);
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        callbackFn(error.message);
+        return;
+      }
+      callbackFn(error);
+      return;
+    }
+    const gameState = this.getClientGameState(lobby, user);
+    callbackFn(null, gameState);
+    this.emitClientGameStateToLobby(lobby);
+  }
+
+  cancelMyTrades(socketId, callbackFn) {
+    const user = this.users.find((user) => user.id === socketId);
+    if (!user) {
+      callbackFn('User not found');
+      return;
+    }
+    const lobby = this.lobbies.find((lobby) => lobby.users.includes(user));
+    if (!lobby) {
+      callbackFn('Lobby not found');
+      return;
+    }
+    const player = lobby.game.gameState.players.find((player) => player.id === user.id);
+    if (!player) {
+      callbackFn('You are not in this game');
+      return;
+    }
+
+    try {
+      lobby.game.cancelMyTrades(player);
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {

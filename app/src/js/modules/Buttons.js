@@ -39,29 +39,58 @@ export class Buttons {
     this.drawBuyPropertyButton();
     this.drawAuctionPropertyButton();
     this.drawEndTurnButton();
-    this.unmortgageButton = new Button(this.buttonsContainer, 300, -50, 100, 50, 'Buy Back', 0xffff00, 0x000000,
+    this.unmortgageButton = new Button(this.buttonsContainer, 350, -50, 100, 50, 'Buy Back', 0xffff00, 0x000000,
       () => {
-        this.renderState.propertyActionInProgress = !this.renderState.propertyActionInProgress;
-        this.renderState.propertyAction = 'unmortgage';
+        if (this.renderState.propertyAction == 'unmortgage') {
+          this.renderState.propertyAction = '';
+          this.renderState.propertyActionInProgress = false;
+        } else {
+          this.renderState.propertyAction = 'unmortgage';
+          this.renderState.propertyActionInProgress = true;
+        }
       });
-    this.mortgageButton = new Button(this.buttonsContainer, 300, 0, 100, 50, 'Mortgage', 0xffff00, 0x000000,
+    this.mortgageButton = new Button(this.buttonsContainer, 350, 0, 100, 50, 'Mortgage', 0xffff00, 0x000000,
       () => {
-        this.renderState.propertyActionInProgress = !this.renderState.propertyActionInProgress;
-        this.renderState.propertyAction = 'mortgage';
+        if (this.renderState.propertyActionInProgress) {
+          this.renderState.propertyActionInProgress = false;
+          this.renderState.propertyAction = '';
+        } else {
+          this.renderState.propertyActionInProgress = true;
+          this.renderState.propertyAction = 'mortgage';
+        }
       });
-    this.bankruptcyButton = new Button(this.buttonsContainer, 400, 0, 100, 50, 'Declare Bankruptcy',
+    this.bankruptcyButton = new Button(this.buttonsContainer, 300, 0, 100, 50, 'Declare Bankruptcy',
       0xff0000, 0x000000,
       () => {
         this.renderState.declareBankruptcyCallback();
       });
-    this.sellHouseButton = new Button(this.buttonsContainer, 300, 50, 100, 50, 'Sell House', 0xff0000, 0xffffff, () => {
-      this.renderState.propertyActionInProgress = !this.renderState.propertyActionInProgress;
-      this.renderState.propertyAction = 'sellHouse';
+    this.sellHouseButton = new Button(this.buttonsContainer, 350, 50, 100, 50, 'Sell House', 0xff0000, 0xffffff, () => {
+      if (this.renderState.propertyActionInProgress) {
+        this.renderState.propertyActionInProgress = false;
+        this.renderState.propertyAction = '';
+      } else {
+        this.renderState.propertyActionInProgress = true;
+        this.renderState.propertyAction = 'sellHouse';
+      }
     });
-    this.buyHouseButton = new Button(this.buttonsContainer, 300, 100, 100, 50, 'Buy House', 0x00ff00, 0x000000, () => {
-      this.renderState.propertyActionInProgress = !this.renderState.propertyActionInProgress;
-      this.renderState.propertyAction = 'buyHouse';
+    this.buyHouseButton = new Button(this.buttonsContainer, 350, 100, 100, 50, 'Buy House', 0x00ff00, 0x000000, () => {
+      if (this.renderState.propertyActionInProgress) {
+        this.renderState.propertyActionInProgress = false;
+        this.renderState.propertyAction = '';
+      } else {
+        this.renderState.propertyActionInProgress = true;
+        this.renderState.propertyAction = 'buyHouse';
+      }
     });
+    this.tradeButton = new Button(this.buttonsContainer, 500, 100, 100, 50, 'Create Trade', 0x00ff00, 0x000000, () => {
+      console.log('Trade button pressed.');
+      this.renderState?.openTradeDialogCallback();
+    });
+    this.viewTradesButton = new Button(this.buttonsContainer,
+      500, 50, 100, 50, 'Trades (0)', 0x00ff00, 0x000000, () => {
+        console.log('View Trades button pressed.');
+        this.renderState?.openViewTradesDialogCallback();
+      });
   }
 
   setPosition(x, y) {
@@ -70,7 +99,14 @@ export class Buttons {
   }
 
   update(gameState, renderState) {
+    this.gameState = gameState;
     this.renderState = renderState;
+    this.renderState.tradesOfferedToMe = () => {
+      return this.gameState?.trades?.filter((trade) => {
+        return trade.targetPlayerId === this.gameState?.myId;
+      }) || [];
+    };
+    const myPlayer = gameState.players.find((player) => player.id === gameState.myId);
     if (renderState.animationInProgress ||
       renderState.playerMovementInProgress ||
       renderState.auctionInProgress ||
@@ -102,8 +138,11 @@ export class Buttons {
     }
 
     // Unmortgage button
-    const unmortgageEnabled = (gameState.state.name == 'TurnEnd' || gameState.state.name == 'Bankruptcy') &&
-      (!renderState.propertyActionInProgress || renderState.propertyAction == 'unmortgage');
+    const unmortgageEnabled = (renderState.propertyAction == 'unmortgage') || (
+      (gameState.state.name == 'TurnEnd' || gameState.state.name == 'Bankruptcy') &&
+      (!renderState.propertyActionInProgress || renderState.propertyAction == 'unmortgage') &&
+      (gameState.tiles.filter((tile) => tile.owner?.id == myPlayer.id).some((tile) => tile.mortgaged))
+    );
     if (unmortgageEnabled) {
       this.unmortgageButton.enable();
     } else {
@@ -111,9 +150,11 @@ export class Buttons {
     }
 
     // Mortgage button
-    const mortgageEnabled = (gameState.state.name == 'TurnEnd' ||
-      gameState.state.name == 'Bankruptcy') &&
-      (!renderState.propertyActionInProgress || renderState.propertyAction == 'mortgage');
+    const mortgageEnabled = renderState.propertyAction == 'mortgage' || (
+      (!renderState.propertyActionInProgress || renderState.propertyAction == 'mortgage') &&
+      (gameState.state.name == 'TurnEnd' || gameState.state.name == 'Bankruptcy') &&
+      (gameState.tiles.filter((tile) => tile.owner?.id == myPlayer.id).some((tile) => !tile.mortgaged))
+    );
     if (mortgageEnabled) {
       this.mortgageButton.enable();
     } else {
@@ -130,7 +171,7 @@ export class Buttons {
 
     // Buy House button
     const colorTileGroups = groupBy(gameState.tiles.filter((t) => t.type == 'property'), (t) => t.color);
-    let ownsAtLeastOneColorGroup = true; // false;
+    let ownsAtLeastOneColorGroup = false;
     for (const [, tiles] of colorTileGroups) {
       const ownsAllTiles = tiles.every((t) => t.owner?.id == gameState.myId);
       if (ownsAllTiles) {
@@ -138,9 +179,11 @@ export class Buttons {
         break;
       }
     }
-    const buyHouseEnabled = (gameState.state.name == 'TurnEnd' &&
-      ownsAtLeastOneColorGroup) &&
-      (!renderState.propertyActionInProgress || renderState.propertyAction == 'buyHouse');
+    const buyHouseEnabled = (renderState.propertyAction == 'buyHouse') || (
+      (gameState.state.name == 'TurnEnd' && ownsAtLeastOneColorGroup) &&
+      (!renderState.propertyActionInProgress || renderState.propertyAction == 'buyHouse') &&
+      (gameState.tiles.filter((tile) => tile.owner?.id == myPlayer.id).some((tile) => tile.houses < 5)) &&
+      (myPlayer.money >= 50));
     if (buyHouseEnabled) {
       this.buyHouseButton.enable();
     } else {
@@ -148,13 +191,27 @@ export class Buttons {
     }
 
     // Sell House button
-    const sellHouseEnabled = (gameState.state.name == 'TurnEnd' || gameState.state.name == 'Bankruptcy') &&
-      (!renderState.propertyActionInProgress || renderState.propertyAction == 'sellHouse');
+    const sellHouseEnabled = (renderState.propertyAction == 'sellHouse') || (
+      (gameState.state.name == 'TurnEnd' || gameState.state.name == 'Bankruptcy') &&
+      (!renderState.propertyActionInProgress || renderState.propertyAction == 'sellHouse') &&
+      (gameState.tiles.filter((tile) => tile.owner?.id == myPlayer.id).some((tile) => tile.houses > 0))
+    );
     if (sellHouseEnabled) {
       this.sellHouseButton.enable();
     } else {
       this.sellHouseButton.disable();
     }
+
+    // Trade button
+    const tradeEnabled = gameState.state.name == 'TurnEnd' && !renderState.propertyActionInProgress;
+    if (tradeEnabled) {
+      this.tradeButton.enable();
+    } else {
+      this.tradeButton.disable();
+    }
+
+    // View Trades Button
+    this.viewTradesButton.buttonText.text = `Trades (${renderState.tradesOfferedToMe().length})`;
   }
 
   disable() {
@@ -179,6 +236,8 @@ export class Buttons {
     this.bankruptcyButton.disable();
     this.sellHouseButton.disable();
     this.buyHouseButton.disable();
+    this.tradeButton.disable();
+    this.viewTradesButton.buttonText.text = `Trades (${this.renderState?.tradesOfferedToMe().length})`;
   }
 
   enable() {
@@ -202,6 +261,7 @@ export class Buttons {
     this.bankruptcyButton.enable();
     this.sellHouseButton.enable();
     this.buyHouseButton.enable();
+    this.tradeButton.enable();
   }
 
   enableBuyAndAuctionButtons() {
@@ -380,7 +440,7 @@ export class Button {
     this.buttonBox.endFill();
     button.addChild(this.buttonBox);
 
-    const fontSize = this.text.length > 10 ? 19 : 24;
+    const fontSize = Math.max(this.text.split(' ').sort().map((x) => x.length)) >= 8 ? 19 : 24;
     this.buttonText = new PIXI.Text(this.text, {
       fontFamily: 'Arial',
       fontSize: fontSize,
