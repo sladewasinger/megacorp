@@ -1,5 +1,8 @@
+import { randomUUID } from 'crypto';
+
 export class Railroad {
   constructor(name, cost) {
+    this.id = randomUUID();
     this.name = name;
     this.title = name;
     this.type = 'property';

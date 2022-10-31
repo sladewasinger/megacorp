@@ -70,18 +70,6 @@ export class Engine {
     }
 
     this.board.update(this.gameState);
-    // if (
-    //   (
-    //     gameState.currentPlayer?.directMovement ||
-    //     gameState.state.name == 'TurnStart' ||
-    //     gameState.prevState?.name == 'TurnEnd'
-    //   ) &&
-    //   (this.board.players?.length ?? 0) > 0 &&
-    //   this.board.renderState.lastGameStateProcessed != gameState.id
-    // ) {
-    //   this.board.drawPlayerMoveAnimation(gameState,
-    //     gameState.currentPlayer.id, gameState.currentPlayer.prevPosition, gameState.currentPlayer.position);
-    // }
   }
 
   update() {

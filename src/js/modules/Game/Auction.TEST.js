@@ -39,7 +39,7 @@ export default class AuctionTests {
     const player1 = new Player('1', 'Player 1');
     const player2 = new Player('2', 'Player 2');
     const player3 = new Player('3', 'Player 3');
-    player3.money = 0;
+    player3.money = -1;
 
     const game = new Game([player1, player2, player3]);
     game.rollDice(1, 2);

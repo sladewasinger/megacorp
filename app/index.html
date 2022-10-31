@@ -128,7 +128,7 @@
               <h2>You Give:</h2>
               <ul>
                 <li v-for="prop in myProperties" :key="prop">
-                  <input type="checkbox" v-model="tradeRequest.offer.properties" :value="prop.name">
+                  <input type="checkbox" v-model="tradeRequest.offer.properties" :value="prop.id">
                   <span class="square"
                     :style="{ backgroundColor: '#' + (prop.color?.toString(16) || '000000') }"></span>
                   {{ prop.name }}
@@ -142,7 +142,7 @@
               <h2>You Get:</h2>
               <ul>
                 <li v-for="prop in tradeTargetOwnedProperties" :key="prop">
-                  <input type="checkbox" v-model="tradeRequest.request.properties" :value="prop.name">
+                  <input type="checkbox" v-model="tradeRequest.request.properties" :value="prop.id">
                   <span class="square"
                     :style="{ backgroundColor: '#' + (prop.color?.toString(16) || '000000') }"></span>
                   {{ prop.name }}
