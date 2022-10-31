@@ -75,6 +75,10 @@ export class Engine {
       callbackFn('Name already registered');
       return;
     }
+    if (this.users.find((user) => user.name?.toUpperCase() === name.toUpperCase())) {
+      callbackFn('Name already taken!');
+      return;
+    }
     console.log('registerName', name);
     user.name = name;
     callbackFn(null, user);

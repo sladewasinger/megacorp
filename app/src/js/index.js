@@ -150,7 +150,6 @@ createApp({
       this.engine.cancelMyTrades();
     },
     tradeRequestNameChanged(e) {
-      console.log('resetting trade request');
       this.tradeRequet = {
         targetPlayerId: this.tradeRequest.targetPlayerId,
         offer: {
@@ -180,7 +179,6 @@ function makeDraggable(elements) {
   for (let i = 0; i < elements.length; i++) {
     const elmnt = elements[i];
     elmnt._zIndex = (+elmnt.style.zIndex || 0);
-    console.log(elmnt._zIndex);
     let endX = 0; let endY = 0; let startX = 0; let startY = 0;
 
     // Must contain a .header element:
