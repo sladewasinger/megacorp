@@ -1,5 +1,7 @@
+import { randomUUID } from 'crypto';
 export class Utility {
   constructor(name, cost) {
+    this.id = randomUUID();
     this.name = name;
     this.title = name;
     this.type = 'property';

@@ -18,6 +18,35 @@ export default class GameTests {
     Assert.equal(player2, game.gameState.currentPlayer);
   }
 
+
+  tradePropertyTeset() {
+    const players = [
+      new Player('1', 'Player 1'),
+      new Player('2', 'Player 2'),
+    ];
+    const game = new Game(players);
+    game.rollDice(1, 2); // Land on Baltic Avenue
+    Assert.equal('Baltic Avenue', game.stateMachine.currentState.name);
+    game.buyProperty();
+
+    game.createTrade(players[0], {
+      targetPlayerId: players[1].id,
+      authorPlayerId: players[0].id,
+      offer: {
+        properties: [game.stateMachine.getStates().find((tile) => tile.name === 'Baltic Avenue').id],
+        money: 0,
+      },
+      request: {
+        properties: [],
+        money: 120,
+      },
+    });
+    game.acceptTrade(game.gameState.trades[0].id);
+    Assert.equal(0, game.gameState.trades.length);
+    Assert.equal(0, players[0].properties.length);
+    Assert.equal(1, players[1].properties.length);
+  }
+
   buyPropertyTest() {
     const players = [
       new Player('1', 'Player 1'),

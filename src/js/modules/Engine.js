@@ -593,7 +593,7 @@ export class Engine {
     }
 
     try {
-      lobby.game.acceptTrade(player.id, trade.id);
+      lobby.game.acceptTrade(trade.id);
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {
