@@ -77,24 +77,24 @@
               <div>
                 <h2>You Give:</h2>
                 <ul>
+                  <li v-if="selectedTrade.request.money > 0">
+                    <b>Money: ${{ selectedTrade.request.money }}</b>
+                  </li>
                   <li v-for="prop in selectedTrade.request.properties" :key="prop">
                     <span class="square" :style="{ backgroundColor: prop.color}"></span>
                     {{ prop.name }}
-                  </li>
-                  <li>
-                    <b>Money: ${{ selectedTrade.request.money }}</b>
                   </li>
                 </ul>
               </div>
               <div>
                 <h2>You Get:</h2>
                 <ul>
+                  <li v-if="selectedTrade.offer.money > 0">
+                    <b>Money: ${{ selectedTrade.offer.money }}</b>
+                  </li>
                   <li v-for="prop in selectedTrade.offer.properties" :key="prop">
                     <span class="square" :style="{ backgroundColor: prop.color}"></span>
                     {{ prop.name }}
-                  </li>
-                  <li>
-                    <b>Money: ${{ selectedTrade.offer.money }}</b>
                   </li>
                 </ul>
               </div>
@@ -126,31 +126,31 @@
             </select>
           </div>
           <div class="flex-row space-between" v-if="tradeRequest.targetPlayerId">
-            <div style="border-right: 1px solid #000; padding-right: 10px">
+            <div>
               <h2>You Give:</h2>
               <ul>
+                <li>
+                  <b>$</b><input style="width: 50px" type="text" v-model="tradeRequest.offer.money">
+                </li>
                 <li v-for="prop in myProperties" :key="prop">
                   <input type="checkbox" v-model="tradeRequest.offer.properties" :value="prop.id">
                   <span class="square"
                     :style="{ backgroundColor: '#' + (prop.color?.toString(16) || '000000') }"></span>
                   {{ prop.name }}
                 </li>
-                <li>
-                  <b>$</b><input style="width: 50px" type="text" v-model="tradeRequest.offer.money">
-                </li>
               </ul>
             </div>
             <div style="padding-left: 10px">
               <h2>You Get:</h2>
               <ul>
+                <li>
+                  <b>$</b><input style="width: 50px" type="text" v-model="tradeRequest.request.money">
+                </li>
                 <li v-for="prop in tradeTargetOwnedProperties" :key="prop">
                   <input type="checkbox" v-model="tradeRequest.request.properties" :value="prop.id">
                   <span class="square"
                     :style="{ backgroundColor: '#' + (prop.color?.toString(16) || '000000') }"></span>
                   {{ prop.name }}
-                </li>
-                <li>
-                  <b>$</b><input style="width: 50px" type="text" v-model="tradeRequest.request.money">
                 </li>
               </ul>
             </div>
