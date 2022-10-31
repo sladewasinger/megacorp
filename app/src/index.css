@@ -95,6 +95,8 @@ body {
   text-align: center;
   cursor: move;
   min-height: 40px;
+  position: sticky;
+  top: 0;
 }
 
 #trade-box .content {
@@ -160,6 +162,8 @@ body {
   text-align: center;
   cursor: move;
   min-height: 40px;
+  position: sticky;
+  top: 0;
 }
 
 #create-trade-box .content {
@@ -196,6 +200,7 @@ body {
 .flex-row {
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
 
 .space-between {

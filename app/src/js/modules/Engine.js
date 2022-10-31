@@ -91,6 +91,7 @@ export class Engine {
     this.socket.emit('registerName', name, (error, result) => {
       if (error) {
         console.error(error);
+        this.createDangerAlert(error);
         return;
       }
       this.user = result;
@@ -101,6 +102,7 @@ export class Engine {
     this.socket.emit('joinLobby', lobbyId, (error, result) => {
       if (error) {
         console.error(error);
+        this.createDangerAlert(error);
         return;
       }
       this.lobby = result;
@@ -321,5 +323,48 @@ export class Engine {
 
   resize() {
     this.app.renderer.resize(window.innerWidth, window.innerHeight);
+  }
+
+  createDangerAlert(msg) {
+    if (msg instanceof Error) {
+      msg = msg.message;
+    }
+    new DangerAlert(msg);
+  }
+}
+
+export class Alert {
+  constructor(msg) {
+    this.msg = msg;
+    this.alert = document.createElement('div');
+    this.alert.classList.add('alert');
+    this.alert.innerHTML = this.getInnerHtml(msg);
+    const alertContainer = document.getElementById('alert-container');
+    if (!alertContainer) {
+      console.error('No alert container found');
+      return;
+    }
+    alertContainer.appendChild(this.alert);
+    setTimeout(() => {
+      this.alert.remove();
+    }, 3000);
+  }
+
+  getInnerHtml(msg) {
+    return `
+      <p>${msg}</p>
+    `;
+  }
+}
+export class DangerAlert extends Alert {
+  constructor(msg) {
+    super(msg);
+    this.alert.classList.add('danger');
+  }
+
+  getInnerHtml(msg) {
+    return `
+      <p><strong>Error!</strong> ${msg}</p>
+    `;
   }
 }

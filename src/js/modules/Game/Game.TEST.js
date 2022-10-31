@@ -18,7 +18,6 @@ export default class GameTests {
     Assert.equal(player2, game.gameState.currentPlayer);
   }
 
-
   tradePropertyTeset() {
     const players = [
       new Player('1', 'Player 1'),
@@ -38,6 +37,34 @@ export default class GameTests {
       },
       request: {
         properties: [],
+        money: 120,
+      },
+    });
+    game.acceptTrade(game.gameState.trades[0].id);
+    Assert.equal(0, game.gameState.trades.length);
+    Assert.equal(0, players[0].properties.length);
+    Assert.equal(1, players[1].properties.length);
+  }
+
+  tradePropertyTeset_Railroad() {
+    const players = [
+      new Player('1', 'Player 1'),
+      new Player('2', 'Player 2'),
+    ];
+    const game = new Game(players);
+    game.rollDice(1, 24); // Land on Baltic Avenue
+    Assert.equal('B. & O. Railroad', game.stateMachine.currentState.name);
+    game.buyProperty();
+
+    game.createTrade(players[1], {
+      targetPlayerId: players[0].id,
+      authorPlayerId: players[1].id,
+      offer: {
+        properties: [],
+        money: 0,
+      },
+      request: {
+        properties: [game.stateMachine.getStates().find((tile) => tile.name === 'B. & O. Railroad').id],
         money: 120,
       },
     });

@@ -404,7 +404,7 @@ export class Game {
     }
     const otherPlayerOwnedProperties = PlayerUtils.getProperties(otherPlayer, this.stateMachine, this.gameState);
     for (const requestTile of trade.request.properties) {
-      if (!otherPlayerOwnedProperties.find((x) => x.id === requestTile.id)) {
+      if (!otherPlayerOwnedProperties.find((x) => x.id === requestTile)) {
         throw new Error('Target player doesn\'t own this property!');
       }
     }
