@@ -59,11 +59,22 @@ try {
     for (const testName of tests) {
       let exceptionThrown = false;
 
+      let testLog = [];
+      const originalConsoleLog = console.log;
       try {
+        testLog = [];
         console.log(chalk.yellow(`[${testName}]`));
+        console.log = (...args) => {
+          testLog.push(args);
+        };
         test.default.prototype[testName]();
+        console.log = originalConsoleLog;
       } catch (e) {
+        console.log = originalConsoleLog;
         exceptionThrown = true;
+        for (const log of testLog) {
+          console.log(...log);
+        }
         console.log(chalk.red(`[TEST FAILED] ${testName}`));
         console.log(chalk.bgRed(e));
         console.log(e);
