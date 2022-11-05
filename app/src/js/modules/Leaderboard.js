@@ -27,6 +27,15 @@ export class Leaderboard {
     if (!showingLine) {
       this.hideLineToPlayer();
     }
+
+    const missingPlayer = this.players.some((p) => !this.gameState.players.find((p2) => p2.id == p.id));
+    if (missingPlayer) {
+      this.players.forEach((p) => {
+        this.leaderboardContainer.removeChild(p.playerText);
+        this.leaderboardContainer.removeChild(p.moneyText);
+      });
+      this.drawPlayersInitial(gameState);
+    }
   }
 
   showLineToPlayer(gameState, player, boardPlayers) {

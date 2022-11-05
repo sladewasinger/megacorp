@@ -163,6 +163,27 @@ export class Game {
     this.stateMachine.setState('TurnStart', this.gameState);
   }
 
+  removePlayer(player) {
+    if (this.gameState.currentPlayer.id == player.id) {
+      this.stateMachine.setState('TurnStart', this.gameState);
+    }
+    this.stateMachine.getStates().forEach((state) => {
+      if (state.owner == player.id) {
+        state.owner = null;
+        state.mortgaged = false;
+        state.houses = 0;
+        state.hotel = false;
+      }
+    });
+    this.gameState.players = this.gameState.players.filter((p) => p.id !== player.id);
+    if (this.gameState.players.length == 1) {
+      this.gameState.winner = this.gameState.currentPlayer;
+      this.gameState.gameOver = true;
+      this.stateMachine.setState('GameOver', this.gameState);
+    }
+    this.gameStateUpdatedCallbackFn(this.gameState);
+  }
+
   rollDice(dice1Override, dice2Override) {
     if (this.stateMachine.currentState.name !== 'RollDice' &&
       this.stateMachine.currentState.name !== 'JailDecision') {

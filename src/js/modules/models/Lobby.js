@@ -29,6 +29,10 @@ export class Lobby {
 
   removeUser(user) {
     this.users = this.users.filter((u) => u.id !== user.id);
+    const player = this.game?.gameState?.players.find((p) => p.id === user.id);
+    if (player) {
+      this.game.removePlayer(player);
+    }
   }
 
   getUserById(id) {
